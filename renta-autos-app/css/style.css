@@ -1,0 +1,290 @@
+:root {
+    --primary-color: #91d0bd;
+    --secondary-color: #03211b;
+    --text-main: #c0d9cb;
+    --text-light: #9ab6a7;
+    --bg-light: #22453f;
+    --white: #c0d9cb;
+    --border-color: #26544b;
+    --surface-color: #03211b;
+    --surface-light: #22453f;
+    --page-color: #030506;
+    --light-accent: #c0d9cb;
+    --shadow: 0 6px 16px rgba(3, 5, 6, 0.35);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-main);
+    background-color: var(--page-color);
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 80px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--secondary-color);
+    z-index: 1000;
+}
+
+.logo {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo img {
+    display: block;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+nav ul li a:hover {
+    color: var(--primary-color);
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--light-accent);
+}
+
+/* HERO & SEARCH */
+.hero {
+    padding: 40px 80px;
+    text-align: center;
+}
+
+.search-container {
+    background: var(--surface-color);
+    padding: 10px 30px;
+    border-radius: 40px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 850px;
+    margin: 20px auto;
+    border: 1px solid var(--border-color);
+}
+
+.search-field {
+    flex: 1;
+    padding: 10px;
+    text-align: left;
+    border-right: 1px solid var(--border-color);
+}
+
+.search-field:last-child {
+    border-right: none;
+}
+
+.search-field label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: var(--text-main);
+}
+
+.search-field input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    background: transparent;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* CAR GRID */
+.main-content {
+    padding: 0 80px 40px;
+}
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+}
+
+.car-card {
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.car-card:hover {
+    transform: translateY(-5px);
+}
+
+.car-image {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background-color: var(--surface-light);
+}
+
+.car-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.car-info p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.car-price {
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+/* LOGIN PAGE */
+.login-page {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--page-color);
+}
+
+.login-card {
+    background: var(--surface-color);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-card h2 {
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--text-main);
+    background-color: var(--surface-light);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background-color: var(--light-accent);
+}
+
+.login-footer {
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.login-footer a {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header, .hero, .main-content {
+        padding: 20px;
+    }
+    .search-container {
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 20px;
+        gap: 15px;
+    }
+    .search-field {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        width: 100%;
+    }
+}
