@@ -1,22 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('RentaAutos Home loaded');
+    console.log('Sistema RentaAutos inicializado');
 
+    // Búsqueda de vehículos
     const searchBtn = document.querySelector('.search-btn');
-    const carCards = document.querySelectorAll('.car-card');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const destinationInput = document.getElementById('destination');
+            const destination = destinationInput ? destinationInput.value.trim() : '';
 
-    searchBtn.addEventListener('click', () => {
-        const destination = document.getElementById('destination').value;
-        if (destination) {
-            alert(`Buscando los mejores autos en ${destination}... 🚗`);
-        } else {
-            alert('Por favor, ingresa un destino para buscar.');
-        }
-    });
-
-    carCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const carName = card.querySelector('h3').innerText;
-            alert(`Has seleccionado el ${carName}. ¡Redirigiendo a los detalles de reserva!`);
+            if (destination) {
+                console.log(`Buscando autos disponibles en: ${destination}`);
+            }
         });
-    });
+    }
+
+    // Selección de tarjetas de autos
+    const carCards = document.querySelectorAll('.car-card');
+    if (carCards.length > 0) {
+        carCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const carTitle = card.querySelector('h3');
+                if (carTitle) {
+                    const carName = carTitle.innerText;
+                    console.log(`Auto seleccionado: ${carName}`);
+                }
+            });
+        });
+    }
 });

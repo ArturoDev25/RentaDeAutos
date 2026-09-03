@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Renta de Autos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-page">
+
+    <div class="login-card">
+        <div class="logo">
+            <img src="assets/Imagenes/LogoCar.png" alt="Logo Renta de Autos">
+        </div>
+        
+        <h2>Crear Cuenta</h2>
+        <p class="subtitle">Ingresa tus datos para registrarte</p>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <input type="text" id="nombre" placeholder="Tu nombre completo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-email">Correo Electrónico</label>
+                <input type="email" id="reg-email" placeholder="ejemplo@correo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-password">Contraseña</label>
+                <input type="password" id="reg-password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="login-btn">REGISTRARSE</button>
+        </form>
+
+        <div class="login-footer">
+            <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE AUTENTICACIÓN / REGISTRO -->
+    <script src="js/auth.js"></script>
+</body>
+</html>
