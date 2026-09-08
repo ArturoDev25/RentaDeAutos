@@ -315,3 +315,70 @@ nav a:hover, nav a.active {
     font-weight: 700;
     text-decoration: underline;
 }
+
+/* ---------------------------------------------------- */
+/* DISEÑO RESPONSIVO                                     */
+/* ---------------------------------------------------- */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.2rem;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .hero h1 {
+        font-size: 1.6rem;
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-field {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+}
+
+/* Teléfonos pequeños */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.35rem;
+    }
+
+    .auth-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .auth-buttons .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .main-content h2 {
+        font-size: 1.3rem;
+    }
+}
