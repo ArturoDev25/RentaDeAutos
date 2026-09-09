@@ -1,0 +1,33 @@
+# =====================================================================
+# application-test.yml — Perfil de test desacoplado
+# Usa H2 en memoria (modo MySQL) para que los tests pasen sin
+# necesitar una instancia real de MySQL.
+#
+# Se activa con: @ActiveProfiles("test")
+# =====================================================================
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      # create-drop: H2 crea las tablas al iniciar el contexto y las
+      # destruye al cerrarlo. Idóneo para tests sin entidades aún.
+      ddl-auto: create-drop
+    show-sql: false
+
+  sql:
+    init:
+      # Deshabilitar la inicialización SQL automática en tests;
+      # el DDL se gestiona vía Hibernate ddl-auto.
+      mode: never
+
+# Silenciar logs verbosos de Hibernate durante los tests
+logging:
+  level:
+    org.hibernate: WARN
+    com.zaxxer.hikari: WARN

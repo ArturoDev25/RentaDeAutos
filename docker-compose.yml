@@ -1,0 +1,38 @@
+# =====================================================================
+# docker-compose.yml — Sistema de Renta de Autos
+# Levanta MySQL 8.0 con auto-inicialización del esquema oficial.
+#
+# Uso rápido:
+#   docker compose up -d
+#   docker compose down          # detener (preserva datos)
+#   docker compose down -v       # detener + borrar volumen
+# =====================================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rentadeautos-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE:      ${DB_NAME:-rentadeautos}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_ROOT_HOST:     "%"
+      TZ:                  UTC
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      # Volumen persistente para los datos de MySQL
+      - mysql_data:/var/lib/mysql
+      # Script DDL oficial — se ejecuta automáticamente sólo si el
+      # volumen está vacío (primer arranque del contenedor)
+      - ./V1__init_schema.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql_data:
+    driver: local
