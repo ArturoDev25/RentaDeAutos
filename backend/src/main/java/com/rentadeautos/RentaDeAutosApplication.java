@@ -2,20 +2,15 @@ package com.rentadeautos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
 /**
  * Punto de entrada principal de la aplicación Renta de Autos.
  *
- * <p>DataSourceAutoConfiguration e HibernateJpaAutoConfiguration se excluyen
- * temporalmente para permitir que la aplicación arranque sin una base de datos activa.
- * Estas exclusiones se eliminarán en la issue S1-04 al configurar la conexión real a MySQL.</p>
+ * <p>DataSource y JPA se auto-configuran desde {@code application.yml}.
+ * La conexión a MySQL se gestiona vía HikariCP y se valida contra el
+ * esquema oficial definido en {@code V1__init_schema.sql} (S1-04).</p>
  */
-@SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class
-})
+@SpringBootApplication
 public class RentaDeAutosApplication {
 
     public static void main(String[] args) {
