@@ -25,7 +25,7 @@
 
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/rentadeautos?serverTimezone=UTC
-   spring.datasource.username=${DB_USERNAME}
+   spring.datasource.username=${DB_USER}
    spring.datasource.password=${DB_PASSWORD}
    spring.flyway.enabled=true
    spring.jpa.hibernate.ddl-auto=validate
