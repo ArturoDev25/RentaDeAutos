@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentaAutos - Encuentra tu vehículo ideal</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="assets/Imagenes/LogoCar.png" alt="RentaAutos">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Explorar</a></li>
+                <li><a href="#">Mis Reservas</a></li>
+                <li><a href="#">Ayuda</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <a href="login.html" class="btn">Iniciar Sesión</a>
+            <a href="registro.html" class="btn btn-primary">Registrarse</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>¿A dónde quieres ir hoy?</h1>
+        <div class="search-container">
+            <div class="search-field">
+                <label>Destino</label>
+                <input type="text" placeholder="¿A dónde vas?" id="destination">
+            </div>
+            <div class="search-field">
+                <label>Fecha</label>
+                <input type="date" id="date">
+            </div>
+            <div class="search-field">
+                <label>Tipo de auto</label>
+                <input type="text" placeholder="SUV, Deportivo, etc." id="car-type">
+            </div>
+            <button class="search-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <h2>Autos recomendados para ti</h2>
+        <div class="car-grid" id="carGrid">
+
+            <div class="car-card">
+                <img src="assets/Imagenes/Carros/tesla.jpg" alt="Tesla" class="car-image">
+                <div class="car-info">
+                    <h3>Tesla Model 3</h3>
+                    <p>Eléctrico • 5 Personas</p>
+                    <p class="car-price">$120 / día</p>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="assets/Imagenes/Carros/Tsuru.jpg" alt="Tsuru Tuneado" class="car-image">
+                <div class="car-info">
+                    <h3>Tsuru Tuneado</h3>
+                    <p>Off-road • 4 Personas</p>
+                    <p class="car-price">$90 / día</p>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="assets/Imagenes/Carros/bmw.jpg" alt="BMW" class="car-image">
+                <div class="car-info">
+                    <h3>BMW M4 Competition</h3>
+                    <p>Lujo • 4 Personas</p>
+                    <p class="car-price">$180 / día</p>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="assets/Imagenes/Carros/Ferrari.jpg" alt="Ferrari" class="car-image">
+                <div class="car-info">
+                    <h3>Ferrari F8 Tributo</h3>
+                    <p>Superdeportivo • 2 Personas</p>
+                    <p class="car-price">$500 / día</p>
+                </div>
+            </div>
+            <div class="car-card">
+                <img src="assets/Imagenes/Carros/Audiq7.jpg" alt="Audi" class="car-image">
+                <div class="car-info">
+                    <h3>Audi Q7</h3>
+                    <p>SUV Familiar • 7 Personas</p>
+                    <p class="car-price">$110 / día</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/client.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>

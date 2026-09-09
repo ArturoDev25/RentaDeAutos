@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: renta-de-autos-backend
+
+  # -------------------------------------------------------
+  # DataSource (MySQL) — Configurado en S1-04
+  # Parametrizado con variables de entorno; valores seguros
+  # para desarrollo local como fallback.
+  # Crear .env a partir de .env.example para sobreescribirlos.
+  # -------------------------------------------------------
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/rentadeautos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # -------------------------------------------------------
+    # HikariCP — Pool de conexiones
+    # -------------------------------------------------------
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      pool-name: RentaDeAutosHikariPool
+
+  # -------------------------------------------------------
+  # JPA / Hibernate
+  # -------------------------------------------------------
+  jpa:
+    hibernate:
+      # validate: verifica que las entidades coincidan con el esquema
+      # oficial (V1__init_schema.sql) sin modificar ninguna tabla.
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+# -------------------------------------------------------
+# Servidor
+# -------------------------------------------------------
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# -------------------------------------------------------
+# Logging
+# -------------------------------------------------------
+logging:
+  level:
+    root: INFO
+    com.rentadeautos: DEBUG
