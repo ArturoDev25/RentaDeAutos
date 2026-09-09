@@ -1,0 +1,384 @@
+/* VARIABLES Y PALETA DE COLORES */
+:root {
+    --bg-black: #030506;
+    --bg-card: #03211B;
+    --border-color: #22453F;
+    --bg-input: #26544B;
+    --text-muted: #9AB6A7;
+    --text-light: #C0D9CB;
+    --btn-mint: #91D0BD;
+}
+
+/* RESET GENERAL */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* HEADER / NAVBAR */
+header {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+nav a:hover, nav a.active {
+    color: var(--btn-mint);
+}
+
+.auth-buttons .btn {
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    color: var(--text-light);
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.auth-buttons .btn-primary {
+    background-color: var(--btn-mint);
+    color: var(--bg-black) !important;
+}
+
+.auth-buttons .btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* INDEX - HERO Y BÚSQUEDA */
+.hero {
+    background-color: var(--bg-black);
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+}
+
+.search-container {
+    background-color: var(--bg-card);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.search-field {
+    flex: 1;
+    min-width: 180px;
+    text-align: left;
+}
+
+.search-field label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.search-field input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-field input:focus {
+    border-color: var(--btn-mint);
+}
+
+.search-field input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-btn {
+    background-color: var(--btn-mint);
+    color: var(--bg-black);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.search-btn:hover {
+    opacity: 0.9;
+}
+
+/* INDEX - CATÁLOGO DE AUTOS */
+.main-content {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    width: 100%;
+}
+
+.main-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+}
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.car-card {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.car-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--btn-mint);
+}
+
+.car-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.car-info {
+    padding: 1rem;
+}
+
+.car-info h3 {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+}
+
+.car-info p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.car-price {
+    font-size: 1.1rem !important;
+    font-weight: 700;
+    color: var(--btn-mint) !important;
+}
+
+/* VISTAS DE AUTENTICACIÓN (LOGIN Y REGISTRO) */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--bg-black);
+    padding: 1.5rem;
+}
+
+.login-card {
+    background-color: var(--bg-card);
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.login-card .logo img {
+    height: 150px;
+    width: auto;
+    margin-bottom: 1rem;
+    object-fit: contain;
+}
+
+.login-card h2 {
+    font-size: 1.5rem;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+.login-card .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1.8rem;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--btn-mint);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.login-btn {
+    width: 100%;
+    background-color: var(--btn-mint);
+    color: var(--bg-black);
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s ease;
+}
+
+.login-btn:hover {
+    opacity: 0.9;
+}
+
+.login-footer {
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.login-footer a {
+    color: var(--text-light);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* ---------------------------------------------------- */
+/* DISEÑO RESPONSIVO                                     */
+/* ---------------------------------------------------- */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.2rem;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 0.8rem;
+    }
+
+    .hero {
+        padding: 2rem 1rem;
+    }
+
+    .hero h1 {
+        font-size: 1.6rem;
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-field {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .search-btn {
+        width: 100%;
+    }
+}
+
+/* Teléfonos pequeños */
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 1.35rem;
+    }
+
+    .auth-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .auth-buttons .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .main-content h2 {
+        font-size: 1.3rem;
+    }
+}
