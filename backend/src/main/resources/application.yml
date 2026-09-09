@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: renta-de-autos-backend
+
+  # -------------------------------------------------------
+  # DataSource (MySQL) — Se activa en S1-04
+  # Las variables de entorno tienen valores predeterminados
+  # para facilitar el desarrollo local.
+  # -------------------------------------------------------
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/rentadeautos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: false
+
+# -------------------------------------------------------
+# Servidor
+# -------------------------------------------------------
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# -------------------------------------------------------
+# Logging
+# -------------------------------------------------------
+logging:
+  level:
+    root: INFO
+    com.rentadeautos: DEBUG

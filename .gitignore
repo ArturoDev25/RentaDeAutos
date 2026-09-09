@@ -1,0 +1,91 @@
+# ============================================================
+# .gitignore — Sistema de Renta de Autos
+# ============================================================
+
+# ------------------------------------------------------------
+# Java / Maven — Compilados y artefactos de build
+# ------------------------------------------------------------
+target/
+backend/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# Excepción: el JAR del Maven Wrapper SÍ debe rastrearse
+!backend/.mvn/wrapper/maven-wrapper.jar
+
+# ------------------------------------------------------------
+# Maven
+# ------------------------------------------------------------
+.mvn/timing.properties
+!backend/.mvn/wrapper/maven-wrapper.properties
+
+# ------------------------------------------------------------
+# Logs
+# ------------------------------------------------------------
+*.log
+logs/
+spring.log
+
+# ------------------------------------------------------------
+# IDEs — IntelliJ IDEA
+# ------------------------------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDEs — Eclipse / STS
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# IDEs — VS Code
+.vscode/
+!.vscode/extensions.json
+
+# IDEs — NetBeans
+nbproject/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ------------------------------------------------------------
+# Sistema operativo
+# ------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ------------------------------------------------------------
+# Entorno local / herramientas
+# ------------------------------------------------------------
+.gemini/
+.env
+.env.local
+.env.*.local
+
+# ------------------------------------------------------------
+# Misceláneos
+# ------------------------------------------------------------
+*.tmp
+*.bak
+*.swp
+*.orig
