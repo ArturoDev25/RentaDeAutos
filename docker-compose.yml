@@ -23,9 +23,6 @@ services:
     volumes:
       # Volumen persistente para los datos de MySQL
       - mysql_data:/var/lib/mysql
-      # Script DDL oficial — se ejecuta automáticamente sólo si el
-      # volumen está vacío (primer arranque del contenedor)
-      - ./V1__init_schema.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
       interval: 10s
