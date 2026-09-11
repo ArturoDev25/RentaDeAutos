@@ -3,10 +3,11 @@ package com.rentadeautos.common.exception;
 import com.rentadeautos.common.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
+import org.springframework.security.authentication.BadCredentialsException;
 /**
  * Manejador global de excepciones para la API REST.
  * Intercepta excepciones no controladas y devuelve respuestas con el formato
@@ -33,5 +34,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Error interno del servidor: " + ex.getMessage()));
+    }
+
+    
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Credenciales inválidas"));
     }
 }
