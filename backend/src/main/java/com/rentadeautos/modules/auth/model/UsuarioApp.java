@@ -74,4 +74,8 @@ public class UsuarioApp {
     public void setUltimoAcceso(LocalDateTime ultimoAcceso) {
         this.ultimoAcceso = ultimoAcceso;
     }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }
