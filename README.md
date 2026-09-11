@@ -62,3 +62,11 @@ cd backend
 ./mvnw clean compile   # BUILD SUCCESS
 ./mvnw test            # BUILD SUCCESS (H2, sin MySQL)
 ```
+
+---
+
+## 🔐 Autenticación
+
+Login con JWT y BCrypt. Requiere las variables `JWT_SECRET` y `JWT_EXPIRATION_MINUTES`.
+
+📖 **Guía completa:** [`docs/autenticacion.md`](docs/autenticacion.md)
