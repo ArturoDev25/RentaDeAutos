@@ -84,7 +84,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOriginPatterns(
-                List.of("http://localhost:*", "http://127.0.0.1:*")
+                List.of("*")
         );
         config.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")

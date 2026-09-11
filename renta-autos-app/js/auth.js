@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE LOGIN ---
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const emailInput = document.getElementById('email');
@@ -15,13 +15,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!email || !password) return;
 
-            const usuario = {
-                email: email,
-                token: 'token-simulado-123456'
-            };
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        correo: email,
+                        password: password
+                    })
+                });
 
-            localStorage.setItem('usuarioSesion', JSON.stringify(usuario));
-            window.location.href = 'index.html';
+                const result = await response.json();
+
+                if (result.success) {
+                    const usuario = {
+                        email: result.data.user.correo,
+                        nombre: result.data.user.nombre,
+                        rol: result.data.user.rol,
+                        token: result.data.accessToken
+                    };
+
+                    localStorage.setItem('usuarioSesion', JSON.stringify(usuario));
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Error: ' + (result.message || 'Credenciales inválidas'));
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('No se pudo conectar con el servidor. Asegúrate de que el backend esté corriendo.');
+            }
         });
     }
 
