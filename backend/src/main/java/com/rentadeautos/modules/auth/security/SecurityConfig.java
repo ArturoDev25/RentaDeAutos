@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -49,9 +50,11 @@ public class SecurityConfig {
             )
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, exception) ->
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                        escribirError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                                "No autenticado"))
                 .accessDeniedHandler((request, response, exception) ->
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN))
+                        escribirError(response, HttpServletResponse.SC_FORBIDDEN,
+                                "No tiene permisos para esta operación"))
             )
             .addFilterBefore(
                     jwtAuthenticationFilter,
@@ -59,6 +62,21 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+     /**
+     * Escribe la respuesta de error directamente en lugar de usar sendError().
+     * sendError() provoca un reenvío interno a /error que vuelve a recorrer la
+     * cadena de seguridad sin contexto de autenticación, lo que convertía
+     * cualquier 403 en un 401 (PA-09).
+     */
+    private void escribirError(HttpServletResponse response, int estado, String mensaje)
+            throws IOException {
+        response.setStatus(estado);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(
+                "{\"success\":false,\"message\":\"" + mensaje + "\"}"
+        );
     }
 
     @Bean
