@@ -60,3 +60,13 @@ logging:
   level:
     root: INFO
     com.rentadeautos: DEBUG
+
+# -------------------------------------------------------
+# Autenticación JWT (S1-08)
+# El secreto NUNCA se escribe aquí: viene de la variable
+# de entorno JWT_SECRET definida en .env (excluido de Git).
+# -------------------------------------------------------
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:30}

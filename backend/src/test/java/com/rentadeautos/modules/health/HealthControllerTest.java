@@ -5,16 +5,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
+import com.rentadeautos.modules.auth.security.JwtService;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import com.rentadeautos.modules.auth.security.JwtService;
+import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
+import com.rentadeautos.modules.auth.security.SecurityConfig;
+import org.springframework.context.annotation.Import;
 /**
  * Pruebas unitarias del endpoint GET /api/v1/health.
  *
@@ -24,6 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(HealthController.class)
 @ActiveProfiles("test")
+@Import({SecurityConfig.class, JwtAuthenticationFilter.class})
+
 class HealthControllerTest {
 
     @Autowired
@@ -36,6 +45,13 @@ class HealthControllerTest {
     @MockBean
     private JdbcTemplate jdbcTemplate;
 
+        /**
+     * Necesario desde S1-08: SecurityConfig carga JwtAuthenticationFilter,
+     * que depende de JwtService. @WebMvcTest no incluye los @Service.
+     */
+    @MockBean
+    private JwtService jwtService;
+    
     @Test
     @DisplayName("GET /api/v1/health debe retornar HTTP 200 OK")
     void health_shouldReturn200() throws Exception {

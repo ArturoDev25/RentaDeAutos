@@ -31,3 +31,10 @@ logging:
   level:
     org.hibernate: WARN
     com.zaxxer.hikari: WARN
+
+# Clave fija solo para pruebas. No es un secreto real:
+# el perfil "test" nunca se usa fuera del entorno de pruebas.
+app:
+  jwt:
+    secret: "clave-de-pruebas-unicamente-no-usar-en-ningun-ambiente-real-1234567890"
+    expiration-minutes: 30
