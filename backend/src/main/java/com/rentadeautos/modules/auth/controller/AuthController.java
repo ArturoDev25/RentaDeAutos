@@ -3,6 +3,7 @@ package com.rentadeautos.modules.auth.controller;
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
+import com.rentadeautos.modules.auth.dto.RegisterRequest;
 import com.rentadeautos.modules.auth.dto.UsuarioResponse;
 import com.rentadeautos.modules.auth.model.UsuarioApp;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
@@ -45,7 +46,19 @@ public class AuthController {
     }
 
     /**
+     * Registra un nuevo usuario en el sistema.
+     */
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<UsuarioResponse>> register(
+            @Valid @RequestBody RegisterRequest peticion) {
+
+        UsuarioResponse respuesta = authService.registrarUsuario(peticion);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(respuesta));
+    }
+
+    /**
      * Devuelve la identidad del usuario autenticado.
+
      */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UsuarioResponse>> me(Authentication autenticacion) {

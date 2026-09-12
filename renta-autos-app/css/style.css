@@ -304,16 +304,42 @@ nav a:hover, nav a.active {
     opacity: 0.9;
 }
 
-.login-footer {
-    margin-top: 1.5rem;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+.btn-loading {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
 
-.login-footer a {
-    color: var(--text-light);
-    font-weight: 700;
-    text-decoration: underline;
+.error-msg {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    background-color: rgba(255, 107, 107, 0.1);
+}
+
+.user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logout-btn {
+    background-color: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
 }
 
 /* ---------------------------------------------------- */

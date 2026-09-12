@@ -21,17 +21,15 @@
                 <label for="nombre">Nombre Completo</label>
                 <input type="text" id="nombre" placeholder="Tu nombre completo" required>
             </div>
-
             <div class="form-group">
                 <label for="reg-email">Correo Electrónico</label>
                 <input type="email" id="reg-email" placeholder="ejemplo@correo.com" required>
             </div>
-
             <div class="form-group">
                 <label for="reg-password">Contraseña</label>
                 <input type="password" id="reg-password" placeholder="••••••••" required>
             </div>
-
+            <div id="authError" class="error-msg" style="display: none; margin-bottom: 1rem; color: #ff6b6b; font-size: 0.85rem; text-align: center;"></div>
             <button type="submit" class="login-btn">REGISTRARSE</button>
         </form>
 
@@ -41,6 +39,7 @@
     </div>
 
     <!-- SCRIPT DE AUTENTICACIÓN / REGISTRO -->
+    <script src="js/client.js"></script>
     <script src="js/auth.js"></script>
 </body>
 </html>
