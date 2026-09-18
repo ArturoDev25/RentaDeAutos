@@ -17,6 +17,27 @@
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
+/* Botón Volver */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-decoration: none;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.2s ease;
+    z-index: 10;
+    opacity: 0.7;
+}
+
+.back-btn:hover {
+    color: var(--btn-mint);
+    opacity: 1;
+}
+
 body {
     background-color: var(--bg-black);
     color: var(--text-light);
@@ -223,6 +244,7 @@ nav a:hover, nav a.active {
 }
 
 .login-card {
+    position: relative;
     background-color: var(--bg-card);
     padding: 2.5rem 2rem;
     border-radius: 20px;
