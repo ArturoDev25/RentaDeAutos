@@ -75,6 +75,22 @@ public class UsuarioApp {
         this.ultimoAcceso = ultimoAcceso;
     }
 
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
