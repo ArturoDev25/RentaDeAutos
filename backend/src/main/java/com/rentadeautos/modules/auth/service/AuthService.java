@@ -2,8 +2,11 @@ package com.rentadeautos.modules.auth.service;
 
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
+import com.rentadeautos.modules.auth.dto.RegisterRequest;
 import com.rentadeautos.modules.auth.dto.UsuarioResponse;
+import com.rentadeautos.modules.auth.model.Rol;
 import com.rentadeautos.modules.auth.model.UsuarioApp;
+import com.rentadeautos.modules.auth.repository.RolRepository;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.auth.security.JwtService;
 import org.slf4j.Logger;
@@ -26,13 +29,16 @@ public class AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UsuarioAppRepository usuarioRepository;
+    private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(UsuarioAppRepository usuarioRepository,
+                       RolRepository rolRepository,
                        PasswordEncoder passwordEncoder,
                        JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -57,7 +63,7 @@ public class AuthService {
 
         if (Boolean.FALSE.equals(usuario.getActivo())) {
             log.warn("Intento de acceso de usuario desactivado: {}", usuario.getId());
-            throw new BadCredentialsException("Correo o contraseña incorrectos");
+            throw new BadCredentialsException("Usuario desactivado. Contacte al administrador.");
         }
 
         usuario.setUltimoAcceso(LocalDateTime.now());
@@ -74,6 +80,31 @@ public class AuthService {
                 jwtService.getSegundosExpiracion(),
                 aResponse(usuario)
         );
+    }
+
+    @Transactional
+    public UsuarioResponse registrarUsuario(RegisterRequest request) {
+        String correo = request.correo().trim().toLowerCase();
+
+        if (usuarioRepository.findByCorreo(correo).isPresent()) {
+            throw new IllegalArgumentException("El correo electrónico ya está registrado");
+        }
+
+        // Asignar rol por defecto: AGENTE
+        Rol rolAgente = rolRepository.findByNombre("AGENTE")
+                .orElseThrow(() -> new IllegalStateException("El rol AGENTE no existe en la base de datos"));
+
+        UsuarioApp nuevoUsuario = new UsuarioApp();
+        nuevoUsuario.setNombre(request.nombre());
+        nuevoUsuario.setCorreo(correo);
+        nuevoUsuario.setPasswordHash(passwordEncoder.encode(request.password()));
+        nuevoUsuario.setRol(rolAgente);
+        nuevoUsuario.setActivo(true);
+
+        UsuarioApp guardado = usuarioRepository.save(nuevoUsuario);
+        log.info("Nuevo usuario registrado exitosamente: {}", guardado.getCorreo());
+
+        return aResponse(guardado);
     }
 
     public UsuarioResponse aResponse(UsuarioApp usuario) {
