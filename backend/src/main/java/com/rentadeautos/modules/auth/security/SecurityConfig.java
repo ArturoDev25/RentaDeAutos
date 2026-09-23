@@ -43,27 +43,85 @@ public class SecurityConfig {
             .sessionManagement(sm ->
                     sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Operaciones públicas existentes.
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
+
+                // Administración de usuarios.
+                .requestMatchers("/api/admin/**")
+                    .hasRole("ADMINISTRADOR")
+
+                // Consultas de los catálogos del Sprint 2.
+                .requestMatchers(HttpMethod.GET,
+                    "/api/v1/clientes", "/api/v1/clientes/**",
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+
+                // Crear y modificar clientes.
+                .requestMatchers(HttpMethod.POST,
+                    "/api/v1/clientes", "/api/v1/clientes/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/v1/clientes", "/api/v1/clientes/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PATCH,
+                    "/api/v1/clientes", "/api/v1/clientes/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+
+                // Crear y modificar vehículos, categorías y tarifas.
+                .requestMatchers(HttpMethod.POST,
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PATCH,
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+
+                // Propuesta: eliminación exclusiva del administrador.
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/v1/clientes", "/api/v1/clientes/**",
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).hasRole("ADMINISTRADOR")
+
+                // Bloquear métodos no contemplados en estos catálogos.
+                .requestMatchers(
+                    "/api/v1/clientes", "/api/v1/clientes/**",
+                    "/api/v1/vehiculos", "/api/v1/vehiculos/**",
+                    "/api/v1/categorias", "/api/v1/categorias/**",
+                    "/api/v1/tarifas", "/api/v1/tarifas/**"
+                ).denyAll()
+
+                // Resto de las rutas: conservar el requisito de autenticación.
                 .anyRequest().authenticated()
             )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, exception) ->
-                        escribirError(response, HttpServletResponse.SC_UNAUTHORIZED,
-                                "No autenticado"))
-                .accessDeniedHandler((request, response, exception) ->
-                        escribirError(response, HttpServletResponse.SC_FORBIDDEN,
-                                "No tiene permisos para esta operación"))
-            )
-            .addFilterBefore(
-                    jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class
-            );
+                        .exceptionHandling(ex -> ex
+                            .authenticationEntryPoint((request, response, exception) ->
+                                    escribirError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                                            "No autenticado"))
+                            .accessDeniedHandler((request, response, exception) ->
+                                    escribirError(response, HttpServletResponse.SC_FORBIDDEN,
+                                            "No tiene permisos para esta operación"))
+                        )
+                        .addFilterBefore(
+                                jwtAuthenticationFilter,
+                                UsernamePasswordAuthenticationFilter.class
+                        );
 
-        return http.build();
-    }
+                    return http.build();
+                }
 
      /**
      * Escribe la respuesta de error directamente en lugar de usar sendError().
