@@ -1,7 +1,9 @@
 package com.rentadeautos.modules.report.controller;
 
 import com.rentadeautos.common.dto.ApiResponse;
+import com.rentadeautos.modules.report.dto.ClientesResponse;
 import com.rentadeautos.modules.report.dto.InventarioResponse;
+import com.rentadeautos.modules.report.service.ReporteClientesService;
 import com.rentadeautos.modules.report.service.ReporteInventarioService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,13 +18,21 @@ import org.springframework.http.ResponseEntity;
 public class ReporteController {
 
     private final ReporteInventarioService reporteInventarioService;
+    private final ReporteClientesService reporteClientesService;
 
-    public ReporteController(ReporteInventarioService reporteInventarioService) {
+    public ReporteController(ReporteInventarioService reporteInventarioService,
+                              ReporteClientesService reporteClientesService) {
         this.reporteInventarioService = reporteInventarioService;
+        this.reporteClientesService = reporteClientesService;
     }
 
     @GetMapping("/inventario")
     public ResponseEntity<ApiResponse<InventarioResponse>> inventario() {
         return ResponseEntity.ok(ApiResponse.success(reporteInventarioService.generar()));
+    }
+
+    @GetMapping("/clientes")
+    public ResponseEntity<ApiResponse<ClientesResponse>> clientes() {
+        return ResponseEntity.ok(ApiResponse.success(reporteClientesService.generar()));
     }
 }
