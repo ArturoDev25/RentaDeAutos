@@ -51,6 +51,9 @@ public class SecurityConfig {
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
+                // Panel de categorías: acceso exclusivo del administrador en Sprint 2.
+                .requestMatchers("/api/categorias", "/api/categorias/**")
+                    .hasRole("ADMINISTRADOR")
 
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,

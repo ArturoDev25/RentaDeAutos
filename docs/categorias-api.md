@@ -70,7 +70,9 @@ Error:
 
 ## Pendientes fuera de este issue
 
-- **Permisos por rol (S2-10):** por ahora cualquier usuario autenticado puede usar todas las rutas. Se pueden restringir con `@PreAuthorize`, porque `@EnableMethodSecurity` ya está activo.
+- **Acceso actualizado en S2-14:** `/api/categorias` y sus subrutas
+  requieren el rol `ADMINISTRADOR`, conforme al Plan Sprint 2 v1.1.
+  Sin autenticación válida se responde 401; con otro rol, 403.
 - **Vehículos (S2-06):** decidir si se puede asignar una categoría inactiva a un vehículo nuevo. Esta API no lo valida todavía.
 
 ## Pruebas
