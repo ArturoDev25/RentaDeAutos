@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservaciones - RentaDeAutos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/reservaciones.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="dashboard-body">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-logo"><a href="dashboard.html"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a></div>
+    <nav class="sidebar-menu" aria-label="Panel de administración">
+      <a class="sidebar-link" href="dashboard.html"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-car"></i><span>Vehículos</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-tags"></i><span>Categorías</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
+      <a class="sidebar-link active" aria-current="page" href="reservaciones.html"><i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-chart-column"></i><span>Reportes</span></a>
+      <a class="sidebar-link" href="auditoria.html"><i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span></a>
+    </nav>
+  </aside>
+  <div class="dashboard-main">
+    <header class="dashboard-topbar reservation-topbar">
+      <a href="dashboard.html">← Volver al Dashboard</a>
+      <div class="dashboard-user-area"><span id="operador"></span><button type="button" id="salir" class="dashboard-logout">Cerrar sesión</button></div>
+    </header>
+    <main class="dashboard-content">
+      <section class="dashboard-title"><div><h1>Reservaciones</h1><p>Gestiona las reservas del panel de Administrador</p></div></section>
+      <p id="mensaje" role="status" aria-live="polite"></p>
+      <section class="dashboard-panel reservation-panel" aria-labelledby="form-titulo">
+        <div class="panel-header"><h2 id="form-titulo"><i class="fa-solid fa-calendar-plus"></i>Nueva reservación</h2></div>
+        <form id="form-reservacion">
+          <div class="reservation-fields">
+            <label>Cliente <select name="clienteId" required><option value="">Selecciona un cliente</option></select></label>
+            <label>Vehículo <select name="vehiculoId" required><option value="">Selecciona un vehículo</option></select></label>
+            <label>Inicio <input name="fechaInicio" type="datetime-local" required></label>
+            <label>Devolución <input name="fechaFin" type="datetime-local" required></label>
+            <label class="reservation-wide">Observaciones <textarea name="observaciones" maxlength="2000" rows="2"></textarea></label>
+          </div>
+          <p class="reservation-note">La tarifa diaria se toma del catálogo vigente para la categoría del vehículo. El total estimado se calcula al guardar.</p>
+          <div class="reservation-actions"><button id="guardar" type="submit">Crear reservación</button><button id="limpiar" type="button" hidden>Cancelar edición</button></div>
+        </form>
+      </section>
+      <section class="dashboard-panel reservation-panel" aria-labelledby="lista-titulo">
+        <div class="panel-header"><h2 id="lista-titulo"><i class="fa-solid fa-list"></i>Reservaciones registradas</h2><button type="button" id="recargar">Actualizar</button></div>
+        <div class="reservation-table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Vehículo</th><th>Inicio</th><th>Devolución</th><th>Estado</th><th>Tarifa diaria</th><th>Total estimado</th><th>Acciones</th></tr></thead><tbody id="filas"></tbody></table></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/client.js"></script>
+  <script src="js/reservaciones.js"></script>
+</body>
+</html>
