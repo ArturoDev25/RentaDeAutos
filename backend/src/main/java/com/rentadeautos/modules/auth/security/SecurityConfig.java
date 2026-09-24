@@ -55,6 +55,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/categorias", "/api/categorias/**")
                     .hasRole("ADMINISTRADOR")
 
+                // Sprint 2: el panel de reservaciones lo opera el Administrador.
+                .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
+                    .hasRole("ADMINISTRADOR")
+
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,
                     "/api/v1/clientes", "/api/v1/clientes/**",

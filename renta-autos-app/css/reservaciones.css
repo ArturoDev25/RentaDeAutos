@@ -1,0 +1,28 @@
+.reservation-topbar { justify-content: space-between; }
+.reservation-topbar a { color: #146653; text-decoration: none; font-weight: 600; }
+.reservation-topbar .dashboard-logout { width: auto; padding: 10px 14px; font-size: 14px; }
+.reservation-panel { margin-bottom: 24px; }
+.reservation-panel form { padding: 22px; }
+.reservation-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.reservation-fields label { display: grid; gap: 7px; font-size: 14px; font-weight: 600; color: #263c48; }
+.reservation-wide { grid-column: 1 / -1; }
+.reservation-fields input, .reservation-fields select, .reservation-fields textarea { width: 100%; box-sizing: border-box; border: 1px solid #cbd8d2; border-radius: 8px; padding: 11px; font: inherit; color: #172033; background: white; }
+.reservation-fields :focus-visible, .reservation-panel button:focus-visible { outline: 3px solid #72b59c; outline-offset: 2px; }
+.reservation-note { color: #637087; font-size: 14px; }
+.reservation-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.reservation-panel button { border: 0; border-radius: 8px; background: #27856d; color: white; padding: 11px 15px; font: inherit; cursor: pointer; }
+.reservation-panel button:hover { background: #146653; }
+.reservation-panel button:disabled { opacity: .55; cursor: wait; }
+.reservation-panel #limpiar, .reservation-panel #recargar, .reservation-panel .secondary { color: #146653; background: #e5f5ed; }
+.reservation-panel #recargar { margin-right: 16px; }
+.reservation-panel td button { margin: 2px; padding: 7px 9px; font-size: 13px; }
+.reservation-table-wrap { overflow-x: auto; }
+.reservation-table-wrap table { border-collapse: collapse; width: 100%; min-width: 870px; }
+.reservation-table-wrap th, .reservation-table-wrap td { padding: 12px; text-align: left; border-bottom: 1px solid #e1e9e5; font-size: 13px; }
+.reservation-table-wrap th { background: #eefaf4; color: #145b49; }
+.reservation-table-wrap td:last-child { white-space: nowrap; }
+#mensaje { min-height: 25px; font-weight: 600; }
+#mensaje.error { color: #a41f2b; }
+#mensaje.ok { color: #146653; }
+@media (max-width: 850px) { .reservation-topbar { gap: 12px; } }
+@media (max-width: 650px) { .reservation-fields { grid-template-columns: 1fr; } .reservation-topbar #operador { display: none; } }
