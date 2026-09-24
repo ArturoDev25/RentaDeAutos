@@ -4,6 +4,7 @@ import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
+import com.rentadeautos.modules.vehicle.dto.FiltroVehiculos;
 import com.rentadeautos.modules.vehicle.dto.VehiculoRequest;
 import com.rentadeautos.modules.vehicle.dto.VehiculoResponse;
 import com.rentadeautos.modules.vehicle.exception.VehiculoDuplicadoException;
@@ -90,7 +91,7 @@ class VehiculoControllerTest {
     @WithMockUser(roles = "AUDITOR")
     @DisplayName("Cualquier rol puede consultar el listado de vehículos")
     void listarDevuelveVehiculos() throws Exception {
-        when(vehiculoService.listar(null, null))
+        when(vehiculoService.listar(FiltroVehiculos.sinFiltros()))
                 .thenReturn(List.of(versa(EstadoVehiculo.DISPONIBLE)));
 
         mockMvc.perform(get(URL))
@@ -103,14 +104,58 @@ class VehiculoControllerTest {
     @WithMockUser(roles = "AGENTE")
     @DisplayName("Se puede filtrar el listado por estado y categoría")
     void listarConFiltros() throws Exception {
-        when(vehiculoService.listar(EstadoVehiculo.DISPONIBLE, 1L))
+        FiltroVehiculos filtro =
+                new FiltroVehiculos(null, EstadoVehiculo.DISPONIBLE, 1L, null, null);
+        when(vehiculoService.listar(filtro))
                 .thenReturn(List.of(versa(EstadoVehiculo.DISPONIBLE)));
 
         mockMvc.perform(get(URL).param("estado", "DISPONIBLE").param("categoriaId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].estado").value("DISPONIBLE"));
 
-        verify(vehiculoService).listar(EstadoVehiculo.DISPONIBLE, 1L);
+        verify(vehiculoService).listar(filtro);
+    }
+
+    @Test
+    @WithMockUser(roles = "AUDITOR")
+    @DisplayName("Se puede buscar por texto y rango de años (S2-07)")
+    void buscarPorTextoYAnios() throws Exception {
+        FiltroVehiculos filtro = new FiltroVehiculos("versa", null, null, 2020, 2024);
+        when(vehiculoService.listar(filtro))
+                .thenReturn(List.of(versa(EstadoVehiculo.DISPONIBLE)));
+
+        mockMvc.perform(get(URL)
+                        .param("q", "versa")
+                        .param("anioDesde", "2020")
+                        .param("anioHasta", "2024"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].modelo").value("Versa"));
+
+        verify(vehiculoService).listar(filtro);
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENTE")
+    @DisplayName("Una búsqueda inválida devuelve 400")
+    void buscarInvalidoDevuelve400() throws Exception {
+        FiltroVehiculos filtro = new FiltroVehiculos(null, null, null, 2024, 2020);
+        when(vehiculoService.listar(filtro)).thenThrow(new VehiculoInvalidoException(
+                "El año inicial no puede ser mayor que el año final"));
+
+        mockMvc.perform(get(URL).param("anioDesde", "2024").param("anioHasta", "2020"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("El año inicial no puede ser mayor que el año final"));
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENTE")
+    @DisplayName("Un año que no es número devuelve 400")
+    void buscarConAnioNoNumericoDevuelve400() throws Exception {
+        mockMvc.perform(get(URL).param("anioDesde", "dos mil"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(vehiculoService);
     }
 
     @Test

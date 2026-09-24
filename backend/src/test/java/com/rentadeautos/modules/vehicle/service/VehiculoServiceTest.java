@@ -1,5 +1,6 @@
 package com.rentadeautos.modules.vehicle.service;
 
+import com.rentadeautos.modules.vehicle.dto.FiltroVehiculos;
 import com.rentadeautos.modules.vehicle.dto.VehiculoRequest;
 import com.rentadeautos.modules.vehicle.dto.VehiculoResponse;
 import com.rentadeautos.modules.vehicle.exception.VehiculoDuplicadoException;
@@ -231,15 +232,63 @@ class VehiculoServiceTest {
     }
 
     @Test
-    @DisplayName("Listar aplica los filtros recibidos")
-    void listarConFiltros() {
-        when(vehiculoRepository.buscar(EstadoVehiculo.DISPONIBLE, 1L))
+    @DisplayName("Listar sin filtros no filtra nada")
+    void listarSinFiltros() {
+        when(vehiculoRepository.buscar(null, null, null, null, null))
                 .thenReturn(List.of(vehiculo(1L, "FAK-1234", VIN)));
 
-        List<VehiculoResponse> respuesta =
-                vehiculoService.listar(EstadoVehiculo.DISPONIBLE, 1L);
+        List<VehiculoResponse> respuesta = vehiculoService.listar(FiltroVehiculos.sinFiltros());
+
+        assertEquals(1, respuesta.size());
+    }
+
+    @Test
+    @DisplayName("Listar aplica los filtros y convierte el texto en patrón de búsqueda")
+    void listarConFiltros() {
+        when(vehiculoRepository.buscar("%nissan%", EstadoVehiculo.DISPONIBLE, 1L, 2020, 2024))
+                .thenReturn(List.of(vehiculo(1L, "FAK-1234", VIN)));
+
+        List<VehiculoResponse> respuesta = vehiculoService.listar(new FiltroVehiculos(
+                "  NISSAN ", EstadoVehiculo.DISPONIBLE, 1L, 2020, 2024));
 
         assertEquals(1, respuesta.size());
         assertEquals("FAK-1234", respuesta.get(0).placa());
+    }
+
+    @Test
+    @DisplayName("Un texto de búsqueda en blanco se ignora")
+    void listarConTextoEnBlanco() {
+        when(vehiculoRepository.buscar(null, null, null, null, null)).thenReturn(List.of());
+
+        vehiculoService.listar(new FiltroVehiculos("   ", null, null, null, null));
+
+        verify(vehiculoRepository).buscar(null, null, null, null, null);
+    }
+
+    @Test
+    @DisplayName("Un texto de búsqueda demasiado largo se rechaza")
+    void listarConTextoLargo() {
+        String largo = "a".repeat(VehiculoService.LONGITUD_MAXIMA_BUSQUEDA + 1);
+
+        assertThrows(VehiculoInvalidoException.class,
+                () -> vehiculoService.listar(new FiltroVehiculos(largo, null, null, null, null)));
+
+        verifyNoInteractions(vehiculoRepository);
+    }
+
+    @Test
+    @DisplayName("Un rango de años invertido se rechaza")
+    void listarConRangoDeAniosInvertido() {
+        assertThrows(VehiculoInvalidoException.class,
+                () -> vehiculoService.listar(new FiltroVehiculos(null, null, null, 2024, 2020)));
+
+        verifyNoInteractions(vehiculoRepository);
+    }
+
+    @Test
+    @DisplayName("Los comodines del usuario se buscan como texto literal")
+    void patronEscapaComodines() {
+        assertEquals("%50!%!_a!!%", VehiculoService.patronBusqueda("50%_A!"));
+        assertNull(VehiculoService.patronBusqueda(null));
     }
 }
