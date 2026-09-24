@@ -1,5 +1,12 @@
 // client.js - Módulo base para consumir la API REST de Spring Boot
-const API_BASE_URL = 'http://localhost:8080/api';
+const esEntornoLocal =
+    window.location.protocol === 'file:' ||
+    ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+
+const API_BASE_URL = window.API_BASE_URL ||
+    (esEntornoLocal
+        ? 'http://localhost:8080/api'
+        : `${window.location.origin}/api`);
 
 async function fetchAPI(endpoint, options = {}) {
     const defaultHeaders = {

@@ -42,7 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
 
                     localStorage.setItem('usuarioSesion', JSON.stringify(usuario));
-                    window.location.href = 'index.html';
+                    if (usuario.rol === 'ADMINISTRADOR') {
+                        window.location.href = 'dashboard.html';
+                    } 
+                    else {
+                        window.location.href = 'index.html';
+                    }
+
                 } else {
                     if (errorDiv) {
                         errorDiv.innerText = result.message || 'Credenciales inválidas';
