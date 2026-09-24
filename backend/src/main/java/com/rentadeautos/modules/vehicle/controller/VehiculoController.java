@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.vehicle.dto.EstadoVehiculoRequest;
+import com.rentadeautos.modules.vehicle.dto.FiltroVehiculos;
 import com.rentadeautos.modules.vehicle.dto.VehiculoRequest;
 import com.rentadeautos.modules.vehicle.dto.VehiculoResponse;
 import com.rentadeautos.modules.vehicle.model.EstadoVehiculo;
@@ -39,13 +40,25 @@ public class VehiculoController {
         this.vehiculoService = vehiculoService;
     }
 
-    /** Lista los vehículos; se puede filtrar con ?estado= y ?categoriaId=. */
+    /**
+     * Lista los vehículos. Todos los parámetros son opcionales y se combinan:
+     * <ul>
+     *   <li>{@code q}: texto a buscar en placa, VIN, marca o modelo (S2-07).</li>
+     *   <li>{@code estado}: DISPONIBLE, RESERVADO, RENTADO, MANTENIMIENTO o BAJA.</li>
+     *   <li>{@code categoriaId}: id de la categoría.</li>
+     *   <li>{@code anioDesde} y {@code anioHasta}: rango de años (inclusive).</li>
+     * </ul>
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<VehiculoResponse>>> listar(
+            @RequestParam(required = false) String q,
             @RequestParam(required = false) EstadoVehiculo estado,
-            @RequestParam(required = false) Long categoriaId) {
-        return ResponseEntity.ok(
-                ApiResponse.success(vehiculoService.listar(estado, categoriaId)));
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) Integer anioDesde,
+            @RequestParam(required = false) Integer anioHasta) {
+        FiltroVehiculos filtro =
+                new FiltroVehiculos(q, estado, categoriaId, anioDesde, anioHasta);
+        return ResponseEntity.ok(ApiResponse.success(vehiculoService.listar(filtro)));
     }
 
     @GetMapping("/{id}")

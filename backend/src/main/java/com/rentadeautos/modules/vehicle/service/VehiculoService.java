@@ -1,5 +1,6 @@
 package com.rentadeautos.modules.vehicle.service;
 
+import com.rentadeautos.modules.vehicle.dto.FiltroVehiculos;
 import com.rentadeautos.modules.vehicle.dto.VehiculoRequest;
 import com.rentadeautos.modules.vehicle.dto.VehiculoResponse;
 import com.rentadeautos.modules.vehicle.exception.VehiculoDuplicadoException;
@@ -26,12 +27,14 @@ import java.util.Objects;
  *   <li>Un vehículo nuevo siempre inicia en estado DISPONIBLE.</li>
  *   <li>El año va de 2000 al año actual + 1.</li>
  *   <li>Los vehículos no se eliminan: se cambian a estado BAJA.</li>
+ *   <li>El listado admite búsqueda por texto y filtros (S2-07).</li>
  * </ul>
  */
 @Service
 public class VehiculoService {
 
     static final int ANIO_MINIMO = 2000;
+    static final int LONGITUD_MAXIMA_BUSQUEDA = 50;
 
     private final VehiculoRepository vehiculoRepository;
     private final CategoriaRepository categoriaRepository;
@@ -42,9 +45,31 @@ public class VehiculoService {
         this.categoriaRepository = categoriaRepository;
     }
 
+    /**
+     * Lista los vehículos que cumplen el filtro (S2-07).
+     * El texto se busca sin distinguir mayúsculas en placa, VIN, marca y modelo.
+     */
     @Transactional(readOnly = true)
-    public List<VehiculoResponse> listar(EstadoVehiculo estado, Long categoriaId) {
-        return vehiculoRepository.buscar(estado, categoriaId).stream()
+    public List<VehiculoResponse> listar(FiltroVehiculos filtro) {
+        String texto = limpiarTexto(filtro.texto());
+
+        if (texto != null && texto.length() > LONGITUD_MAXIMA_BUSQUEDA) {
+            throw new VehiculoInvalidoException("El texto de búsqueda no puede exceder "
+                    + LONGITUD_MAXIMA_BUSQUEDA + " caracteres");
+        }
+        if (filtro.anioDesde() != null && filtro.anioHasta() != null
+                && filtro.anioDesde() > filtro.anioHasta()) {
+            throw new VehiculoInvalidoException(
+                    "El año inicial no puede ser mayor que el año final");
+        }
+
+        return vehiculoRepository.buscar(
+                        patronBusqueda(texto),
+                        filtro.estado(),
+                        filtro.categoriaId(),
+                        filtro.anioDesde(),
+                        filtro.anioHasta())
+                .stream()
                 .map(VehiculoResponse::desde)
                 .toList();
     }
@@ -147,6 +172,21 @@ public class VehiculoService {
     /** Placa y VIN se guardan sin espacios sobrantes y en mayúsculas. */
     private String normalizarClave(String valor) {
         return valor.strip().toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * Convierte el texto del usuario en un patrón LIKE: minúsculas, rodeado de %
+     * y con los caracteres especiales escapados con '!'. Nulo si no hay texto.
+     */
+    static String patronBusqueda(String texto) {
+        if (texto == null) {
+            return null;
+        }
+        String escapado = texto.toLowerCase(Locale.ROOT)
+                .replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_");
+        return "%" + escapado + "%";
     }
 
     /** Un texto opcional vacío o solo con espacios se guarda como nulo. */
