@@ -72,6 +72,11 @@ public class SecurityConfig {
                     "/api/v1/audit", "/api/v1/audit/**"
                 ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR", "AUDITOR")
 
+                // Sprint 2: reportes de solo lectura (S2-17).
+                .requestMatchers(HttpMethod.GET,
+                    "/api/reportes", "/api/reportes/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+
                 // S2-06 — CRUD de vehículos (ruta canónica /api/v1/vehicles).
                 // GET permitido a todos los roles autenticados, incluido AUDITOR.
                 .requestMatchers(HttpMethod.GET,
