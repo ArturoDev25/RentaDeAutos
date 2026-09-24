@@ -430,3 +430,1180 @@ nav a:hover, nav a.active {
         font-size: 1.3rem;
     }
 }
+
+/* =========================================================
+   DASHBOARD ADMINISTRADOR - RENTADEAUTOS
+========================================================= */
+
+.dashboard-body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #172033;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.dashboard-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 265px;
+    height: 100vh;
+
+    background: linear-gradient(
+        180deg,
+        #eefaf4 0%,
+        #e5f5ed 100%
+    );
+
+    border-right: 1px solid #dcebe4;
+
+    display: flex;
+    flex-direction: column;
+
+    z-index: 1000;
+}
+
+
+/* Logo */
+
+.sidebar-logo {
+    height: 105px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 20px;
+}
+
+.sidebar-logo img {
+    width: 185px;
+    height: auto;
+}
+
+
+/* Menú */
+
+.sidebar-menu {
+    padding: 20px 16px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.sidebar-link {
+    height: 55px;
+
+    padding: 0 22px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    text-decoration: none;
+
+    color: #145b49;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+    font-weight: 500;
+
+    transition: all 0.2s ease;
+}
+
+
+.sidebar-link i {
+    width: 25px;
+
+    font-size: 21px;
+
+    text-align: center;
+}
+
+
+.sidebar-link:hover {
+    background: #d7eee3;
+}
+
+
+.sidebar-link.active {
+    background: #27856d;
+
+    color: white;
+
+    box-shadow: 0 5px 12px rgba(39, 133, 109, 0.18);
+}
+
+
+/* Frase */
+
+.sidebar-footer-message {
+    margin-top: auto;
+
+    min-height: 240px;
+
+    padding: 30px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    background:
+        linear-gradient(
+            rgba(228, 246, 237, 0.72),
+            rgba(228, 246, 237, 0.96)
+        );
+}
+
+
+.sidebar-footer-message p {
+    margin: 0;
+
+    color: #145b49;
+
+    font-size: 24px;
+
+    line-height: 1.45;
+
+    font-weight: 600;
+}
+
+
+.sidebar-footer-message span {
+    width: 45px;
+    height: 3px;
+
+    margin-top: 22px;
+
+    background: #146653;
+}
+
+
+
+/* =========================================================
+   CONTENIDO PRINCIPAL
+========================================================= */
+
+.dashboard-main {
+    margin-left: 265px;
+
+    min-height: 100vh;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.dashboard-topbar {
+    height: 82px;
+
+    padding: 0 35px;
+
+    display: flex;
+    align-items: center;
+
+    border-bottom: 1px solid #e7eeeb;
+
+    background: #ffffff;
+
+    box-sizing: border-box;
+}
+
+
+/* Botón móvil */
+
+.mobile-menu-button {
+    display: none;
+
+    border: none;
+
+    background: transparent;
+
+    color: #145b49;
+
+    font-size: 22px;
+
+    cursor: pointer;
+}
+
+
+/* Buscador */
+
+.dashboard-search {
+    width: 620px;
+    height: 46px;
+
+    margin-left: 0;
+
+    border: 1px solid #dce5e1;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+
+    background: #fbfcfc;
+
+    box-sizing: border-box;
+}
+
+
+.dashboard-search i {
+    color: #34455b;
+
+    font-size: 18px;
+
+    margin-right: 15px;
+}
+
+
+.dashboard-search input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 15px;
+
+    color: #172033;
+}
+
+
+.dashboard-search input::placeholder {
+    color: #738096;
+}
+
+
+/* Área usuario */
+
+.dashboard-user-area {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+/* Notificaciones */
+
+.notification-button {
+    position: relative;
+
+    border: none;
+
+    background: transparent;
+
+    color: #172033;
+
+    font-size: 23px;
+
+    cursor: pointer;
+}
+
+
+.notification-button span {
+    position: absolute;
+
+    top: -8px;
+    right: -9px;
+
+    width: 19px;
+    height: 19px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e53935;
+
+    color: white;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+/* Usuario */
+
+.dashboard-user {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.user-avatar {
+    width: 43px;
+    height: 43px;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #e6f4ee;
+
+    color: #16705a;
+
+    font-size: 20px;
+}
+
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+
+    line-height: 1.3;
+}
+
+
+.user-info strong {
+    color: #172033;
+
+    font-size: 15px;
+}
+
+
+.user-info small {
+    color: #718096;
+
+    font-size: 13px;
+}
+
+
+.user-arrow {
+    color: #172033;
+
+    font-size: 13px;
+
+    margin-left: 5px;
+}
+
+
+/* Cerrar sesión */
+
+.dashboard-logout {
+    border: none;
+
+    background: transparent;
+
+    color: #145b49;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    padding: 8px;
+}
+
+
+.dashboard-logout:hover {
+    color: #d83b3b;
+}
+
+
+
+/* =========================================================
+   CONTENIDO
+========================================================= */
+
+.dashboard-content {
+    padding: 28px 36px 20px;
+
+    max-width: 1450px;
+
+    margin: 0 auto;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.dashboard-title {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 24px;
+}
+
+
+.dashboard-title h1 {
+    margin: 0 0 5px;
+
+    color: #172033;
+
+    font-size: 34px;
+
+    font-weight: 700;
+}
+
+
+.dashboard-title p {
+    margin: 0;
+
+    color: #637087;
+
+    font-size: 16px;
+}
+
+
+.dashboard-date {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    color: #145b49;
+}
+
+
+.dashboard-date > i {
+    font-size: 22px;
+}
+
+
+.dashboard-date div {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.dashboard-date small {
+    color: #6d7a8e;
+
+    font-size: 12px;
+}
+
+
+.dashboard-date strong {
+    color: #536177;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+
+
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
+.dashboard-statistics {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+
+.stat-card {
+    min-height: 128px;
+
+    border: 1px solid #e2e9e6;
+
+    border-radius: 11px;
+
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+}
+
+
+.stat-icon {
+    width: 62px;
+    height: 62px;
+
+    flex-shrink: 0;
+
+    border-radius: 11px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 27px;
+}
+
+
+.stat-green {
+    background: #e2f2ec;
+    color: #176653;
+}
+
+
+.stat-light-green {
+    background: #e0f4e9;
+    color: #21825e;
+}
+
+
+.stat-yellow {
+    background: #fff3d9;
+    color: #bd7900;
+}
+
+
+.stat-red {
+    background: #ffe3e5;
+    color: #dc4048;
+}
+
+
+.stat-information strong {
+    display: block;
+
+    color: #172033;
+
+    font-size: 30px;
+
+    line-height: 1;
+}
+
+
+.stat-information h3 {
+    margin: 5px 0 2px;
+
+    color: #273247;
+
+    font-size: 15px;
+}
+
+
+.stat-information p {
+    margin: 0;
+
+    color: #6d788b;
+
+    font-size: 13px;
+}
+
+
+
+/* =========================================================
+   PANEL INTERMEDIO
+========================================================= */
+
+.dashboard-middle {
+    display: grid;
+
+    grid-template-columns: 1fr 1.08fr;
+
+    gap: 16px;
+
+    margin-bottom: 16px;
+}
+
+
+.dashboard-panel {
+    border: 1px solid #e1e9e5;
+
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+
+.panel-header {
+    min-height: 58px;
+
+    padding: 0 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom: 1px solid #edf1ef;
+
+    box-sizing: border-box;
+}
+
+
+.panel-header h2 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 17px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.panel-header h2 i {
+    color: #146653;
+
+    font-size: 18px;
+}
+
+
+.panel-header a {
+    color: #166a56;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.panel-header a i {
+    margin-left: 5px;
+}
+
+
+
+/* =========================================================
+   GRÁFICA DE VEHÍCULOS
+========================================================= */
+
+.vehicle-chart-container {
+    min-height: 240px;
+
+    padding: 20px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 25px;
+
+    box-sizing: border-box;
+}
+
+
+.vehicle-donut {
+    width: 190px;
+    height: 190px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #3caf7d 0deg 225deg,
+            #f5b52c 225deg 315deg,
+            #ef5d67 315deg 345deg,
+            #aeb8c6 345deg 360deg
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.donut-center {
+    width: 112px;
+    height: 112px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+}
+
+
+.donut-center strong {
+    color: #172033;
+
+    font-size: 27px;
+}
+
+
+.donut-center span {
+    color: #647086;
+
+    font-size: 13px;
+}
+
+
+.vehicle-legend {
+    flex: 1;
+
+    border: 1px solid #e9efec;
+
+    border-radius: 9px;
+
+    overflow: hidden;
+}
+
+
+.legend-row {
+    min-height: 43px;
+
+    padding: 0 12px;
+
+    display: grid;
+
+    grid-template-columns: 14px 1fr 30px 45px;
+
+    align-items: center;
+
+    gap: 8px;
+
+    border-bottom: 1px solid #edf1ef;
+
+    box-sizing: border-box;
+}
+
+
+.legend-row:last-child {
+    border-bottom: none;
+}
+
+
+.legend-row span:not(.legend-color) {
+    color: #344054;
+
+    font-size: 13px;
+}
+
+
+.legend-row strong {
+    color: #536177;
+
+    font-size: 13px;
+}
+
+
+.legend-row small {
+    color: #758197;
+
+    font-size: 12px;
+}
+
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+
+    border-radius: 50%;
+}
+
+
+.available {
+    background: #3caf7d;
+}
+
+
+.rented {
+    background: #f5b52c;
+}
+
+
+.maintenance {
+    background: #ef5d67;
+}
+
+
+.inactive {
+    background: #aeb8c6;
+}
+
+
+
+/* =========================================================
+   TABLA RESERVACIONES
+========================================================= */
+
+.reservations-table-container {
+    overflow-x: auto;
+
+    padding: 0 15px 15px;
+}
+
+
+.reservations-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 610px;
+}
+
+
+.reservations-table th {
+    background: #e9f5ef;
+
+    color: #243344;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-align: left;
+
+    padding: 11px 8px;
+}
+
+
+.reservations-table td {
+    color: #465267;
+
+    font-size: 12px;
+
+    padding: 11px 8px;
+
+    border-bottom: 1px solid #edf1ef;
+
+    white-space: nowrap;
+}
+
+
+.reservations-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+.reservation-status {
+    padding: 5px 10px;
+
+    border-radius: 9px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.reservation-status.confirmed {
+    background: #ddf3e6;
+
+    color: #18734d;
+}
+
+
+.reservation-status.pending {
+    background: #fff1c9;
+
+    color: #a16a00;
+}
+
+
+
+/* =========================================================
+   GESTIÓN DEL SISTEMA
+========================================================= */
+
+.management-panel {
+    margin-bottom: 16px;
+}
+
+
+.management-grid {
+    padding: 15px;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 12px;
+}
+
+
+.management-card {
+    min-height: 84px;
+
+    padding: 14px;
+
+    border: 1px solid #e1ece7;
+
+    border-radius: 10px;
+
+    background: #fbfefd;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+
+    box-sizing: border-box;
+}
+
+
+.management-card:hover {
+    border-color: #8acbb3;
+
+    background: #f2faf6;
+
+    transform: translateY(-2px);
+}
+
+
+.management-icon {
+    width: 47px;
+    height: 47px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #dff3e9;
+
+    color: #176653;
+
+    font-size: 20px;
+}
+
+
+.management-card div:nth-child(2) {
+    flex: 1;
+}
+
+
+.management-card h3 {
+    margin: 0 0 5px;
+
+    color: #1d2939;
+
+    font-size: 15px;
+}
+
+
+.management-card p {
+    margin: 0;
+
+    color: #68758a;
+
+    font-size: 12px;
+}
+
+
+.management-card > i:last-child {
+    color: #176653;
+
+    font-size: 13px;
+}
+
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.dashboard-footer {
+    min-height: 58px;
+
+    border-top: 1px solid #e6ece9;
+
+    display: flex;
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 2px;
+
+    color: #637087;
+
+    font-size: 13px;
+}
+
+
+.dashboard-footer div {
+    display: flex;
+    gap: 12px;
+}
+
+
+.dashboard-footer a {
+    color: #637087;
+
+    text-decoration: none;
+}
+
+
+.dashboard-footer a:hover {
+    color: #176653;
+}
+
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-sidebar {
+        width: 230px;
+    }
+
+    .dashboard-main {
+        margin-left: 230px;
+    }
+
+    .dashboard-statistics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-middle {
+        grid-template-columns: 1fr;
+    }
+
+    .management-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-search {
+        width: 450px;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .dashboard-sidebar {
+        display: none;
+    }
+
+    .dashboard-main {
+        margin-left: 0;
+    }
+
+    .dashboard-topbar {
+        padding: 0 20px;
+    }
+
+    .mobile-menu-button {
+        display: block;
+
+        margin-right: 15px;
+    }
+
+    .dashboard-search {
+        flex: 1;
+
+        width: auto;
+    }
+
+    .user-info,
+    .user-arrow {
+        display: none;
+    }
+
+    .dashboard-content {
+        padding: 25px 20px;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .dashboard-statistics {
+        grid-template-columns: 1fr;
+    }
+
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-title {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 15px;
+    }
+
+    .dashboard-title h1 {
+        font-size: 27px;
+    }
+
+    .dashboard-date {
+        display: none;
+    }
+
+    .dashboard-topbar {
+        gap: 10px;
+    }
+
+    .notification-button {
+        display: none;
+    }
+
+    .dashboard-user-area {
+        gap: 8px;
+    }
+
+    .vehicle-chart-container {
+        flex-direction: column;
+    }
+
+    .vehicle-donut {
+        width: 170px;
+        height: 170px;
+    }
+
+    .dashboard-footer {
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: 10px;
+
+        padding: 15px 0;
+    }
+}

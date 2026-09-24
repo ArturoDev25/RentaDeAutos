@@ -51,6 +51,13 @@ public class SecurityConfig {
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
+                // Panel de categorías: acceso exclusivo del administrador en Sprint 2.
+                .requestMatchers("/api/categorias", "/api/categorias/**")
+                    .hasRole("ADMINISTRADOR")
+
+                // Sprint 2: el panel de reservaciones lo opera el Administrador.
+                .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
+                    .hasRole("ADMINISTRADOR")
 
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,
@@ -59,6 +66,30 @@ public class SecurityConfig {
                     "/api/v1/categorias", "/api/v1/categorias/**",
                     "/api/v1/tarifas", "/api/v1/tarifas/**"
                 ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+
+                // Módulo de Auditoría
+                .requestMatchers(HttpMethod.GET,
+                    "/api/v1/audit", "/api/v1/audit/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR", "AUDITOR")
+
+                // S2-06 — CRUD de vehículos (ruta canónica /api/v1/vehicles).
+                // GET permitido a todos los roles autenticados, incluido AUDITOR.
+                .requestMatchers(HttpMethod.GET,
+                    "/api/v1/vehicles", "/api/v1/vehicles/**"
+                ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+                // POST, PUT y PATCH denegados al rol AUDITOR (→ 403 Forbidden).
+                .requestMatchers(HttpMethod.POST,
+                    "/api/v1/vehicles", "/api/v1/vehicles/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/v1/vehicles", "/api/v1/vehicles/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PATCH,
+                    "/api/v1/vehicles", "/api/v1/vehicles/**"
+                ).hasAnyRole("ADMINISTRADOR", "SUPERVISOR")
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/v1/vehicles", "/api/v1/vehicles/**"
+                ).hasRole("ADMINISTRADOR")
 
                 // Crear y modificar clientes.
                 .requestMatchers(HttpMethod.POST,

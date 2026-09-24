@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - RentaDeAutos</title>
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- =====================================================
+         BARRA LATERAL
+    ====================================================== -->
+    <aside class="dashboard-sidebar">
+
+        <!-- Logo -->
+        <div class="sidebar-logo">
+
+            <img src="assets/Imagenes/LogoCar.png"
+                alt="RentaDeAutos">
+
+        </div>
+
+
+        <!-- Menú -->
+        <nav class="sidebar-menu">
+
+            <a href="dashboard.html" class="sidebar-link active">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-car"></i>
+                <span>Vehículos</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-tags"></i>
+                <span>Categorías</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Clientes</span>
+            </a>
+
+            <a href="reservaciones.html" class="sidebar-link">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Reservaciones</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Reportes</span>
+            </a>
+
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Auditoría</span>
+            </a>
+
+        </nav>
+
+
+        <!-- Frase inferior -->
+        <div class="sidebar-footer-message">
+
+            <p>
+                Conduce<br>
+                tus mejores<br>
+                experiencias
+            </p>
+
+            <span></span>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+    <div class="dashboard-main">
+
+
+        <!-- =================================================
+             BARRA SUPERIOR
+        ================================================== -->
+        <header class="dashboard-topbar">
+
+            <!-- Botón menú móvil -->
+            <button class="mobile-menu-button">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+
+            <!-- Buscador -->
+            <div class="dashboard-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    placeholder="Buscar en el sistema..."
+                >
+
+            </div>
+
+
+            <!-- Usuario -->
+            <div class="dashboard-user-area">
+
+                <!-- Notificaciones -->
+                <button class="notification-button">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                    <span>3</span>
+
+                </button>
+
+
+                <!-- Usuario -->
+                <div class="dashboard-user">
+
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div class="user-info">
+
+                        <strong id="nombreAdministrador">
+                            Administrador
+                        </strong>
+
+                        <small>
+                            Administrador
+                        </small>
+
+                    </div>
+
+                    <i class="fa-solid fa-chevron-down user-arrow"></i>
+
+                </div>
+
+
+                <!-- Cerrar sesión -->
+                <button
+                    id="btnCerrarSesion"
+                    class="dashboard-logout"
+                    title="Cerrar sesión">
+
+                    <i class="fa-solid fa-right-from-bracket"></i>
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             CONTENIDO
+        ================================================== -->
+        <main class="dashboard-content">
+
+
+            <!-- TÍTULO -->
+            <section class="dashboard-title">
+
+                <div>
+
+                    <h1>
+                        Panel de Administrador
+                    </h1>
+
+                    <p>
+                        Bienvenido al sistema de renta de autos
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-date">
+
+                    <i class="fa-regular fa-calendar"></i>
+
+                    <div>
+                        <small>Hoy</small>
+                        <strong>23 de septiembre de 2026</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 INDICADORES
+            ================================================== -->
+            <section class="dashboard-statistics">
+
+
+                <!-- Vehículos -->
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-green">
+                        <i class="fa-solid fa-car"></i>
+                    </div>
+
+                    <div class="stat-information">
+
+                        <strong>
+                            24
+                        </strong>
+
+                        <h3>
+                            Vehículos
+                        </h3>
+
+                        <p>
+                            Total registrados
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Clientes -->
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-light-green">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <div class="stat-information">
+
+                        <strong>
+                            38
+                        </strong>
+
+                        <h3>
+                            Clientes activos
+                        </h3>
+
+                        <p>
+                            Clientes registrados
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Reservaciones -->
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-yellow">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+
+                    <div class="stat-information">
+
+                        <strong>
+                            12
+                        </strong>
+
+                        <h3>
+                            Reservaciones
+                        </h3>
+
+                        <p>
+                            Próximas reservaciones
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Disponibles -->
+                <div class="stat-card">
+
+                    <div class="stat-icon stat-red">
+                        <i class="fa-regular fa-circle-check"></i>
+                    </div>
+
+                    <div class="stat-information">
+
+                        <strong>
+                            15
+                        </strong>
+
+                        <h3>
+                            Disponibles
+                        </h3>
+
+                        <p>
+                            Vehículos disponibles
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 GRÁFICA + RESERVACIONES
+            ================================================== -->
+            <section class="dashboard-middle">
+
+
+                <!-- ESTADO DE VEHÍCULOS -->
+                <div class="dashboard-panel">
+
+                    <div class="panel-header">
+
+                        <h2>
+                            <i class="fa-solid fa-chart-column"></i>
+                            Estado de vehículos
+                        </h2>
+
+                    </div>
+
+
+                    <div class="vehicle-chart-container">
+
+                        <!-- Gráfica -->
+                        <div class="vehicle-donut">
+
+                            <div class="donut-center">
+
+                                <strong>
+                                    24
+                                </strong>
+
+                                <span>
+                                    Vehículos
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Información -->
+                        <div class="vehicle-legend">
+
+                            <div class="legend-row">
+
+                                <span class="legend-color available"></span>
+
+                                <span>
+                                    Disponibles
+                                </span>
+
+                                <strong>
+                                    15
+                                </strong>
+
+                                <small>
+                                    62.5%
+                                </small>
+
+                            </div>
+
+
+                            <div class="legend-row">
+
+                                <span class="legend-color rented"></span>
+
+                                <span>
+                                    Rentados
+                                </span>
+
+                                <strong>
+                                    6
+                                </strong>
+
+                                <small>
+                                    25.0%
+                                </small>
+
+                            </div>
+
+
+                            <div class="legend-row">
+
+                                <span class="legend-color maintenance"></span>
+
+                                <span>
+                                    Mantenimiento
+                                </span>
+
+                                <strong>
+                                    2
+                                </strong>
+
+                                <small>
+                                    8.3%
+                                </small>
+
+                            </div>
+
+
+                            <div class="legend-row">
+
+                                <span class="legend-color inactive"></span>
+
+                                <span>
+                                    Inactivos
+                                </span>
+
+                                <strong>
+                                    1
+                                </strong>
+
+                                <small>
+                                    4.2%
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- RESERVACIONES -->
+                <div class="dashboard-panel reservations-panel">
+
+                    <div class="panel-header">
+
+                        <h2>
+                            <i class="fa-regular fa-calendar-days"></i>
+                            Reservaciones próximas
+                        </h2>
+
+                        <a href="reservaciones.html">
+                            Ver todas
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+
+                    <div class="reservations-table-container">
+
+                        <table class="reservations-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Vehículo</th>
+                                    <th>Fecha de inicio</th>
+                                    <th>Fecha de fin</th>
+                                    <th>Estado</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr>
+
+                                    <td>Juan Pérez</td>
+                                    <td>Toyota Corolla</td>
+                                    <td>23/09/2026</td>
+                                    <td>25/09/2026</td>
+
+                                    <td>
+                                        <span class="reservation-status confirmed">
+                                            Confirmada
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>María López</td>
+                                    <td>Nissan Kicks</td>
+                                    <td>24/09/2026</td>
+                                    <td>27/09/2026</td>
+
+                                    <td>
+                                        <span class="reservation-status confirmed">
+                                            Confirmada
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>Carlos Ruiz</td>
+                                    <td>Ford Ranger</td>
+                                    <td>25/09/2026</td>
+                                    <td>28/09/2026</td>
+
+                                    <td>
+                                        <span class="reservation-status pending">
+                                            Pendiente
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>Ana Torres</td>
+                                    <td>Chevrolet Onix</td>
+                                    <td>26/09/2026</td>
+                                    <td>29/09/2026</td>
+
+                                    <td>
+                                        <span class="reservation-status confirmed">
+                                            Confirmada
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+
+                                    <td>Luis García</td>
+                                    <td>Mazda CX-5</td>
+                                    <td>27/09/2026</td>
+                                    <td>30/09/2026</td>
+
+                                    <td>
+                                        <span class="reservation-status pending">
+                                            Pendiente
+                                        </span>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 GESTIÓN DEL SISTEMA
+            ================================================== -->
+            <section class="dashboard-panel management-panel">
+
+                <div class="panel-header">
+
+                    <h2>
+                        <i class="fa-solid fa-gear"></i>
+                        Gestión del sistema
+                    </h2>
+
+                </div>
+
+
+                <div class="management-grid">
+
+
+                    <!-- Vehículos -->
+                    <a href="#" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Vehículos
+                            </h3>
+
+                            <p>
+                                Gestionar vehículos registrados
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Categorías -->
+                    <a href="#" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Categorías
+                            </h3>
+
+                            <p>
+                                Administrar categorías de vehículos
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Clientes -->
+                    <a href="#" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Clientes
+                            </h3>
+
+                            <p>
+                                Consultar y administrar clientes
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Reservaciones -->
+                    <a href="reservaciones.html" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-regular fa-calendar-days"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Reservaciones
+                            </h3>
+
+                            <p>
+                                Consultar reservaciones
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Reportes -->
+                    <a href="#" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Reportes
+                            </h3>
+
+                            <p>
+                                Consultar información y reportes
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+
+                    <!-- Auditoría -->
+                    <a href="#" class="management-card">
+
+                        <div class="management-icon">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Auditoría
+                            </h3>
+
+                            <p>
+                                Consultar registros de auditoría
+                            </p>
+
+                        </div>
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </a>
+
+                </div>
+
+            </section>
+
+
+            <!-- Footer -->
+            <footer class="dashboard-footer">
+
+                <span>
+                    RentaDeAutos © 2026. Todos los derechos reservados.
+                </span>
+
+                <div>
+                    <a href="#">Términos</a>
+                    <span>|</span>
+                    <a href="#">Privacidad</a>
+                    <span>|</span>
+                    <a href="#">Soporte</a>
+                </div>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

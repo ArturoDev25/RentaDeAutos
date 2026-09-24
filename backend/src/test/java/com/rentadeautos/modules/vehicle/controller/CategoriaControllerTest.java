@@ -1,5 +1,9 @@
 package com.rentadeautos.modules.vehicle.controller;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
@@ -69,7 +73,7 @@ class CategoriaControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "AGENTE")
+    @WithMockUser(roles = "ADMINISTRADOR")
     @DisplayName("Se pueden consultar las categorías")
     void listarDevuelveCategorias() throws Exception {
         when(categoriaService.listar(null)).thenReturn(List.of(suv(true)));
@@ -81,7 +85,7 @@ class CategoriaControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "AGENTE")
+    @WithMockUser(roles = "ADMINISTRADOR")
     @DisplayName("Se puede filtrar el listado por estado activo")
     void listarFiltraPorActivo() throws Exception {
         when(categoriaService.listar(true)).thenReturn(List.of(suv(true)));
@@ -94,7 +98,7 @@ class CategoriaControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "AGENTE")
+    @WithMockUser(roles = "ADMINISTRADOR")
     @DisplayName("Se puede consultar una categoría por id")
     void obtenerDevuelveCategoria() throws Exception {
         when(categoriaService.obtener(1L)).thenReturn(suv(true));
@@ -106,7 +110,7 @@ class CategoriaControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "AGENTE")
+    @WithMockUser(roles = "ADMINISTRADOR")
     @DisplayName("Consultar una categoría inexistente devuelve 404")
     void obtenerInexistenteDevuelve404() throws Exception {
         when(categoriaService.obtener(99L))
@@ -258,4 +262,63 @@ class CategoriaControllerTest {
 
         verifyNoInteractions(categoriaService);
     }
+
+    @ParameterizedTest(name = "{0} no puede operar el catálogo de categorías")
+@ValueSource(strings = {"AGENTE", "SUPERVISOR", "AUDITOR"})
+void otrosRolesNoPuedenOperarCategorias(String rol) throws Exception {
+    mockMvc.perform(get("/api/categorias")
+                    .with(user("usuario-prueba").roles(rol)))
+            .andExpect(status().isForbidden());
+
+    mockMvc.perform(get("/api/categorias/1")
+                    .with(user("usuario-prueba").roles(rol)))
+            .andExpect(status().isForbidden());
+
+    mockMvc.perform(post("/api/categorias")
+                    .with(user("usuario-prueba").roles(rol))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(CUERPO_VALIDO))
+            .andExpect(status().isForbidden());
+
+    mockMvc.perform(put("/api/categorias/1")
+                    .with(user("usuario-prueba").roles(rol))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(CUERPO_VALIDO))
+            .andExpect(status().isForbidden());
+
+    mockMvc.perform(patch("/api/categorias/1/estado")
+                    .with(user("usuario-prueba").roles(rol))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"activo\":false}"))
+            .andExpect(status().isForbidden());
+
+    mockMvc.perform(delete("/api/categorias/1")
+                    .with(user("usuario-prueba").roles(rol)))
+            .andExpect(status().isForbidden());
+
+    verifyNoInteractions(categoriaService);
+}
+
+@Test
+void sinSesionNoPuedeModificarCategorias() throws Exception {
+    mockMvc.perform(post("/api/categorias")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(CUERPO_VALIDO))
+            .andExpect(status().isUnauthorized());
+
+    mockMvc.perform(put("/api/categorias/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(CUERPO_VALIDO))
+            .andExpect(status().isUnauthorized());
+
+    mockMvc.perform(patch("/api/categorias/1/estado")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"activo\":false}"))
+            .andExpect(status().isUnauthorized());
+
+    mockMvc.perform(delete("/api/categorias/1"))
+            .andExpect(status().isUnauthorized());
+
+    verifyNoInteractions(categoriaService);
+}
 }

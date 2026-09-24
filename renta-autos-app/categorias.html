@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías | RentaDeAutos</title>
+    <link rel="stylesheet" href="css/categorias.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <a class="marca" href="index.html">RentaDeAutos</a>
+        <p class="subtitulo-menu">Panel de administración</p>
+
+        <nav aria-label="Menú principal">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="vehiculos.html">Vehículos</a>
+            <a href="reservaciones.html">Reservaciones</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="categorias.html" aria-current="page">Categorías</a>
+            <a href="reportes.html">Reportes</a>
+            <a href="auditoria.html">Auditoría</a>
+        </nav>
+    </aside>
+
+    <main>
+        <header class="barra">
+            <span>Administración / Categorías</span>
+            <span id="nombre-usuario">Verificando sesión…</span>
+        </header>
+
+        <div class="contenido">
+            <div class="encabezado">
+                <div>
+                    <h1>Categorías de vehículos</h1>
+                    <p>Administra las categorías y su depósito base.</p>
+                </div>
+                <button id="nueva-categoria" type="button" disabled>
+                    + Nueva categoría
+                </button>
+            </div>
+
+            <p id="mensaje" role="status" aria-live="polite" hidden></p>
+
+            <section class="tarjeta" aria-label="Catálogo de categorías">
+                <div class="herramientas">
+                    <div>
+                        <label for="filtro-estado">Estado</label>
+                        <select id="filtro-estado" disabled>
+                            <option value="">Todas</option>
+                            <option value="true">Activas</option>
+                            <option value="false">Inactivas</option>
+                        </select>
+                    </div>
+                    <button id="recargar" class="secundario"
+                            type="button" disabled>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div class="tabla-contenedor">
+                    <table>
+                        <caption class="solo-lector">
+                            Categorías registradas en el sistema
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Depósito base</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-categorias">
+                            <tr>
+                                <td colspan="5">Verificando sesión…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="total-categorias" class="total"></p>
+            </section>
+        </div>
+    </main>
+
+    <dialog id="dialogo-categoria" aria-labelledby="titulo-formulario">
+        <form id="formulario-categoria">
+            <h2 id="titulo-formulario">Nueva categoría</h2>
+            <p class="ayuda">Los campos marcados con * son obligatorios.</p>
+
+            <label for="nombre">Nombre *</label>
+            <input id="nombre" name="nombre" type="text"
+                   maxlength="80" required>
+
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" name="descripcion"
+                      maxlength="255" rows="3"></textarea>
+
+            <label for="deposito">Depósito base (MXN) *</label>
+            <input id="deposito" name="deposito" type="number"
+                   min="0" max="99999999.99" step="0.01"
+                   value="0" required>
+
+            <p id="error-formulario" class="mensaje-error"
+               role="alert" hidden></p>
+
+            <div class="acciones-formulario">
+                <button id="cancelar" class="secundario" type="button">
+                    Cancelar
+                </button>
+                <button id="guardar" type="submit">Guardar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="js/client.js"></script>
+    <script src="js/categorias.js"></script>
+</body>
+</html>
