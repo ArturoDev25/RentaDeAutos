@@ -1,221 +1,330 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auditoría | RentaDeAutos</title>
-    <!-- CSS principal y CSS scoped para auditoría -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/auditoria.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditoría - RentaDeAutos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auditoria.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-<body class="aud-body">
+<body class="dashboard-body">
 
-    <!-- SIDEBAR -->
-    <!-- Sidebar Oficial -->
-    <aside class="sidebar">
-        <div class="brand">
-        <div style="display: flex; align-items: center; gap: 10px; color: #fff; font-size: 1.2rem; font-weight: 700; padding: 10px 6px;">
-            <i class="fa-solid fa-car-side" style="color: #1565C0; font-size: 1.4rem;"></i>
-            <span>RentaDeAutos</span>
-        </div>
-        </div>
-
-        <nav class="nav-menu">
-        <a href="dashboard.html" class="nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-        <a href="vehiculos.html" class="nav-item"><i class="fa-solid fa-car"></i> Vehículos</a>
-        <a href="reservaciones.html" class="nav-item"><i class="fa-solid fa-calendar-days"></i> Reservaciones</a>
-        <a href="clientes.html" class="nav-item"><i class="fa-solid fa-users"></i> Clientes</a>
-        <a href="categorias.html" class="nav-item"><i class="fa-solid fa-tags"></i> Categorías</a>
-        <a href="reportes.html" class="nav-item"><i class="fa-solid fa-chart-column"></i> Reportes</a>
-        <a href="auditoria.html" class="nav-item active"><i class="fa-solid fa-file-shield"></i> Auditoría</a>
-        <a href="usuarios.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Usuarios</a>
-        <a href="configuracion.html" class="nav-item"><i class="fa-solid fa-gear"></i> Configuración</a>
-        </nav>
-
-        <div style="text-align: center; padding: 15px 0;">
-        <i class="fa-solid fa-car" style="color: #1976D2; font-size: 2.2rem; margin-bottom: 8px;"></i>
-        <p style="color: #64748b; font-size: 0.8rem; line-height: 1.3; margin: 0;">Transparencia<br>en movimiento</p>
-        </div>
-    </aside>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="aud-main">
-        <!-- TOPBAR -->
-        <header class="aud-topbar">
-            <div class="aud-search-global">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Buscar en el sistema...">
-            </div>
-            <div class="aud-user-controls">
-                <div class="aud-notification">
-                    <i class="fa-regular fa-bell"></i>
-                    <span class="aud-badge-count">3</span>
-                </div>
-                <div class="aud-profile">
-                    <div class="aud-avatar">LR</div>
-                    <span class="aud-username" id="topbarUsername">Cargando...</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- CONTENIDO PAGINA -->
-        <div class="aud-content">
-            <div class="aud-page-header">
-                <div class="aud-breadcrumb">Inicio &gt; <span>Auditoría</span></div>
-                <h1>Auditoría</h1>
-                <p>Consulta el registro de actividades y cambios realizados en el sistema.</p>
-            </div>
-
-            <!-- KPI CARDS -->
-            <div class="aud-kpi-grid">
-                <div class="aud-kpi-card aud-kpi-blue">
-                    <div class="aud-kpi-icon"><i class="fa-regular fa-file-lines"></i></div>
-                    <div class="aud-kpi-data">
-                        <span class="aud-kpi-value" id="kpi-total">...</span>
-                        <span class="aud-kpi-label">Total de registros</span>
-                    </div>
-                </div>
-                <div class="aud-kpi-card aud-kpi-green">
-                    <div class="aud-kpi-icon"><i class="fa-regular fa-user"></i></div>
-                    <div class="aud-kpi-data">
-                        <span class="aud-kpi-value" id="kpi-usuarios">...</span>
-                        <span class="aud-kpi-label">Usuarios activos</span>
-                    </div>
-                </div>
-                <div class="aud-kpi-card aud-kpi-orange">
-                    <div class="aud-kpi-icon"><i class="fa-regular fa-clock"></i></div>
-                    <div class="aud-kpi-data">
-                        <span class="aud-kpi-value" id="kpi-hoy">...</span>
-                        <span class="aud-kpi-label">Acciones hoy</span>
-                    </div>
-                </div>
-                <div class="aud-kpi-card aud-kpi-red">
-                    <div class="aud-kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="aud-kpi-data">
-                        <span class="aud-kpi-value" id="kpi-fallidos">...</span>
-                        <span class="aud-kpi-label">Intentos fallidos</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TABLA Y FILTROS -->
-            <div class="aud-table-container">
-                <div class="aud-filters">
-                    <div class="aud-search-filter">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="filter-q" placeholder="Buscar por usuario, acción o descripción...">
-                    </div>
-                    <div class="aud-select-group">
-                        <select id="filter-usuario">
-                            <option value="">Usuario: Todos</option>
-                        </select>
-                        <select id="filter-modulo">
-                            <option value="">Módulo: Todos</option>
-                        </select>
-                        <select id="filter-accion">
-                            <option value="">Acción: Todas</option>
-                        </select>
-                        <button class="aud-btn-clear" id="btn-limpiar">
-                            <i class="fa-solid fa-rotate-right"></i> Limpiar filtros
-                        </button>
-                    </div>
-                </div>
-
-                <div class="aud-table-wrapper">
-                    <table class="aud-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Fecha y hora</th>
-                                <th>Usuario</th>
-                                <th>Módulo</th>
-                                <th>Acción</th>
-                                <th>Descripción</th>
-                                <th>Dirección IP</th>
-                                <th>Resultado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="audit-tbody">
-                            <!-- Filas generadas por JS -->
-                            <tr><td colspan="8" style="text-align: center; padding: 2rem;">Cargando registros...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="aud-pagination">
-                    <div class="aud-page-info" id="page-info">Mostrando 0 a 0 de 0 registros</div>
-                    <div class="aud-page-controls" id="page-controls">
-                        <!-- Controles generados por JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- FOOTER INFERIOR -->
-            <footer class="aud-footer">
-                <p>RentaDeAutos &copy; 2026. Todos los derechos reservados.</p>
-                <div class="aud-footer-links">
-                    <a href="#">Auditoría</a>
-                    <a href="#">Confidencialidad</a>
-                    <a href="#">Reportes</a>
-                </div>
-            </footer>
-        </div>
-    </main>
-
-    <!-- MODAL FORENSE -->
-    <div class="aud-modal-overlay" id="auditModal">
-        <div class="aud-modal">
-            <div class="aud-modal-header">
-                <h2>Detalle del Evento <span id="modal-id" class="aud-modal-badge">AUD-0000</span></h2>
-                <button class="aud-modal-close" id="btn-cerrar-modal"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="aud-modal-body">
-                <div class="aud-modal-metadata">
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Usuario</span>
-                        <span class="aud-meta-value" id="modal-usuario"></span>
-                    </div>
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Fecha y hora</span>
-                        <span class="aud-meta-value" id="modal-fecha"></span>
-                    </div>
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Módulo</span>
-                        <span class="aud-meta-value" id="modal-modulo"></span>
-                    </div>
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Acción</span>
-                        <span class="aud-meta-value" id="modal-accion"></span>
-                    </div>
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Resultado</span>
-                        <span class="aud-meta-value" id="modal-resultado"></span>
-                    </div>
-                    <div class="aud-meta-item">
-                        <span class="aud-meta-label">Dirección IP</span>
-                        <span class="aud-meta-value aud-ip" id="modal-ip"></span>
-                    </div>
-                </div>
-                
-                <div class="aud-modal-description" id="modal-descripcion"></div>
-
-                <div class="aud-modal-diff">
-                    <div class="aud-diff-col">
-                        <h3>Valores Anteriores</h3>
-                        <pre id="modal-antes" class="aud-json-block"></pre>
-                    </div>
-                    <div class="aud-diff-col">
-                        <h3>Valores Nuevos</h3>
-                        <pre id="modal-despues" class="aud-json-block"></pre>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- ════════════════════════════════════════
+       SIDEBAR  (estructura idéntica a reportes.html)
+  ═══════════════════════════════════════════ -->
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-logo">
+      <a href="dashboard.html">
+        <img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos">
+      </a>
     </div>
 
-    <!-- SCRIPTS -->
-    <script src="js/client.js"></script>
-    <script src="js/auditoria.js"></script>
+    <nav class="sidebar-menu" aria-label="Panel de administración">
+      <a class="sidebar-link" href="dashboard.html">
+        <i class="fa-solid fa-house"></i><span>Dashboard</span>
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fa-solid fa-car"></i><span>Vehículos</span>
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span>
+      </a>
+      <a class="sidebar-link" href="#">
+        <i class="fa-solid fa-users"></i><span>Clientes</span>
+      </a>
+      <a class="sidebar-link" href="categorias.html">
+        <i class="fa-solid fa-tags"></i><span>Categorías</span>
+      </a>
+      <a class="sidebar-link" href="reportes.html">
+        <i class="fa-solid fa-chart-column"></i><span>Reportes</span>
+      </a>
+      <a class="sidebar-link active" aria-current="page" href="auditoria.html">
+        <i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span>
+      </a>
+    </nav>
+
+    <!-- Pie del sidebar -->
+    <div class="sidebar-footer-message">
+      <p>Transparencia<br>en movimiento</p>
+      <span></span>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+  ═══════════════════════════════════════════ -->
+  <div class="dashboard-main">
+
+    <!-- TOPBAR (idéntico a dashboard.html) -->
+    <header class="dashboard-topbar">
+
+      <!-- Botón menú móvil -->
+      <button class="mobile-menu-button" type="button" aria-label="Menú">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <!-- Buscador -->
+      <div class="dashboard-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Buscar en el sistema..." aria-label="Búsqueda global">
+      </div>
+
+      <!-- Área de usuario -->
+      <div class="dashboard-user-area">
+
+        <!-- Notificaciones -->
+        <button class="notification-button" type="button" aria-label="Notificaciones">
+          <i class="fa-regular fa-bell"></i>
+          <span>3</span>
+        </button>
+
+        <!-- Usuario — idéntico a dashboard.html -->
+        <div class="dashboard-user">
+          <div class="user-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="user-info">
+            <strong id="topbarUsername">Luis Ramírez</strong>
+            <small id="topbarRol">Auditor</small>
+          </div>
+          <i class="fa-solid fa-chevron-down user-arrow"></i>
+        </div>
+
+        <!-- Cerrar sesión -->
+        <button type="button" id="salir" class="dashboard-logout" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- ── CONTENIDO DE PÁGINA ── -->
+    <main class="dashboard-content">
+
+      <!-- Encabezado + breadcrumb -->
+      <section class="dashboard-title">
+        <div>
+          <h1>Auditoría</h1>
+          <p>Consulta el registro de actividades y cambios realizados en el sistema.</p>
+        </div>
+        <nav class="aud-breadcrumb" aria-label="Ruta de navegación">
+          <a href="dashboard.html">Inicio</a>
+          <i class="fa-solid fa-chevron-right"></i>
+          <span>Auditoría</span>
+        </nav>
+      </section>
+
+      <!-- ──── KPI CARDS (misma estructura que dashboard.html) ──── -->
+      <div class="dashboard-statistics">
+
+        <div class="stat-card">
+          <div class="stat-icon stat-green">
+            <i class="fa-regular fa-file-lines"></i>
+          </div>
+          <div class="stat-information">
+            <strong id="kpi-total">—</strong>
+            <h3>Total de registros</h3>
+            <p>Eventos en bitácora</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-light-green">
+            <i class="fa-regular fa-user"></i>
+          </div>
+          <div class="stat-information">
+            <strong id="kpi-usuarios">—</strong>
+            <h3>Usuarios activos</h3>
+            <p>Con actividad registrada</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-yellow">
+            <i class="fa-regular fa-clock"></i>
+          </div>
+          <div class="stat-information">
+            <strong id="kpi-hoy">—</strong>
+            <h3>Acciones hoy</h3>
+            <p>Eventos del día actual</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon stat-red">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="stat-information">
+            <strong id="kpi-fallidos">—</strong>
+            <h3>Intentos fallidos</h3>
+            <p>Resultado FALLIDO</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ──── PANEL TABLA (usa dashboard-panel de style.css) ──── -->
+      <section class="dashboard-panel" aria-label="Bitácora de auditoría">
+
+        <!-- Barra de filtros -->
+        <div class="panel-header aud-filter-bar">
+          <div class="aud-filter-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text"
+                   id="filter-q"
+                   placeholder="Buscar por usuario, acción o descripción..."
+                   autocomplete="off">
+          </div>
+
+          <div class="aud-filter-selects">
+            <div class="aud-select-wrap">
+              <label for="filter-usuario">Usuario</label>
+              <select id="filter-usuario">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="aud-select-wrap">
+              <label for="filter-modulo">Módulo</label>
+              <select id="filter-modulo">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="aud-select-wrap">
+              <label for="filter-accion">Tipo de acción</label>
+              <select id="filter-accion">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <button class="aud-btn-limpiar" id="btn-limpiar" type="button">
+              <i class="fa-solid fa-rotate-right"></i>
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="reservations-table-container">
+          <table class="reservations-table" aria-label="Registros de auditoría">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha y hora</th>
+                <th>Usuario</th>
+                <th>Módulo</th>
+                <th>Acción</th>
+                <th>Descripción</th>
+                <th>Dirección IP</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody">
+              <tr>
+                <td colspan="8" class="aud-table-loading">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i>
+                  Cargando registros…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="aud-pagination-bar">
+          <span class="aud-page-info" id="page-info">Mostrando 0 a 0 de 0 registros</span>
+          <div class="aud-page-controls" id="page-controls"></div>
+        </div>
+
+      </section>
+
+      <!-- FOOTER DE PÁGINA -->
+      <footer class="dashboard-footer">
+        <span>RentaDeAutos &copy; 2026. Todos los derechos reservados.</span>
+        <div>
+          <a href="#">Auditoría</a>
+          <a href="#">Confidencialidad</a>
+          <a href="#">Reportes</a>
+        </div>
+      </footer>
+
+    </main>
+  </div><!-- /dashboard-main -->
+
+  <!-- ════════════════════════════════════════
+       MODAL FORENSE
+  ═══════════════════════════════════════════ -->
+  <div class="aud-modal-overlay" id="auditModal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="aud-modal-box">
+
+      <div class="aud-modal-head">
+        <div class="aud-modal-head-left">
+          <h2 class="aud-modal-title" id="modal-title-text">Detalle del Evento</h2>
+          <span class="aud-modal-badge" id="modal-id">AUD-0000</span>
+        </div>
+        <button class="aud-modal-close" id="btn-cerrar-modal" type="button" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="aud-modal-body">
+
+        <!-- Metadatos del evento -->
+        <div class="aud-meta-grid">
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Usuario</span>
+            <span class="aud-meta-value" id="modal-usuario">—</span>
+          </div>
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Fecha y hora</span>
+            <span class="aud-meta-value" id="modal-fecha">—</span>
+          </div>
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Módulo</span>
+            <span class="aud-meta-value" id="modal-modulo">—</span>
+          </div>
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Acción</span>
+            <span class="aud-meta-value" id="modal-accion">—</span>
+          </div>
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Resultado</span>
+            <span class="aud-meta-value" id="modal-resultado">—</span>
+          </div>
+          <div class="aud-meta-item">
+            <span class="aud-meta-label">Dirección IP</span>
+            <span class="aud-meta-value aud-ip" id="modal-ip">—</span>
+          </div>
+        </div>
+
+        <p class="aud-modal-desc" id="modal-descripcion"></p>
+
+        <!-- Comparador JSON -->
+        <div class="aud-diff">
+          <div class="aud-diff-col">
+            <h3 class="aud-diff-title">
+              <i class="fa-solid fa-circle-minus" style="color:#dc4048"></i>
+              Valores Anteriores
+            </h3>
+            <pre class="aud-json-block" id="modal-antes"></pre>
+          </div>
+          <div class="aud-diff-col">
+            <h3 class="aud-diff-title">
+              <i class="fa-solid fa-circle-plus" style="color:#3caf7d"></i>
+              Valores Nuevos
+            </h3>
+            <pre class="aud-json-block" id="modal-despues"></pre>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/client.js"></script>
+  <script src="js/auditoria.js"></script>
 </body>
 </html>
