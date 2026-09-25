@@ -2,6 +2,7 @@ package com.rentadeautos.modules.client.service;
 
 import com.rentadeautos.modules.client.dto.ClienteRequest;
 import com.rentadeautos.modules.client.dto.ClienteResponse;
+import com.rentadeautos.modules.client.dto.FiltroClientes;
 import com.rentadeautos.modules.client.exception.ClienteDuplicadoException;
 import com.rentadeautos.modules.client.exception.ClienteInvalidoException;
 import com.rentadeautos.modules.client.exception.ClienteNoEncontradoException;
@@ -16,6 +17,8 @@ import java.util.List;
 @Service
 public class ClienteService {
 
+    static final int LONGITUD_MAXIMA_BUSQUEDA = 50;
+
     private final ClienteRepository clienteRepository;
 
     public ClienteService(ClienteRepository clienteRepository) {
@@ -24,7 +27,18 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public List<ClienteResponse> listar() {
-        return clienteRepository.findAllByOrderByApellidosAscNombreAsc().stream()
+        return listar(FiltroClientes.sinFiltros());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClienteResponse> listar(FiltroClientes filtro) {
+        String texto = limpiarTexto(filtro.texto());
+        if (texto != null && texto.length() > LONGITUD_MAXIMA_BUSQUEDA) {
+            throw new ClienteInvalidoException("El texto de búsqueda no puede exceder "
+                    + LONGITUD_MAXIMA_BUSQUEDA + " caracteres");
+        }
+
+        return clienteRepository.buscar(patronBusqueda(texto), filtro.activo()).stream()
                 .map(ClienteResponse::desde)
                 .toList();
     }
@@ -114,5 +128,19 @@ public class ClienteService {
 
     private String normalizarOpcional(String valor) {
         return valor == null || valor.trim().isEmpty() ? null : valor.trim();
+    }
+
+    private String limpiarTexto(String texto) {
+        return texto == null || texto.trim().isEmpty() ? null : texto.trim().toLowerCase();
+    }
+
+    private String patronBusqueda(String texto) {
+        if (texto == null) {
+            return null;
+        }
+        String escapado = texto.replace("!", "!!")
+                .replace("%", "!%")
+                .replace("_", "!_");
+        return "%" + escapado + "%";
     }
 }

@@ -3,6 +3,7 @@ package com.rentadeautos.modules.client.controller;
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.client.dto.ClienteRequest;
 import com.rentadeautos.modules.client.dto.ClienteResponse;
+import com.rentadeautos.modules.client.dto.FiltroClientes;
 import com.rentadeautos.modules.client.service.ClienteService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,8 +31,11 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ClienteResponse>>> listar() {
-        return ResponseEntity.ok(ApiResponse.success(clienteService.listar()));
+    public ResponseEntity<ApiResponse<List<ClienteResponse>>> listar(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Boolean activo) {
+        return ResponseEntity.ok(ApiResponse.success(
+                clienteService.listar(new FiltroClientes(q, activo))));
     }
 
     @GetMapping("/{id}")
