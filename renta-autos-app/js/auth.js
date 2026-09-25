@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Error de conexión:', error);
                 if (errorDiv) {
-                    errorDiv.innerText = 'No se pudo conectar con el servidor. Intenta más tarde.';
+                    errorDiv.innerText = error.message || 'No se pudo conectar con el servidor. Intenta más tarde.';
                     errorDiv.style.display = 'block';
                 }
             } finally {
