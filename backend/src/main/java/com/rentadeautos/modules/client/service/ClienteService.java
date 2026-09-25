@@ -79,6 +79,13 @@ public class ClienteService {
         return ClienteResponse.desde(clienteRepository.saveAndFlush(cliente));
     }
 
+    @Transactional
+    public ClienteResponse reactivar(Long id) {
+        Cliente cliente = buscar(id);
+        cliente.setActivo(true);
+        return ClienteResponse.desde(clienteRepository.saveAndFlush(cliente));
+    }
+
     private Cliente buscar(Long id) {
         return clienteRepository.findById(id)
                 .orElseThrow(ClienteNoEncontradoException::new);

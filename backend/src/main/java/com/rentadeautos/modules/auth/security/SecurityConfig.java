@@ -103,6 +103,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT,
                     "/api/v1/clientes", "/api/v1/clientes/**"
                 ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                // Reactivar clientes es una operación administrativa explícita.
+                .requestMatchers(HttpMethod.PATCH,
+                    "/api/v1/clientes/*/activar"
+                ).hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PATCH,
                     "/api/v1/clientes", "/api/v1/clientes/**"
                 ).hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")

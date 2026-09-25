@@ -74,6 +74,19 @@ class ClienteServiceTest {
     }
 
     @Test
+    void reactivarMarcaClienteComoActivo() {
+        Cliente cliente = new Cliente();
+        cliente.setActivo(false);
+        when(clienteRepository.findById(7L)).thenReturn(Optional.of(cliente));
+        when(clienteRepository.saveAndFlush(cliente)).thenReturn(cliente);
+
+        clienteService.reactivar(7L);
+
+        assertEquals(true, cliente.getActivo());
+        verify(clienteRepository).saveAndFlush(cliente);
+    }
+
+    @Test
     void listarAplicaTextoYEstadoActivo() {
         when(clienteRepository.buscar("%ana!!!%!_%", true)).thenReturn(List.of());
 

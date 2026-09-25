@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const acciones = crear('div', 'veh-acciones'); acciones.append(botonAccion('ver', 'fa-solid fa-eye', 'Ver detalle', () => abrirDetalle(cliente)));
             if (puedeModificar) acciones.append(botonAccion('editar', 'fa-solid fa-pen', 'Editar', () => abrirFormulario(cliente)));
             if (puedeDesactivar && cliente.activo) acciones.append(botonAccion('eliminar', 'fa-solid fa-user-slash', 'Desactivar', () => desactivar(cliente)));
+            if (puedeDesactivar && !cliente.activo) acciones.append(botonAccion('activar', 'fa-solid fa-user-check', 'Activar', () => reactivar(cliente)));
             celda(acciones); return fila;
         });
         tabla.replaceChildren(...filas); dibujarPaginacion();
@@ -150,6 +151,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!window.confirm(`¿Desactivar a ${nombreCompleto(cliente)}? Su historial se conservará.`)) return;
         try { await solicitar(`${RUTA}/${cliente.id}`, { method: 'DELETE' }); mostrarMensaje(`Se desactivó a ${nombreCompleto(cliente)}.`); await Promise.all([cargarResumen(), cargarClientes({ conservarPagina: true })]); }
         catch (error) { mostrarMensaje(error.message, true); }
+    }
+
+    async function reactivar(cliente) {
+        if (!window.confirm(`¿Reactivar a ${nombreCompleto(cliente)}?`)) return;
+        try {
+            await solicitar(`${RUTA}/${cliente.id}/activar`, { method: 'PATCH' });
+            mostrarMensaje(`Se reactivó a ${nombreCompleto(cliente)}.`);
+            await Promise.all([cargarResumen(), cargarClientes({ conservarPagina: true })]);
+        } catch (error) { mostrarMensaje(error.message, true); }
     }
 
     buscar.addEventListener('input', () => { clearTimeout(temporizadorBusqueda); temporizadorBusqueda = setTimeout(() => cargarClientes(), 350); });
