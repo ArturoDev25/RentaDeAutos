@@ -3,47 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categorías | RentaDeAutos</title>
-    <link rel="stylesheet" href="css/categorias.css">
-</head>
-<body>
-    <aside class="sidebar">
-        <a class="marca" href="index.html">RentaDeAutos</a>
-        <p class="subtitulo-menu">Panel de administración</p>
+    <title>Categorías - RentaDeAutos</title>
 
-        <nav aria-label="Menú principal">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="vehiculos.html">Vehículos</a>
-            <a href="reservaciones.html">Reservaciones</a>
-            <a href="clientes.html">Clientes</a>
-            <a href="categorias.html" aria-current="page">Categorías</a>
-            <a href="reportes.html">Reportes</a>
-            <a href="auditoria.html">Auditoría</a>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/categorias.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="dashboard-body categorias-page">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <a href="dashboard.html" aria-label="Ir al Dashboard">
+                <img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos">
+            </a>
+        </div>
+
+        <nav class="sidebar-menu" aria-label="Menú principal">
+            <a href="dashboard.html" class="sidebar-link">
+                <i class="fa-solid fa-house" aria-hidden="true"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="vehiculos.html" class="sidebar-link">
+                <i class="fa-solid fa-car" aria-hidden="true"></i>
+                <span>Vehículos</span>
+            </a>
+            <a href="categorias.html" class="sidebar-link active"
+               aria-current="page">
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                <span>Categorías</span>
+            </a>
+            <a href="clientes.html" class="sidebar-link">
+                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="reservaciones.html" class="sidebar-link">
+                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                <span>Reservaciones</span>
+            </a>
+            <a href="reportes.html" class="sidebar-link">
+                <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+                <span>Reportes</span>
+            </a>
+            <a href="auditoria.html" class="sidebar-link">
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+                <span>Auditoría</span>
+            </a>
         </nav>
+
+        <div class="sidebar-footer-message">
+            <p>Conduce<br>tus mejores<br>experiencias</p>
+            <span></span>
+        </div>
     </aside>
 
-    <main>
-        <header class="barra">
-            <span>Administración / Categorías</span>
-            <span id="nombre-usuario">Verificando sesión…</span>
+    <div class="dashboard-main">
+        <header class="dashboard-topbar">
+            <div class="cat-ubicacion">
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                <span>Administración / Categorías</span>
+            </div>
+
+            <div class="dashboard-user-area">
+                <div class="dashboard-user">
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    </div>
+                    <div class="user-info">
+                        <strong id="nombre-usuario">Verificando sesión…</strong>
+                        <small>Panel de Administrador</small>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <div class="contenido">
-            <div class="encabezado">
+        <main class="dashboard-content">
+            <section class="dashboard-title">
                 <div>
-                    <h1>Categorías de vehículos</h1>
-                    <p>Administra las categorías y su depósito base.</p>
+                    <h1>Categorías</h1>
+                    <p>Administra las categorías de vehículos y su depósito base</p>
                 </div>
-                <button id="nueva-categoria" type="button" disabled>
-                    + Nueva categoría
+
+                <button id="nueva-categoria" class="cat-btn"
+                        type="button" disabled>
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    Nueva categoría
                 </button>
-            </div>
+            </section>
 
             <p id="mensaje" role="status" aria-live="polite" hidden></p>
 
-            <section class="tarjeta" aria-label="Catálogo de categorías">
-                <div class="herramientas">
-                    <div>
+            <section class="dashboard-panel cat-panel"
+                     aria-label="Catálogo de categorías">
+                <div class="panel-header">
+                    <h2>
+                        <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+                        Catálogo de categorías
+                    </h2>
+                </div>
+
+                <div class="cat-herramientas">
+                    <div class="cat-filtro">
                         <label for="filtro-estado">Estado</label>
                         <select id="filtro-estado" disabled>
                             <option value="">Todas</option>
@@ -51,14 +111,17 @@
                             <option value="false">Inactivas</option>
                         </select>
                     </div>
-                    <button id="recargar" class="secundario"
+
+                    <button id="recargar" class="cat-btn secundario"
                             type="button" disabled>
+                        <i class="fa-solid fa-rotate" aria-hidden="true"></i>
                         Actualizar
                     </button>
                 </div>
 
-                <div class="tabla-contenedor">
-                    <table>
+                <div class="cat-tabla-contenedor" tabindex="0"
+                     role="region" aria-label="Tabla de categorías desplazable">
+                    <table class="cat-tabla">
                         <caption class="solo-lector">
                             Categorías registradas en el sistema
                         </caption>
@@ -79,37 +142,48 @@
                     </table>
                 </div>
 
-                <p id="total-categorias" class="total"></p>
+                <p id="total-categorias" class="cat-total"></p>
             </section>
-        </div>
-    </main>
 
-    <dialog id="dialogo-categoria" aria-labelledby="titulo-formulario">
+            <footer class="dashboard-footer">
+                <span>RentaDeAutos © 2026. Todos los derechos reservados.</span>
+            </footer>
+        </main>
+    </div>
+
+    <dialog id="dialogo-categoria" class="cat-dialogo"
+            aria-labelledby="titulo-formulario">
         <form id="formulario-categoria">
-            <h2 id="titulo-formulario">Nueva categoría</h2>
-            <p class="ayuda">Los campos marcados con * son obligatorios.</p>
+            <div class="cat-dialogo-cabecera">
+                <h2 id="titulo-formulario">Nueva categoría</h2>
+                <p>Los campos marcados con * son obligatorios.</p>
+            </div>
 
-            <label for="nombre">Nombre *</label>
-            <input id="nombre" name="nombre" type="text"
-                   maxlength="80" required>
+            <div class="cat-campos">
+                <label for="nombre">Nombre *</label>
+                <input id="nombre" name="nombre" type="text"
+                       maxlength="80" required>
 
-            <label for="descripcion">Descripción</label>
-            <textarea id="descripcion" name="descripcion"
-                      maxlength="255" rows="3"></textarea>
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion"
+                          maxlength="255" rows="3"></textarea>
 
-            <label for="deposito">Depósito base (MXN) *</label>
-            <input id="deposito" name="deposito" type="number"
-                   min="0" max="99999999.99" step="0.01"
-                   value="0" required>
+                <label for="deposito">Depósito base (MXN) *</label>
+                <input id="deposito" name="deposito" type="number"
+                       min="0" max="99999999.99" step="0.01"
+                       value="0" required>
 
-            <p id="error-formulario" class="mensaje-error"
-               role="alert" hidden></p>
+                <p id="error-formulario" class="mensaje-error"
+                   role="alert" hidden></p>
+            </div>
 
-            <div class="acciones-formulario">
-                <button id="cancelar" class="secundario" type="button">
+            <div class="cat-dialogo-acciones">
+                <button id="cancelar" class="cat-btn secundario" type="button">
                     Cancelar
                 </button>
-                <button id="guardar" type="submit">Guardar</button>
+                <button id="guardar" class="cat-btn" type="submit">
+                    Guardar
+                </button>
             </div>
         </form>
     </dialog>
