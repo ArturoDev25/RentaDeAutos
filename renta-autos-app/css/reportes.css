@@ -1,0 +1,55 @@
+.reporte-total {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0 1rem;
+}
+
+.reporte-columnas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.reporte-columnas table,
+.dashboard-panel table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.reporte-columnas th,
+.reporte-columnas td,
+.dashboard-panel th,
+.dashboard-panel td {
+    text-align: left;
+    padding: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.reporte-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.reporte-tarjeta {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.reporte-tarjeta .valor {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+@media (max-width: 720px) {
+    .reporte-columnas {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel-header button {
+    white-space: nowrap;
+    padding: 8px 14px;
+}

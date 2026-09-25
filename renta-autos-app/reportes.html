@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reportes - RentaDeAutos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/reportes.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="dashboard-body">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-logo"><a href="dashboard.html"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a></div>
+    <nav class="sidebar-menu" aria-label="Panel de administración">
+      <a class="sidebar-link" href="dashboard.html"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-car"></i><span>Vehículos</span></a>
+      <a class="sidebar-link" href="categorias.html"><i class="fa-solid fa-tags"></i><span>Categorías</span></a>
+      <a class="sidebar-link" href="#"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
+      <a class="sidebar-link" href="reservaciones.html"><i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span></a>
+      <a class="sidebar-link active" aria-current="page" href="reportes.html"><i class="fa-solid fa-chart-column"></i><span>Reportes</span></a>
+      <a class="sidebar-link" href="auditoria.html"><i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span></a>
+    </nav>
+  </aside>
+  <div class="dashboard-main">
+    <header class="dashboard-topbar reservation-topbar">
+      <a href="dashboard.html">← Volver al Dashboard</a>
+      <div class="dashboard-user-area"><span id="operador"></span><button type="button" id="salir" class="dashboard-logout">Cerrar sesión</button></div>
+    </header>
+    <main class="dashboard-content">
+      <section class="dashboard-title"><div><h1>Reportes</h1><p>Consulta información operacional del sistema</p></div></section>
+      <p id="mensaje" role="status" aria-live="polite"></p>
+
+      <section class="dashboard-panel" aria-labelledby="inventario-titulo">
+        <div class="panel-header">
+          <h2 id="inventario-titulo"><i class="fa-solid fa-car"></i>Inventario de vehículos</h2>
+          <button type="button" id="recargar-inventario">Actualizar</button>
+        </div>
+        <p id="inventario-total" class="reporte-total"></p>
+        <div class="reporte-columnas">
+          <div>
+            <h3>Por estado</h3>
+            <table><thead><tr><th>Estado</th><th>Cantidad</th></tr></thead><tbody id="inventario-estado"></tbody></table>
+          </div>
+          <div>
+            <h3>Por categoría</h3>
+            <table><thead><tr><th>Categoría</th><th>Cantidad</th></tr></thead><tbody id="inventario-categoria"></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-panel" aria-labelledby="clientes-titulo">
+        <div class="panel-header">
+          <h2 id="clientes-titulo"><i class="fa-solid fa-users"></i>Clientes</h2>
+          <button type="button" id="recargar-clientes">Actualizar</button>
+        </div>
+        <div class="reporte-tarjetas" id="clientes-tarjetas"></div>
+      </section>
+
+      <section class="dashboard-panel" aria-labelledby="reservaciones-titulo">
+        <div class="panel-header">
+          <h2 id="reservaciones-titulo"><i class="fa-solid fa-calendar-days"></i>Reservaciones</h2>
+          <button type="button" id="recargar-reservaciones">Actualizar</button>
+        </div>
+        <p id="reservaciones-total" class="reporte-total"></p>
+        <table><thead><tr><th>Estado</th><th>Cantidad</th></tr></thead><tbody id="reservaciones-estado"></tbody></table>
+      </section>
+    </main>
+  </div>
+  <script src="js/client.js"></script>
+  <script src="js/reportes.js"></script>
+</body>
+</html>
