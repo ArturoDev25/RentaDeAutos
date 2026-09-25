@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vehículos - RentaDeAutos</title>
+
+    <!-- Estilos base del panel (barra lateral, barra superior, tarjetas) -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Estilos propios de la pantalla de vehículos (S2-12) -->
+    <link rel="stylesheet" href="css/vehiculos.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+
+    <!-- =====================================================
+         BARRA LATERAL
+    ====================================================== -->
+    <aside class="dashboard-sidebar">
+
+        <div class="sidebar-logo">
+            <img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos">
+        </div>
+
+        <nav class="sidebar-menu" aria-label="Menú principal">
+            <a href="dashboard.html" class="sidebar-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="vehiculos.html" class="sidebar-link active" aria-current="page">
+                <i class="fa-solid fa-car"></i>
+                <span>Vehículos</span>
+            </a>
+            <a href="categorias.html" class="sidebar-link">
+                <i class="fa-solid fa-tags"></i>
+                <span>Categorías</span>
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="reservaciones.html" class="sidebar-link">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Reservaciones</span>
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="fa-solid fa-chart-column"></i>
+                <span>Reportes</span>
+            </a>
+            <a href="auditoria.html" class="sidebar-link">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Auditoría</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer-message">
+            <p>Conduce<br>tus mejores<br>experiencias</p>
+            <span></span>
+        </div>
+    </aside>
+
+
+    <!-- =====================================================
+         CONTENIDO PRINCIPAL
+    ====================================================== -->
+    <div class="dashboard-main">
+
+        <header class="dashboard-topbar">
+            <button class="mobile-menu-button" type="button" aria-label="Menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="dashboard-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema">
+            </div>
+
+            <div class="dashboard-user-area">
+                <button class="notification-button" type="button" aria-label="Notificaciones">
+                    <i class="fa-regular fa-bell"></i>
+                    <span>3</span>
+                </button>
+
+                <div class="dashboard-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info">
+                        <strong id="nombre-usuario">Usuario</strong>
+                        <small id="rol-usuario">—</small>
+                    </div>
+                    <i class="fa-solid fa-chevron-down user-arrow"></i>
+                </div>
+
+                <button id="cerrar-sesion" class="dashboard-logout" type="button" title="Cerrar sesión">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </header>
+
+
+        <main class="dashboard-content">
+
+            <!-- TÍTULO -->
+            <section class="dashboard-title">
+                <div>
+                    <h1>Vehículos</h1>
+                    <p>Administra los vehículos disponibles en el sistema</p>
+                </div>
+
+                <button id="registrar-vehiculo" class="veh-btn veh-btn-primario" type="button" hidden>
+                    <i class="fa-solid fa-plus"></i>
+                    Registrar vehículo
+                </button>
+            </section>
+
+            <!-- RESUMEN -->
+            <section class="dashboard-statistics veh-resumen" aria-label="Resumen de la flotilla">
+                <article class="stat-card">
+                    <div class="stat-icon veh-icono-gris"><i class="fa-solid fa-car-side"></i></div>
+                    <div class="stat-information">
+                        <strong id="total-vehiculos">—</strong>
+                        <p>Total de vehículos</p>
+                    </div>
+                </article>
+                <article class="stat-card veh-tarjeta-verde">
+                    <div class="stat-icon stat-light-green"><i class="fa-regular fa-circle-check"></i></div>
+                    <div class="stat-information">
+                        <strong id="total-disponibles">—</strong>
+                        <p>Disponibles</p>
+                    </div>
+                </article>
+                <article class="stat-card veh-tarjeta-amarilla">
+                    <div class="stat-icon stat-yellow"><i class="fa-regular fa-clock"></i></div>
+                    <div class="stat-information">
+                        <strong id="total-rentados">—</strong>
+                        <p>Rentados</p>
+                    </div>
+                </article>
+                <article class="stat-card veh-tarjeta-roja">
+                    <div class="stat-icon stat-red"><i class="fa-solid fa-wrench"></i></div>
+                    <div class="stat-information">
+                        <strong id="total-mantenimiento">—</strong>
+                        <p>En mantenimiento</p>
+                    </div>
+                </article>
+            </section>
+
+            <p id="mensaje" class="veh-mensaje" role="status" aria-live="polite" hidden></p>
+
+            <!-- FILTROS (S2-13) -->
+            <section class="veh-filtros" aria-label="Buscar y filtrar vehículos">
+                <div class="veh-buscador">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="buscar" type="search" maxlength="50"
+                           placeholder="Buscar por marca, modelo, placa o VIN..."
+                           aria-label="Buscar por marca, modelo, placa o VIN">
+                </div>
+
+                <label class="veh-select">
+                    <span>Categoría</span>
+                    <select id="filtro-categoria">
+                        <option value="">Todas</option>
+                    </select>
+                </label>
+
+                <label class="veh-select">
+                    <span>Estado</span>
+                    <select id="filtro-estado">
+                        <option value="">Todos</option>
+                        <option value="DISPONIBLE">Disponible</option>
+                        <option value="RESERVADO">Reservado</option>
+                        <option value="RENTADO">Rentado</option>
+                        <option value="MANTENIMIENTO">En mantenimiento</option>
+                        <option value="BAJA">Baja</option>
+                    </select>
+                </label>
+
+                <button id="limpiar-filtros" class="veh-btn veh-btn-claro" type="button">
+                    <i class="fa-solid fa-rotate"></i>
+                    Limpiar filtros
+                </button>
+            </section>
+
+            <!-- TABLA -->
+            <section class="veh-tabla-contenedor" aria-label="Vehículos registrados">
+                <table class="veh-tabla">
+                    <thead>
+                        <tr>
+                            <th scope="col">Imagen</th>
+                            <th scope="col">Marca</th>
+                            <th scope="col">Modelo</th>
+                            <th scope="col">Año</th>
+                            <th scope="col">Placa</th>
+                            <th scope="col">VIN</th>
+                            <th scope="col">Categoría</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-vehiculos">
+                        <tr><td colspan="9" class="veh-celda-aviso">Cargando vehículos…</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- PAGINACIÓN -->
+            <nav class="veh-paginacion" aria-label="Paginación">
+                <p id="texto-paginacion"></p>
+                <div id="botones-paginacion" class="veh-paginas"></div>
+            </nav>
+
+            <footer class="dashboard-footer">
+                <span>RentaDeAutos © 2026. Todos los derechos reservados.</span>
+                <div>
+                    <a href="#">Términos</a> |
+                    <a href="#">Privacidad</a> |
+                    <a href="#">Soporte</a>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+
+    <!-- =====================================================
+         MENÚ DE CAMBIO DE ESTADO (⋮)
+    ====================================================== -->
+    <div id="menu-estado" class="veh-menu" role="menu" hidden>
+        <p class="veh-menu-titulo">Cambiar estado a</p>
+        <button type="button" role="menuitem" data-estado="DISPONIBLE">
+            <span class="veh-punto disponible"></span>Disponible</button>
+        <button type="button" role="menuitem" data-estado="RESERVADO">
+            <span class="veh-punto reservado"></span>Reservado</button>
+        <button type="button" role="menuitem" data-estado="RENTADO">
+            <span class="veh-punto rentado"></span>Rentado</button>
+        <button type="button" role="menuitem" data-estado="MANTENIMIENTO">
+            <span class="veh-punto mantenimiento"></span>En mantenimiento</button>
+        <button type="button" role="menuitem" data-estado="BAJA">
+            <span class="veh-punto baja"></span>Baja</button>
+    </div>
+
+
+    <!-- =====================================================
+         FORMULARIO REGISTRAR / EDITAR
+    ====================================================== -->
+    <dialog id="dialogo-vehiculo" class="veh-dialogo" aria-labelledby="titulo-formulario">
+        <form id="formulario-vehiculo" novalidate>
+            <header class="veh-dialogo-cabecera">
+                <h2 id="titulo-formulario">Registrar vehículo</h2>
+                <button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+
+            <p class="veh-ayuda">Los campos con * son obligatorios. Un vehículo nuevo inicia como <strong>Disponible</strong>.</p>
+
+            <div class="veh-campos">
+                <label class="veh-campo veh-campo-completo">
+                    <span>Categoría *</span>
+                    <select id="campo-categoria" name="categoriaId" required></select>
+                </label>
+
+                <label class="veh-campo">
+                    <span>Marca *</span>
+                    <input id="campo-marca" name="marca" type="text" maxlength="80" required>
+                </label>
+                <label class="veh-campo">
+                    <span>Modelo *</span>
+                    <input id="campo-modelo" name="modelo" type="text" maxlength="80" required>
+                </label>
+
+                <label class="veh-campo">
+                    <span>Placa *</span>
+                    <input id="campo-placa" name="placa" type="text" maxlength="15" required
+                           placeholder="ABC-1234" autocapitalize="characters">
+                </label>
+                <label class="veh-campo">
+                    <span>Año *</span>
+                    <input id="campo-anio" name="anio" type="number" min="2000" step="1" required>
+                </label>
+
+                <label class="veh-campo veh-campo-completo">
+                    <span>VIN / número de serie *</span>
+                    <input id="campo-vin" name="vin" type="text" maxlength="17" minlength="17" required
+                           placeholder="17 caracteres, sin I, O ni Q" autocapitalize="characters">
+                </label>
+
+                <label class="veh-campo">
+                    <span>Color</span>
+                    <input id="campo-color" name="color" type="text" maxlength="40">
+                </label>
+                <label class="veh-campo">
+                    <span>Kilometraje *</span>
+                    <input id="campo-kilometraje" name="kilometraje" type="number" min="0" step="0.1" required>
+                </label>
+            </div>
+
+            <p id="error-formulario" class="veh-error" role="alert" hidden></p>
+
+            <footer class="veh-dialogo-acciones">
+                <button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cancelar</button>
+                <button id="guardar-vehiculo" type="submit" class="veh-btn veh-btn-primario">Guardar</button>
+            </footer>
+        </form>
+    </dialog>
+
+
+    <!-- =====================================================
+         DETALLE
+    ====================================================== -->
+    <dialog id="dialogo-detalle" class="veh-dialogo" aria-labelledby="titulo-detalle">
+        <header class="veh-dialogo-cabecera">
+            <h2 id="titulo-detalle">Detalle del vehículo</h2>
+            <button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+        <div id="contenido-detalle" class="veh-detalle"></div>
+        <footer class="veh-dialogo-acciones">
+            <button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cerrar</button>
+        </footer>
+    </dialog>
+
+    <script src="js/client.js"></script>
+    <script src="js/vehiculos.js"></script>
+</body>
+
+</html>

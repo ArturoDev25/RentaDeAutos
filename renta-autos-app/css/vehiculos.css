@@ -1,0 +1,627 @@
+/* =========================================================
+   VEHÍCULOS (S2-12)
+   Complementa css/style.css: reutiliza la barra lateral, la barra
+   superior y las tarjetas del dashboard, y agrega lo propio de esta
+   pantalla. Todas las clases nuevas empiezan con "veh-" para no
+   chocar con los estilos de otras pantallas.
+========================================================= */
+
+:root {
+    --veh-verde: #145b49;
+    --veh-verde-hover: #0f4638;
+    --veh-verde-claro: #e9f5ef;
+    --veh-borde: #e2e9e6;
+    --veh-texto: #172033;
+    --veh-texto-suave: #637087;
+}
+
+
+/* ---------- Botones ---------- */
+
+.veh-btn {
+    height: 48px;
+    padding: 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Sin esto, display:inline-flex le gana al atributo hidden */
+.veh-btn[hidden] {
+    display: none;
+}
+
+.veh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.veh-btn-primario {
+    border: none;
+    background: var(--veh-verde);
+    color: #ffffff;
+    box-shadow: 0 5px 12px rgba(20, 91, 73, 0.18);
+}
+
+.veh-btn-primario:hover:not(:disabled) {
+    background: var(--veh-verde-hover);
+}
+
+.veh-btn-claro {
+    border: 1px solid var(--veh-borde);
+    background: #f7faf9;
+    color: var(--veh-texto);
+}
+
+.veh-btn-claro:hover:not(:disabled) {
+    background: #eef4f1;
+}
+
+.veh-btn-primario i,
+.veh-btn-claro i {
+    font-size: 17px;
+}
+
+
+/* ---------- Tarjetas de resumen ---------- */
+
+.veh-resumen .stat-card {
+    min-height: 98px;
+}
+
+.veh-icono-gris {
+    background: #e9eef0;
+    color: #34455b;
+}
+
+.veh-tarjeta-verde {
+    background: #f4fbf7;
+    border-color: #dcefe4;
+}
+
+.veh-tarjeta-amarilla {
+    background: #fffaf1;
+    border-color: #f6ead0;
+}
+
+.veh-tarjeta-roja {
+    background: #fff6f6;
+    border-color: #f8dfe1;
+}
+
+.veh-resumen .stat-information p {
+    margin-top: 8px;
+    font-size: 15px;
+    color: #4a5568;
+}
+
+
+/* ---------- Mensaje general ---------- */
+
+.veh-mensaje {
+    margin: 0 0 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.veh-mensaje.exito {
+    background: #e2f5eb;
+    color: #17623f;
+}
+
+.veh-mensaje.error {
+    background: #ffe7e8;
+    color: #a4262c;
+}
+
+
+/* ---------- Filtros ---------- */
+
+.veh-filtros {
+    display: grid;
+    grid-template-columns: minmax(260px, 2.1fr) 1fr 1fr auto;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.veh-buscador {
+    height: 58px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #dce5e1;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.veh-buscador i {
+    color: #34455b;
+    font-size: 18px;
+}
+
+.veh-buscador input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: var(--veh-texto);
+}
+
+.veh-buscador input::placeholder {
+    color: #738096;
+}
+
+.veh-buscador:focus-within,
+.veh-select:focus-within {
+    border-color: #27856d;
+    box-shadow: 0 0 0 3px rgba(39, 133, 109, 0.12);
+}
+
+.veh-select {
+    height: 58px;
+    padding: 6px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid #dce5e1;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.veh-select span {
+    font-size: 13px;
+    color: var(--veh-texto);
+}
+
+.veh-select select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: #4a5568;
+    padding: 2px 0 0;
+    cursor: pointer;
+}
+
+.veh-filtros .veh-btn {
+    height: 58px;
+}
+
+
+/* ---------- Tabla ---------- */
+
+.veh-tabla-contenedor {
+    overflow-x: auto;
+    border: 1px solid var(--veh-borde);
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.veh-tabla {
+    width: 100%;
+    min-width: 1000px;
+    border-collapse: collapse;
+}
+
+.veh-tabla th {
+    background: var(--veh-verde-claro);
+    color: #243344;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    padding: 18px 16px;
+}
+
+.veh-tabla td {
+    padding: 10px 16px;
+    color: #243344;
+    font-size: 15px;
+    border-bottom: 1px solid #edf1ef;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.veh-tabla tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.veh-tabla tbody tr:hover td {
+    background: #fafdfb;
+}
+
+.veh-celda-aviso {
+    text-align: center;
+    color: var(--veh-texto-suave);
+    padding: 40px 16px !important;
+}
+
+.veh-vin {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+}
+
+/* Miniatura */
+
+.veh-miniatura {
+    width: 92px;
+    height: 54px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #eef4f1;
+    color: #7a9a8d;
+    font-size: 26px;
+}
+
+.veh-miniatura img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Estado */
+
+.veh-estado {
+    display: inline-block;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.veh-estado.disponible    { background: #ddf3e6; color: #18734d; }
+.veh-estado.reservado     { background: #e3edfb; color: #2958a3; }
+.veh-estado.rentado       { background: #fff1d6; color: #a16a00; }
+.veh-estado.mantenimiento { background: #ffe3e5; color: #c62f38; }
+.veh-estado.baja          { background: #eceff3; color: #5b6576; }
+
+/* Acciones */
+
+.veh-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.veh-accion {
+    width: 40px;
+    height: 40px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #172033;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.veh-accion.ver {
+    background: #f4f6f7;
+}
+
+.veh-accion.editar {
+    background: #eef1f3;
+    border-color: #e1e6ea;
+}
+
+.veh-accion:hover:not(:disabled) {
+    background: #e2ece7;
+}
+
+.veh-accion:focus-visible,
+.veh-btn:focus-visible,
+.veh-paginas button:focus-visible {
+    outline: 3px solid rgba(39, 133, 109, 0.35);
+    outline-offset: 2px;
+}
+
+
+/* ---------- Menú ⋮ ---------- */
+
+.veh-menu {
+    position: fixed;
+    z-index: 2000;
+    min-width: 210px;
+    padding: 8px;
+    border: 1px solid var(--veh-borde);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 14px 30px rgba(23, 32, 51, 0.14);
+}
+
+.veh-menu-titulo {
+    margin: 4px 10px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--veh-texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.veh-menu button {
+    width: 100%;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--veh-texto);
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.veh-menu button:hover:not(:disabled) {
+    background: var(--veh-verde-claro);
+}
+
+.veh-menu button:disabled {
+    color: #9aa4b2;
+    cursor: default;
+}
+
+.veh-punto {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.veh-punto.disponible    { background: #21825e; }
+.veh-punto.reservado     { background: #2f6fd1; }
+.veh-punto.rentado       { background: #d99a00; }
+.veh-punto.mantenimiento { background: #dc4048; }
+.veh-punto.baja          { background: #8a94a6; }
+
+
+/* ---------- Paginación ---------- */
+
+.veh-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 10px 26px;
+}
+
+.veh-paginacion p {
+    margin: 0;
+    color: #4a5568;
+    font-size: 15px;
+}
+
+.veh-paginas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.veh-paginas button {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--veh-texto);
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.veh-paginas button:hover:not(:disabled) {
+    background: #eef4f1;
+}
+
+.veh-paginas button.activa {
+    background: var(--veh-verde);
+    color: #ffffff;
+}
+
+.veh-paginas button.flecha {
+    background: #f4f6f7;
+}
+
+.veh-paginas button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+
+/* ---------- Diálogos ---------- */
+
+.veh-dialogo {
+    width: min(620px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    /* style.css pone margin: 0 a todo; se restaura para centrar el diálogo */
+    margin: auto;
+    padding: 0;
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(23, 32, 51, 0.25);
+    color: var(--veh-texto);
+}
+
+.veh-dialogo::backdrop {
+    background: rgba(12, 26, 22, 0.45);
+}
+
+/* style.css da fondo oscuro a todos los <header>; aquí se anula */
+.veh-dialogo-cabecera {
+    background: transparent;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 26px 6px;
+}
+
+.veh-dialogo-cabecera h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.veh-cerrar {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #4a5568;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.veh-cerrar:hover {
+    background: #f1f4f3;
+}
+
+.veh-ayuda {
+    margin: 0 26px 16px;
+    color: var(--veh-texto-suave);
+    font-size: 14px;
+}
+
+.veh-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+    padding: 0 26px;
+}
+
+.veh-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3a4e;
+}
+
+.veh-campo-completo {
+    grid-column: 1 / -1;
+}
+
+.veh-campo input,
+.veh-campo select {
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d5dfdb;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--veh-texto);
+    background: #ffffff;
+}
+
+.veh-campo input:focus,
+.veh-campo select:focus {
+    outline: none;
+    border-color: #27856d;
+    box-shadow: 0 0 0 3px rgba(39, 133, 109, 0.12);
+}
+
+.veh-campo input[aria-invalid="true"] {
+    border-color: #dc4048;
+}
+
+.veh-error {
+    margin: 16px 26px 0;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: #ffe7e8;
+    color: #a4262c;
+    font-size: 14px;
+}
+
+.veh-dialogo-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 22px 26px 24px;
+}
+
+.veh-dialogo-acciones .veh-btn {
+    height: 44px;
+    font-size: 15px;
+}
+
+/* Detalle */
+
+.veh-detalle {
+    padding: 8px 26px 0;
+}
+
+.veh-detalle .veh-miniatura {
+    width: 100%;
+    height: 170px;
+    font-size: 54px;
+    margin-bottom: 18px;
+}
+
+.veh-detalle dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    margin: 0;
+}
+
+.veh-detalle dt {
+    font-size: 13px;
+    color: var(--veh-texto-suave);
+}
+
+.veh-detalle dd {
+    margin: 3px 0 0;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1200px) {
+    .veh-filtros {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .veh-buscador {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 650px) {
+    .veh-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-title .veh-btn {
+        width: 100%;
+    }
+
+    .veh-paginacion {
+        flex-direction: column;
+    }
+
+    .veh-campos,
+    .veh-detalle dl {
+        grid-template-columns: 1fr;
+    }
+}
