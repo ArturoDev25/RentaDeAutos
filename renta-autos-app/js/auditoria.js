@@ -6,13 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Topbar username
-    document.getElementById('topbarUsername').textContent = `${usuarioSesion.nombre} - ${usuarioSesion.rol}`;
-    const avatar = document.querySelector('.aud-avatar');
-    if (avatar && usuarioSesion.nombre) {
-        const initials = usuarioSesion.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-        avatar.textContent = initials;
-    }
+    // Topbar — nombre y rol (igual que dashboard.js)
+    document.getElementById('topbarUsername').textContent = usuarioSesion.nombre || 'Usuario';
+    const rolEl = document.getElementById('topbarRol');
+    if (rolEl) rolEl.textContent = usuarioSesion.rol || '';
 
     // 2. Fetch Wrapper con JWT
     async function fetchAudit(endpoint) {
