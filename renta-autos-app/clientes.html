@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - RentaDeAutos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/vehiculos.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></div>
+        <nav class="sidebar-menu" aria-label="Menú principal">
+            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+            <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car"></i><span>Vehículos</span></a>
+            <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags"></i><span>Categorías</span></a>
+            <a href="clientes.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
+            <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span></a>
+            <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column"></i><span>Reportes</span></a>
+            <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span></a>
+        </nav>
+        <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+    </aside>
+
+    <div class="dashboard-main">
+        <header class="dashboard-topbar">
+            <button class="mobile-menu-button" type="button" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
+            <div class="dashboard-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema"></div>
+            <div class="dashboard-user-area">
+                <button class="notification-button" type="button" aria-label="Notificaciones"><i class="fa-regular fa-bell"></i><span>3</span></button>
+                <div class="dashboard-user"><div class="user-avatar"><i class="fa-solid fa-user"></i></div><div class="user-info"><strong id="nombre-usuario">Usuario</strong><small id="rol-usuario">-</small></div><i class="fa-solid fa-chevron-down user-arrow"></i></div>
+                <button id="cerrar-sesion" class="dashboard-logout" type="button" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <section class="dashboard-title"><div><h1>Clientes</h1><p>Administra la información de los clientes registrados</p></div><button id="registrar-cliente" class="veh-btn veh-btn-primario" type="button"><i class="fa-solid fa-plus"></i>Registrar cliente</button></section>
+            <section class="dashboard-statistics veh-resumen" aria-label="Resumen de clientes">
+                <article class="stat-card"><div class="stat-icon veh-icono-gris"><i class="fa-solid fa-users"></i></div><div class="stat-information"><strong id="total-clientes">-</strong><p>Total de clientes</p></div></article>
+                <article class="stat-card veh-tarjeta-verde"><div class="stat-icon stat-light-green"><i class="fa-regular fa-circle-check"></i></div><div class="stat-information"><strong id="total-activos">-</strong><p>Activos</p></div></article>
+                <article class="stat-card veh-tarjeta-roja"><div class="stat-icon stat-red"><i class="fa-solid fa-user-slash"></i></div><div class="stat-information"><strong id="total-inactivos">-</strong><p>Inactivos</p></div></article>
+            </section>
+            <p id="mensaje" class="veh-mensaje" role="status" aria-live="polite" hidden></p>
+            <section class="veh-filtros" aria-label="Buscar y filtrar clientes">
+                <div class="veh-buscador"><i class="fa-solid fa-magnifying-glass"></i><input id="buscar" type="search" maxlength="50" placeholder="Buscar por nombre, correo, teléfono o licencia..." aria-label="Buscar clientes"></div>
+                <label class="veh-select"><span>Estado</span><select id="filtro-activo"><option value="">Todos</option><option value="true">Activos</option><option value="false">Inactivos</option></select></label>
+                <button id="limpiar-filtros" class="veh-btn veh-btn-claro" type="button"><i class="fa-solid fa-rotate"></i>Limpiar filtros</button>
+            </section>
+            <section class="veh-tabla-contenedor" aria-label="Clientes registrados">
+                <table class="veh-tabla clientes-tabla"><thead><tr><th>Cliente</th><th>Correo</th><th>Teléfono</th><th>Licencia</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tabla-clientes"><tr><td colspan="7" class="veh-celda-aviso">Cargando clientes...</td></tr></tbody></table>
+            </section>
+            <nav class="veh-paginacion" aria-label="Paginación"><p id="texto-paginacion"></p><div id="botones-paginacion" class="veh-paginas"></div></nav>
+            <footer class="dashboard-footer"><span>RentaDeAutos © 2026. Todos los derechos reservados.</span><div><a href="#">Términos</a> | <a href="#">Privacidad</a> | <a href="#">Soporte</a></div></footer>
+        </main>
+    </div>
+
+    <dialog id="dialogo-cliente" class="veh-dialogo" aria-labelledby="titulo-formulario"><form id="formulario-cliente" novalidate>
+        <header class="veh-dialogo-cabecera"><h2 id="titulo-formulario">Registrar cliente</h2><button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header>
+        <p class="veh-ayuda">Los campos con * son obligatorios.</p>
+        <div class="veh-campos">
+            <label class="veh-campo"><span>Nombre *</span><input name="nombre" type="text" maxlength="100" required></label><label class="veh-campo"><span>Apellidos *</span><input name="apellidos" type="text" maxlength="150" required></label>
+            <label class="veh-campo"><span>Correo</span><input name="correo" type="email" maxlength="150"></label><label class="veh-campo"><span>Teléfono *</span><input name="telefono" type="tel" maxlength="20" required></label>
+            <label class="veh-campo"><span>Número de licencia *</span><input name="numeroLicencia" type="text" maxlength="50" required autocapitalize="characters"></label><label class="veh-campo"><span>Vencimiento de licencia *</span><input name="licenciaVencimiento" type="date" required></label>
+            <label class="veh-campo veh-campo-completo"><span>Dirección</span><input name="direccion" type="text" maxlength="255"></label>
+        </div>
+        <p id="error-formulario" class="veh-error" role="alert" hidden></p><footer class="veh-dialogo-acciones"><button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cancelar</button><button id="guardar-cliente" type="submit" class="veh-btn veh-btn-primario">Guardar</button></footer>
+    </form></dialog>
+    <dialog id="dialogo-detalle" class="veh-dialogo" aria-labelledby="titulo-detalle"><header class="veh-dialogo-cabecera"><h2 id="titulo-detalle">Detalle del cliente</h2><button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header><div id="contenido-detalle" class="veh-detalle"></div><footer class="veh-dialogo-acciones"><button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cerrar</button></footer></dialog>
+    <script src="js/client.js"></script><script src="js/clientes.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.clientes-tabla { min-width: 920px; }
+.clientes-tabla th:first-child, .clientes-tabla td:first-child { min-width: 190px; }
+.cliente-nombre { display: flex; align-items: center; gap: 12px; }
+.cliente-avatar { width: 40px; height: 40px; flex: 0 0 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #e9f5ef; color: #145b49; font-weight: 700; }
+.cliente-nombre strong, .cliente-nombre small { display: block; }
+.cliente-nombre small { margin-top: 3px; color: #637087; font-size: 12px; }
+.cliente-estado.activo { background: #ddf3e6; color: #18734d; }
+.cliente-estado.inactivo { background: #eceff3; color: #5b6576; }
+@media (max-width: 650px) { .clientes-tabla { min-width: 860px; } }
