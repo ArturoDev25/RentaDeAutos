@@ -1,0 +1,162 @@
+/* Estructura común de las siete pantallas administrativas.
+   Cargar después del CSS propio de cada módulo. */
+.dashboard-body .dashboard-main {
+    min-width: 0;
+}
+
+.dashboard-body .dashboard-sidebar {
+    overflow-y: auto;
+}
+
+.dashboard-body .sidebar-logo,
+.dashboard-body .sidebar-menu {
+    flex-shrink: 0;
+}
+
+.dashboard-body .dashboard-topbar {
+    min-height: 82px;
+    height: auto;
+    padding: 16px 36px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.dashboard-body .panel-ubicacion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #637087;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.dashboard-body .panel-ubicacion i {
+    color: #27856d;
+}
+
+.dashboard-body .dashboard-user-area {
+    margin-left: auto;
+    max-width: 100%;
+    gap: 20px;
+}
+
+.dashboard-body .dashboard-user {
+    min-width: 0;
+}
+
+.dashboard-body .user-avatar {
+    flex-shrink: 0;
+}
+
+.dashboard-body .user-info {
+    display: flex;
+    min-width: 0;
+}
+
+.dashboard-body .user-info strong {
+    max-width: 240px;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-body .dashboard-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #dce5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #145b49;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dashboard-body .dashboard-logout:hover {
+    background: #eefaf4;
+    border-color: #8acbb3;
+}
+
+.dashboard-body .dashboard-title {
+    gap: 20px;
+}
+
+.dashboard-body .dashboard-title > div {
+    min-width: 0;
+}
+
+.dashboard-body .dashboard-topbar :focus-visible,
+.dashboard-body .dashboard-sidebar :focus-visible {
+    outline: 3px solid #27856d;
+    outline-offset: 3px;
+}
+
+@media (max-width: 850px) {
+    .dashboard-body .dashboard-sidebar {
+        position: static;
+        display: flex;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        border-right: 0;
+        border-bottom: 1px solid #dcebe4;
+    }
+
+    .dashboard-body .sidebar-logo {
+        height: 76px;
+    }
+
+    .dashboard-body .sidebar-logo img {
+        width: 150px;
+    }
+
+    .dashboard-body .sidebar-menu {
+        flex-direction: row;
+        padding: 10px 14px;
+        overflow-x: auto;
+    }
+
+    .dashboard-body .sidebar-link {
+        flex-shrink: 0;
+        height: 44px;
+        padding: 0 14px;
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .dashboard-body .sidebar-footer-message {
+        display: none;
+    }
+
+    .dashboard-body .dashboard-main {
+        margin-left: 0;
+    }
+
+    .dashboard-body .dashboard-topbar {
+        padding: 16px 20px;
+    }
+}
+
+@media (max-width: 650px) {
+    .dashboard-body .dashboard-topbar {
+        gap: 14px;
+    }
+
+    .dashboard-body .dashboard-user-area {
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .dashboard-body .dashboard-logout span {
+        display: none;
+    }
+
+    .dashboard-body .dashboard-logout {
+        width: 44px;
+    }
+}

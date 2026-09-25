@@ -7,24 +7,39 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/reservaciones.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/panel.css">
 </head>
 <body class="dashboard-body">
   <aside class="dashboard-sidebar">
-    <div class="sidebar-logo"><a href="dashboard.html"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a></div>
-    <nav class="sidebar-menu" aria-label="Panel de administración">
-      <a class="sidebar-link" href="dashboard.html"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
-      <a class="sidebar-link" href="vehiculos.html"><i class="fa-solid fa-car"></i><span>Vehículos</span></a>
-      <a class="sidebar-link" href="categorias.html"><i class="fa-solid fa-tags"></i><span>Categorías</span></a>
-      <a class="sidebar-link" href="clientes.html"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
-      <a class="sidebar-link active" aria-current="page" href="reservaciones.html"><i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span></a>
-      <a class="sidebar-link" href="reportes.html"><i class="fa-solid fa-chart-column"></i><span>Reportes</span></a>
-      <a class="sidebar-link" href="auditoria.html"><i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span></a>
+    <div class="sidebar-logo">
+      <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+    </div>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+      <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
     </nav>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
   </aside>
   <div class="dashboard-main">
-    <header class="dashboard-topbar reservation-topbar">
-      <a href="dashboard.html">← Volver al Dashboard</a>
-      <div class="dashboard-user-area"><span id="operador"></span><button type="button" id="salir" class="dashboard-logout">Cerrar sesión</button></div>
+    <header class="dashboard-topbar">
+      <div class="panel-ubicacion"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Administración / Reservaciones</span></div>
+      <div class="dashboard-user-area">
+        <div class="dashboard-user">
+          <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+          <div class="user-info">
+            <strong id="operador">Usuario</strong>
+            <small data-panel-rol>Sesión</small>
+          </div>
+        </div>
+        <button id="salir" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+        </button>
+      </div>
     </header>
     <main class="dashboard-content">
       <section class="dashboard-title"><div><h1>Reservaciones</h1><p>Gestiona las reservas del panel de Administrador</p></div></section>
@@ -51,5 +66,6 @@
   </div>
   <script src="js/client.js"></script>
   <script src="js/reservaciones.js"></script>
+  <script src="js/panel.js"></script>
 </body>
 </html>
