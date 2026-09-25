@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.client.service;
 
 import com.rentadeautos.modules.client.dto.ClienteRequest;
+import com.rentadeautos.modules.client.dto.FiltroClientes;
 import com.rentadeautos.modules.client.exception.ClienteDuplicadoException;
 import com.rentadeautos.modules.client.model.Cliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
@@ -13,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -69,5 +71,22 @@ class ClienteServiceTest {
 
         assertFalse(cliente.getActivo());
         verify(clienteRepository).saveAndFlush(cliente);
+    }
+
+    @Test
+    void listarAplicaTextoYEstadoActivo() {
+        when(clienteRepository.buscar("%ana!!!%!_%", true)).thenReturn(List.of());
+
+        clienteService.listar(new FiltroClientes(" Ana!%_ ", true));
+
+        verify(clienteRepository).buscar("%ana!!!%!_%", true);
+    }
+
+    @Test
+    void listarRechazaTextoDemasiadoLargo() {
+        String texto = "a".repeat(51);
+
+        assertThrows(RuntimeException.class,
+                () -> clienteService.listar(new FiltroClientes(texto, null)));
     }
 }
