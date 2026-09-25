@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/auditoria.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/panel.css">
 </head>
 <body class="dashboard-body">
 
@@ -15,40 +16,18 @@
   ═══════════════════════════════════════════ -->
   <aside class="dashboard-sidebar">
     <div class="sidebar-logo">
-      <a href="dashboard.html">
-        <img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos">
-      </a>
+      <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
     </div>
-
-    <nav class="sidebar-menu" aria-label="Panel de administración">
-      <a class="sidebar-link" href="dashboard.html">
-        <i class="fa-solid fa-house"></i><span>Dashboard</span>
-      </a>
-      <a class="sidebar-link" href="#">
-        <i class="fa-solid fa-car"></i><span>Vehículos</span>
-      </a>
-      <a class="sidebar-link" href="#">
-        <i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span>
-      </a>
-      <a class="sidebar-link" href="clientes.html">
-        <i class="fa-solid fa-users"></i><span>Clientes</span>
-      </a>
-      <a class="sidebar-link" href="categorias.html">
-        <i class="fa-solid fa-tags"></i><span>Categorías</span>
-      </a>
-      <a class="sidebar-link" href="reportes.html">
-        <i class="fa-solid fa-chart-column"></i><span>Reportes</span>
-      </a>
-      <a class="sidebar-link active" aria-current="page" href="auditoria.html">
-        <i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span>
-      </a>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+      <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
     </nav>
-
-    <!-- Pie del sidebar -->
-    <div class="sidebar-footer-message">
-      <p>Transparencia<br>en movimiento</p>
-      <span></span>
-    </div>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
   </aside>
 
   <!-- ════════════════════════════════════════
@@ -58,44 +37,18 @@
 
     <!-- TOPBAR (idéntico a dashboard.html) -->
     <header class="dashboard-topbar">
-
-      <!-- Botón menú móvil -->
-      <button class="mobile-menu-button" type="button" aria-label="Menú">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-
-      <!-- Buscador -->
-      <div class="dashboard-search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Buscar en el sistema..." aria-label="Búsqueda global">
-      </div>
-
-      <!-- Área de usuario -->
+      <div class="panel-ubicacion"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Administración / Auditoría</span></div>
       <div class="dashboard-user-area">
-
-        <!-- Notificaciones -->
-        <button class="notification-button" type="button" aria-label="Notificaciones">
-          <i class="fa-regular fa-bell"></i>
-          <span>3</span>
-        </button>
-
-        <!-- Usuario — idéntico a dashboard.html -->
         <div class="dashboard-user">
-          <div class="user-avatar">
-            <i class="fa-solid fa-user"></i>
-          </div>
+          <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
           <div class="user-info">
-            <strong id="topbarUsername">Luis Ramírez</strong>
-            <small id="topbarRol">Auditor</small>
+            <strong id="topbarUsername">Usuario</strong>
+            <small id="topbarRol" data-panel-rol>Sesión</small>
           </div>
-          <i class="fa-solid fa-chevron-down user-arrow"></i>
         </div>
-
-        <!-- Cerrar sesión -->
-        <button type="button" id="salir" class="dashboard-logout" title="Cerrar sesión">
-          <i class="fa-solid fa-right-from-bracket"></i>
+        <button id="salir" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión" data-panel-logout>
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
         </button>
-
       </div>
     </header>
 
@@ -326,5 +279,6 @@
   <!-- Scripts -->
   <script src="js/client.js"></script>
   <script src="js/auditoria.js"></script>
+  <script src="js/panel.js"></script>
 </body>
 </html>

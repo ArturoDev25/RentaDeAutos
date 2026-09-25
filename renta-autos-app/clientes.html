@@ -8,32 +8,41 @@
     <link rel="stylesheet" href="css/vehiculos.css">
     <link rel="stylesheet" href="css/clientes.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/panel.css">
 </head>
 <body class="dashboard-body">
     <aside class="dashboard-sidebar">
-        <div class="sidebar-logo"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></div>
-        <nav class="sidebar-menu" aria-label="Menú principal">
-            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
-            <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car"></i><span>Vehículos</span></a>
-            <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags"></i><span>Categorías</span></a>
-            <a href="clientes.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-users"></i><span>Clientes</span></a>
-            <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days"></i><span>Reservaciones</span></a>
-            <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column"></i><span>Reportes</span></a>
-            <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list"></i><span>Auditoría</span></a>
-        </nav>
-        <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
-    </aside>
+    <div class="sidebar-logo">
+      <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+    </div>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+      <a href="clientes.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
+    </nav>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+  </aside>
 
     <div class="dashboard-main">
         <header class="dashboard-topbar">
-            <button class="mobile-menu-button" type="button" aria-label="Menú"><i class="fa-solid fa-bars"></i></button>
-            <div class="dashboard-search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema"></div>
-            <div class="dashboard-user-area">
-                <button class="notification-button" type="button" aria-label="Notificaciones"><i class="fa-regular fa-bell"></i><span>3</span></button>
-                <div class="dashboard-user"><div class="user-avatar"><i class="fa-solid fa-user"></i></div><div class="user-info"><strong id="nombre-usuario">Usuario</strong><small id="rol-usuario">-</small></div><i class="fa-solid fa-chevron-down user-arrow"></i></div>
-                <button id="cerrar-sesion" class="dashboard-logout" type="button" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
-            </div>
-        </header>
+      <div class="panel-ubicacion"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Administración / Clientes</span></div>
+      <div class="dashboard-user-area">
+        <div class="dashboard-user">
+          <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+          <div class="user-info">
+            <strong id="nombre-usuario">Usuario</strong>
+            <small id="rol-usuario" data-panel-rol>Sesión</small>
+          </div>
+        </div>
+        <button id="cerrar-sesion" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+        </button>
+      </div>
+    </header>
 
         <main class="dashboard-content">
             <section class="dashboard-title"><div><h1>Clientes</h1><p>Administra la información de los clientes registrados</p></div><button id="registrar-cliente" class="veh-btn veh-btn-primario" type="button"><i class="fa-solid fa-plus"></i>Registrar cliente</button></section>
@@ -69,5 +78,6 @@
     </form></dialog>
     <dialog id="dialogo-detalle" class="veh-dialogo" aria-labelledby="titulo-detalle"><header class="veh-dialogo-cabecera"><h2 id="titulo-detalle">Detalle del cliente</h2><button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></header><div id="contenido-detalle" class="veh-detalle"></div><footer class="veh-dialogo-acciones"><button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cerrar</button></footer></dialog>
     <script src="js/client.js"></script><script src="js/clientes.js"></script>
+  <script src="js/panel.js"></script>
 </body>
 </html>
