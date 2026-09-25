@@ -1,4 +1,5 @@
 // client.js - Módulo base para consumir la API REST de Spring Boot
+
 const esEntornoLocal =
     window.location.protocol === 'file:' ||
     ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
@@ -9,10 +10,30 @@ const API_BASE_URL = window.API_BASE_URL ||
         : `${window.location.origin}/api`);
 
 async function fetchAPI(endpoint, options = {}) {
+
+    // Obtener la sesión del usuario
+    const sesion = localStorage.getItem('usuarioSesion');
+
+    let token = null;
+
+    if (sesion) {
+        try {
+            const usuario = JSON.parse(sesion);
+            token = usuario.token;
+        } catch (error) {
+            console.error('Error al leer la sesión:', error);
+        }
+    }
+
     const defaultHeaders = {
         'Content-Type': 'application/json',
         ...options.headers
     };
+
+    // Agregar el token JWT
+    if (token) {
+        defaultHeaders.Authorization = `Bearer ${token}`;
+    }
 
     const config = {
         ...options,
@@ -20,11 +41,18 @@ async function fetchAPI(endpoint, options = {}) {
     };
 
     let response;
+
     try {
         response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     } catch (error) {
-        console.error(`No se pudo conectar con el backend en ${endpoint}:`, error);
-        throw new Error('No se pudo conectar con el servidor. Verifica tu conexión.');
+        console.error(
+            `No se pudo conectar con el backend en ${endpoint}:`,
+            error
+        );
+
+        throw new Error(
+            'No se pudo conectar con el servidor. Verifica tu conexión.'
+        );
     }
 
     if (response.status === 204) {
@@ -32,6 +60,7 @@ async function fetchAPI(endpoint, options = {}) {
     }
 
     let body = null;
+
     try {
         body = await response.json();
     } catch (_) {
@@ -39,7 +68,11 @@ async function fetchAPI(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-        const mensaje = body && body.message ? body.message : `Error HTTP: ${response.status}`;
+        const mensaje =
+            body && body.message
+                ? body.message
+                : `Error HTTP: ${response.status}`;
+
         const error = new Error(mensaje);
         error.status = response.status;
         throw error;
