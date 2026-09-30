@@ -19,6 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import com.rentadeautos.modules.vehicle.exception.TarifaException;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -70,6 +74,65 @@ class TarifaControllerTest {
     @Test @WithMockUser(roles = "CLIENTE")
     void rolNoPermitidoDevuelve403() throws Exception {
         mvc.perform(get("/api/v1/tarifas")).andExpect(status().isForbidden());
+        verifyNoInteractions(tarifas);
+    }
+
+    private String cuerpo(String precio, String cargo, String inicio) {
+        return "{\"categoriaId\":2,\"precioDia\":" + precio
+                + ",\"cargoAtrasoDia\":" + cargo + ",\"fechaInicio\":" + inicio + "}";
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ADMINISTRADOR", "SUPERVISOR"})
+    void altaValidaDevuelve201(String rol) throws Exception {
+        when(tarifas.crear(any())).thenReturn(tarifa());
+        mvc.perform(post("/api/v1/tarifas").with(user("operador").roles(rol))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("850.00", "0", "\"2026-10-01\"")))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.success").value(true));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "-1", "null", "850.001", "100000000"})
+    @WithMockUser(roles = "ADMINISTRADOR")
+    void precioInvalidoDevuelve400(String precio) throws Exception {
+        mvc.perform(post("/api/v1/tarifas").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo(precio, "0", "\"2026-10-01\"")))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.success").value(false));
+        verifyNoInteractions(tarifas);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "null", "1.001", "100000000"})
+    @WithMockUser(roles = "ADMINISTRADOR")
+    void cargoInvalidoDevuelve400(String cargo) throws Exception {
+        mvc.perform(post("/api/v1/tarifas").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("850", cargo, "\"2026-10-01\"")))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(tarifas);
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void fechaInicialObligatoria() throws Exception {
+        mvc.perform(post("/api/v1/tarifas").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("850", "0", "null"))).andExpect(status().isBadRequest());
+        verifyNoInteractions(tarifas);
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void traslapeDevuelve409() throws Exception {
+        when(tarifas.crear(any())).thenThrow(new TarifaException(HttpStatus.CONFLICT, "Vigencia superpuesta"));
+        mvc.perform(post("/api/v1/tarifas").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("850", "0", "\"2026-10-01\"")))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.message").value("Vigencia superpuesta"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AGENTE", "AUDITOR", "CLIENTE"})
+    void rolesSinPermisoNoCrean(String rol) throws Exception {
+        mvc.perform(post("/api/v1/tarifas").with(user("operador").roles(rol))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("850", "0", "\"2026-10-01\""))).andExpect(status().isForbidden());
         verifyNoInteractions(tarifas);
     }
 }

@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(assignableTypes = TarifaController.class)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class TarifaExceptionHandler {
+    @ExceptionHandler(TarifaException.class)
+    public ResponseEntity<ApiResponse<Void>> negocio(TarifaException ex) {
+        return ResponseEntity.status(ex.getStatus()).body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(TarifaNoEncontradaException.class)
     public ResponseEntity<ApiResponse<Void>> noEncontrada(TarifaNoEncontradaException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(ex.getMessage()));
