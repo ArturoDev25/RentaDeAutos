@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -27,6 +28,11 @@ public class TarifaController {
     @PostMapping
     public ResponseEntity<ApiResponse<TarifaResponse>> crear(@Valid @RequestBody TarifaRequest datos) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(tarifas.crear(datos)));
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<TarifaResponse> editar(@PathVariable Long id, @Valid @RequestBody TarifaRequest datos) {
+        return ApiResponse.success(tarifas.editar(id, datos));
     }
 
     @GetMapping

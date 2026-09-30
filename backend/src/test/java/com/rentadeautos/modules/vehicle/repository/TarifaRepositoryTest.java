@@ -28,7 +28,7 @@ class TarifaRepositoryTest {
         em.persistAndFlush(categoria);
     }
 
-    private void guardar(LocalDate fin, boolean activo) {
+    private Long guardar(LocalDate fin, boolean activo) {
         Tarifa tarifa = new Tarifa();
         tarifa.setCategoria(categoria);
         tarifa.setPrecioDia(new BigDecimal("850.00"));
@@ -36,6 +36,7 @@ class TarifaRepositoryTest {
         tarifa.setFechaFin(fin);
         tarifa.setActivo(activo);
         em.persistAndFlush(tarifa);
+        return tarifa.getId();
     }
 
     @Test void limitesInclusivosSeTraslapan() {
@@ -64,5 +65,20 @@ class TarifaRepositoryTest {
         otra.setNombre("Compacto");
         em.persistAndFlush(otra);
         assertTrue(tarifas.buscarTraslapes(otra.getId(), inicio, null).isEmpty());
+    }
+
+    @Test void excluyeLaPropiaTarifa() {
+        Long id = guardar(null, true);
+        assertTrue(tarifas.buscarTraslapesExcluyendo(categoria.getId(), inicio, null, id).isEmpty());
+        assertEquals(categoria.getId(), tarifas.consultarCategoriaId(id).orElseThrow());
+        assertEquals(id, tarifas.bloquearPorId(id).orElseThrow().getId());
+    }
+
+    @Test void exclusionNoOcultaOtraTarifa() {
+        Long propia = guardar(inicio.plusDays(9), true);
+        Long otra = guardar(null, true);
+        var resultado = tarifas.buscarTraslapesExcluyendo(categoria.getId(), inicio, null, propia);
+        assertEquals(1, resultado.size());
+        assertEquals(otra, resultado.get(0).getId());
     }
 }

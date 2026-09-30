@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import com.rentadeautos.modules.vehicle.exception.TarifaException;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -133,6 +134,46 @@ class TarifaControllerTest {
         mvc.perform(post("/api/v1/tarifas").with(user("operador").roles(rol))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(cuerpo("850", "0", "\"2026-10-01\""))).andExpect(status().isForbidden());
+        verifyNoInteractions(tarifas);
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void editarDevuelve200() throws Exception {
+        when(tarifas.editar(eq(1L), any())).thenReturn(tarifa());
+        mvc.perform(put("/api/v1/tarifas/1").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("900", "0", "\"2026-10-01\"")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(1));
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void editarInexistenteDevuelve404() throws Exception {
+        when(tarifas.editar(eq(99L), any())).thenThrow(new TarifaNoEncontradaException());
+        mvc.perform(put("/api/v1/tarifas/99").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("900", "0", "\"2026-10-01\"")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void editarConTraslapeDevuelve409() throws Exception {
+        when(tarifas.editar(eq(1L), any())).thenThrow(new TarifaException(HttpStatus.CONFLICT, "Traslape"));
+        mvc.perform(put("/api/v1/tarifas/1").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("900", "0", "\"2026-10-01\"")))
+                .andExpect(status().isConflict());
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void editarPrecioCeroDevuelve400() throws Exception {
+        mvc.perform(put("/api/v1/tarifas/1").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("0", "0", "\"2026-10-01\"")))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(tarifas);
+    }
+
+    @Test @WithMockUser(roles = "AUDITOR")
+    void auditorNoEdita() throws Exception {
+        mvc.perform(put("/api/v1/tarifas/1").contentType(MediaType.APPLICATION_JSON)
+                .content(cuerpo("900", "0", "\"2026-10-01\"")))
+                .andExpect(status().isForbidden());
         verifyNoInteractions(tarifas);
     }
 }

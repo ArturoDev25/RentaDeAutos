@@ -26,10 +26,7 @@ public class TarifaService {
 
     @Transactional
     public TarifaResponse crear(TarifaRequest datos) {
-        if (datos.fechaFin() != null && datos.fechaFin().isBefore(datos.fechaInicio())) {
-            throw new TarifaException(HttpStatus.BAD_REQUEST,
-                    "La fecha final no puede ser anterior a la inicial");
-        }
+        validarFechas(datos);
         // Bloquear la categoría antes de consultar traslapes protege también el primer alta.
         var categoria = categorias.bloquearPorId(datos.categoriaId())
                 .orElseThrow(() -> new TarifaException(HttpStatus.BAD_REQUEST,
@@ -48,6 +45,51 @@ public class TarifaService {
         tarifa.setFechaInicio(datos.fechaInicio());
         tarifa.setFechaFin(datos.fechaFin());
         return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
+    }
+
+    @Transactional
+    public TarifaResponse editar(Long id, TarifaRequest datos) {
+        validarFechas(datos);
+        Long origenId = tarifas.consultarCategoriaId(id)
+                .orElseThrow(TarifaNoEncontradaException::new);
+        // Orden estable para evitar bloqueos cruzados al cambiar de categoría.
+        var ids = java.util.stream.Stream.of(origenId, datos.categoriaId()).distinct().sorted().toList();
+        com.rentadeautos.modules.vehicle.model.Categoria destino = null;
+        for (Long categoriaId : ids) {
+            var categoria = categorias.bloquearPorId(categoriaId)
+                    .orElseThrow(() -> new TarifaException(HttpStatus.BAD_REQUEST, "La categoría no existe"));
+            if (categoriaId.equals(datos.categoriaId())) {
+                destino = categoria;
+            }
+        }
+        if (!Boolean.TRUE.equals(destino.getActivo())) {
+            throw new TarifaException(HttpStatus.BAD_REQUEST, "La categoría está inactiva");
+        }
+        Tarifa tarifa = tarifas.bloquearPorId(id).orElseThrow(TarifaNoEncontradaException::new);
+        if (!tarifa.getCategoria().getId().equals(origenId)) {
+            throw new TarifaException(HttpStatus.CONFLICT,
+                    "La categoría de la tarifa cambió durante la operación; vuelve a intentarlo");
+        }
+        if (Boolean.TRUE.equals(tarifa.getActivo()) &&
+                !tarifas.buscarTraslapesExcluyendo(datos.categoriaId(), datos.fechaInicio(),
+                        datos.fechaFin(), id).isEmpty()) {
+            throw new TarifaException(HttpStatus.CONFLICT,
+                    "Ya existe una tarifa activa para la categoría en ese periodo");
+        }
+        tarifa.setCategoria(destino);
+        tarifa.setPrecioDia(datos.precioDia());
+        tarifa.setCargoAtrasoDia(datos.cargoAtrasoDia());
+        tarifa.setFechaInicio(datos.fechaInicio());
+        tarifa.setFechaFin(datos.fechaFin());
+        // Editar el catálogo no modifica la tarifa histórica de las reservaciones.
+        return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
+    }
+
+    private void validarFechas(TarifaRequest datos) {
+        if (datos.fechaFin() != null && datos.fechaFin().isBefore(datos.fechaInicio())) {
+            throw new TarifaException(HttpStatus.BAD_REQUEST,
+                    "La fecha final no puede ser anterior a la inicial");
+        }
     }
 
     /** Incluye tarifas activas e inactivas para consultar el historial. */
