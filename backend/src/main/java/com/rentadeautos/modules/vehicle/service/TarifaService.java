@@ -85,6 +85,27 @@ public class TarifaService {
         return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
     }
 
+    /** Baja lógica: conserva el catálogo y las tarifas históricas de reservaciones. */
+    @Transactional
+    public TarifaResponse desactivar(Long id) {
+        Long categoriaId = tarifas.consultarCategoriaId(id)
+                .orElseThrow(TarifaNoEncontradaException::new);
+        categorias.bloquearPorId(categoriaId)
+                .orElseThrow(() -> new TarifaException(HttpStatus.CONFLICT,
+                        "La categoría de la tarifa ya no existe"));
+        Tarifa tarifa = tarifas.bloquearPorId(id).orElseThrow(TarifaNoEncontradaException::new);
+        if (!tarifa.getCategoria().getId().equals(categoriaId)) {
+            throw new TarifaException(HttpStatus.CONFLICT,
+                    "La categoría de la tarifa cambió durante la operación; vuelve a intentarlo");
+        }
+        // Repetir la baja devuelve el mismo estado sin eliminar ni reactivar el registro.
+        if (!Boolean.TRUE.equals(tarifa.getActivo())) {
+            return TarifaResponse.desde(tarifa);
+        }
+        tarifa.setActivo(false);
+        return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
+    }
+
     private void validarFechas(TarifaRequest datos) {
         if (datos.fechaFin() != null && datos.fechaFin().isBefore(datos.fechaInicio())) {
             throw new TarifaException(HttpStatus.BAD_REQUEST,

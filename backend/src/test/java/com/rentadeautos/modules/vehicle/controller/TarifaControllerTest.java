@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import com.rentadeautos.modules.vehicle.exception.TarifaException;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -174,6 +175,36 @@ class TarifaControllerTest {
         mvc.perform(put("/api/v1/tarifas/1").contentType(MediaType.APPLICATION_JSON)
                 .content(cuerpo("900", "0", "\"2026-10-01\"")))
                 .andExpect(status().isForbidden());
+        verifyNoInteractions(tarifas);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ADMINISTRADOR", "SUPERVISOR"})
+    void desactivarDevuelve200YEstadoInactivo(String rol) throws Exception {
+        var inactiva = new TarifaResponse(1L, 2L, "SUV", new BigDecimal("850.00"),
+                BigDecimal.ZERO, LocalDate.of(2026, 10, 1), null, false);
+        when(tarifas.desactivar(1L)).thenReturn(inactiva);
+        mvc.perform(patch("/api/v1/tarifas/1/desactivar").with(user("operador").roles(rol)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.activo").value(false));
+    }
+
+    @Test @WithMockUser(roles = "ADMINISTRADOR")
+    void desactivarInexistenteDevuelve404() throws Exception {
+        when(tarifas.desactivar(99L)).thenThrow(new TarifaNoEncontradaException());
+        mvc.perform(patch("/api/v1/tarifas/99/desactivar"))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.success").value(false));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AGENTE", "AUDITOR", "CLIENTE"})
+    void rolesNoPermitidosNoDesactivan(String rol) throws Exception {
+        mvc.perform(patch("/api/v1/tarifas/1/desactivar").with(user("operador").roles(rol)))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(tarifas);
+    }
+
+    @Test void bajaSinSesionDevuelve401() throws Exception {
+        mvc.perform(patch("/api/v1/tarifas/1/desactivar")).andExpect(status().isUnauthorized());
         verifyNoInteractions(tarifas);
     }
 }

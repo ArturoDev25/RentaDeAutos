@@ -81,4 +81,15 @@ class TarifaRepositoryTest {
         assertEquals(1, resultado.size());
         assertEquals(otra, resultado.get(0).getId());
     }
+
+    @Test void bajaLiberaVigenciaYConservaRegistro() {
+        Long id = guardar(null, true);
+        Tarifa t = tarifas.bloquearPorId(id).orElseThrow();
+        t.setActivo(false);
+        tarifas.saveAndFlush(t);
+        em.clear();
+        assertTrue(tarifas.buscarTraslapes(categoria.getId(), inicio, null).isEmpty());
+        assertFalse(tarifas.findById(id).orElseThrow().getActivo());
+        assertEquals(1, tarifas.count());
+    }
 }
