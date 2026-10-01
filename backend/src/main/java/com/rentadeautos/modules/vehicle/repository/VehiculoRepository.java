@@ -2,11 +2,14 @@ package com.rentadeautos.modules.vehicle.repository;
 
 import com.rentadeautos.modules.vehicle.model.EstadoVehiculo;
 import com.rentadeautos.modules.vehicle.model.Vehiculo;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Acceso a datos de los vehículos.
@@ -20,6 +23,14 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
     boolean existsByVinIgnoreCase(String vin);
 
     boolean existsByVinIgnoreCaseAndIdNot(String vin, Long id);
+
+    /**
+     * S3-09: lectura actual con bloqueo (SELECT ... FOR UPDATE) para cambiar
+     * el estado del vehículo sin carreras con otras operaciones.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT v FROM Vehiculo v WHERE v.id = :id")
+    Optional<Vehiculo> findByIdParaActualizar(@Param("id") Long id);
 
     /**
      * Busca vehículos con su categoría (S2-07). Los criterios nulos se ignoran.
