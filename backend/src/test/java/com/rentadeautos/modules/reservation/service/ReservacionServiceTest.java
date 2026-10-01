@@ -180,11 +180,15 @@ class ReservacionServiceTest {
 
         assertEquals(409, assertThrows(ReservacionException.class,
                 () -> servicio.confirmar(8L)).getStatus().value());
+
         assertEquals("PENDIENTE", r.getEstado());
         verify(reservaciones, never()).saveAndFlush(any());
+        verify(jdbc, never()).update(
+            startsWith("UPDATE vehiculos SET estado = 'RESERVADO'"),
+            anyLong());
         verifyNoInteractions(auditoria);
     }
-
+    
     @Test void confirmarReservacionInexistenteDevuelve404() {
         when(reservaciones.findById(99L)).thenReturn(Optional.empty());
         assertEquals(404, assertThrows(ReservacionException.class,
