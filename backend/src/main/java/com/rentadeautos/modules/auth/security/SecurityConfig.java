@@ -59,6 +59,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
                     .hasRole("ADMINISTRADOR")
 
+                // S3-09: entrega de vehículos (matriz de roles: Admin, Agente y Supervisor
+                // registran; el Auditor solo consulta).
+                .requestMatchers(HttpMethod.POST, "/api/v1/entregas")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers(HttpMethod.GET, "/api/v1/entregas/**")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+                .requestMatchers("/api/v1/entregas", "/api/v1/entregas/**")
+                    .denyAll()
+
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,
                     "/api/v1/clientes", "/api/v1/clientes/**",

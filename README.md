@@ -78,3 +78,12 @@ El backend permite alta, consulta, edición y baja lógica de tarifas, con valid
 de vigencias sin traslape y conservación de la tarifa histórica de reservaciones.
 
 Contrato REST, permisos y guía de comprobación: [docs/tarifas-api.md](docs/tarifas-api.md).
+
+
+## Entrega de vehículo — Sprint 3
+
+`POST /api/v1/entregas` entrega el vehículo de una reservación confirmada: registra
+kilometraje, combustible y condición de salida, pasa la reservación a `EN_CURSO` y el
+vehículo a `RENTADO` en una sola transacción, y genera auditoría.
+
+Contrato REST, reglas y guía de comprobación: [docs/entregas-api.md](docs/entregas-api.md).
