@@ -78,3 +78,11 @@ El backend permite alta, consulta, edición y baja lógica de tarifas, con valid
 de vigencias sin traslape y conservación de la tarifa histórica de reservaciones.
 
 Contrato REST, permisos y guía de comprobación: [docs/tarifas-api.md](docs/tarifas-api.md).
+
+
+## Seed de tarifas — S3-07
+
+En desarrollo se cargan tarifas ficticias faltantes para las categorías activas,
+sin duplicar ni sustituir las tarifas vigentes existentes.
+
+Ejecución, precios y guion de demostración: [docs/seed-tarifas-sprint-3.md](docs/seed-tarifas-sprint-3.md).
