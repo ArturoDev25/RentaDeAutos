@@ -86,3 +86,11 @@ En desarrollo se cargan tarifas ficticias faltantes para las categorías activas
 sin duplicar ni sustituir las tarifas vigentes existentes.
 
 Ejecución, precios y guion de demostración: [docs/seed-tarifas-sprint-3.md](docs/seed-tarifas-sprint-3.md).
+
+## Entrega de vehículo — Sprint 3
+
+`POST /api/v1/entregas` entrega el vehículo de una reservación confirmada: registra
+kilometraje, combustible y condición de salida, pasa la reservación a `EN_CURSO` y el
+vehículo a `RENTADO` en una sola transacción, y genera auditoría.
+
+Contrato REST, reglas y guía de comprobación: [docs/entregas-api.md](docs/entregas-api.md).
