@@ -158,5 +158,21 @@ sin contraseñas ni tokens.
 12. En dos sesiones simultáneas, intentar crear tarifas para la misma categoría y
     periodo: solo una debe guardarse. Verificar en MySQL que no quedaron dos activas.
 
-Registrar resultados manuales en el PR antes de considerar cumplida la Definition
-of Done y solicitar la revisión de un compañero.
+### Evidencia manual ejecutada (30 de septiembre de 2026)
+
+Se ejecuto contra MySQL 8.0.46 en Docker y el backend con JWT:
+
+- `POST /api/v1/tarifas`: 201; las validaciones de precio cero, cargo negativo
+   y fechas invertidas devolvieron 400.
+- Solapamiento en la fecha limite: 409; inicio al dia siguiente: 201.
+- Reserva de tres dias: 201 con `tarifaDia=850.00` y `totalEstimado=2550.00`.
+   Tras editar la tarifa a 900, la reserva conservo 850 y 2550.
+- Baja logica y repeticion: 200 en ambos casos; el registro inactivo permanecio
+   en MySQL. Sin tarifa vigente, una nueva reserva devolvio 409; el reemplazo
+   devolvio 201.
+- Permisos: sin token 401; Agente consulto con 200 y recibio 403 al crear.
+- Concurrencia: dos altas simultaneas para la misma categoria y periodo
+   devolvieron 201 y 409; MySQL conservo una sola tarifa activa.
+
+La bateria focalizada de tarifas ejecuto 64 casos, con 0 fallos, 0 errores y 0
+omitidos. Falta la revision de un compañero antes de cerrar la Definition of Done.
