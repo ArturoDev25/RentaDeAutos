@@ -1,5 +1,6 @@
 package com.rentadeautos.modules.reservation.service;
 
+import com.rentadeautos.modules.audit.service.AuditService;
 import com.rentadeautos.modules.auth.model.UsuarioApp;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.reservation.dto.ReservacionRequest;
@@ -32,6 +33,7 @@ class ReservacionServiceTest {
     @Mock ReservacionRepository reservaciones;
     @Mock UsuarioAppRepository usuarios;
     @Mock JdbcTemplate jdbc;
+    @Mock AuditService auditoria;
     @InjectMocks ReservacionService servicio;
 
     private final LocalDateTime inicio = LocalDateTime.of(2026, 10, 1, 10, 0);

@@ -1,5 +1,6 @@
 package com.rentadeautos.modules.reservation.service;
 
+import com.rentadeautos.modules.audit.service.AuditService;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.reservation.dto.ReservacionRequest;
 import com.rentadeautos.modules.reservation.dto.ReservacionResponse;
@@ -23,12 +24,14 @@ public class ReservacionService {
     private final ReservacionRepository reservaciones;
     private final UsuarioAppRepository usuarios;
     private final JdbcTemplate jdbc;
+    private final AuditService auditoria;
 
     public ReservacionService(ReservacionRepository reservaciones,
-            UsuarioAppRepository usuarios, JdbcTemplate jdbc) {
+            UsuarioAppRepository usuarios, JdbcTemplate jdbc, AuditService auditoria) {
         this.reservaciones = reservaciones;
         this.usuarios = usuarios;
         this.jdbc = jdbc;
+        this.auditoria = auditoria;
     }
 
     @Transactional(readOnly = true)
@@ -98,6 +101,41 @@ public class ReservacionService {
         validarEditable(r);
         r.setEstado("CANCELADA");
         return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+    }
+
+    @Transactional
+    public ReservacionResponse confirmar(Long id) {
+        Reservacion r = buscar(id);
+        if (!"PENDIENTE".equals(r.getEstado())) {
+            throw new ReservacionException(HttpStatus.CONFLICT,
+                    "Solo se pueden confirmar reservaciones pendientes");
+        }
+        // Bloquea el auto y confirma que sigue apto para reservarse.
+        bloquearYValidarVehiculo(r.getVehiculoId());
+        // Revalida que ninguna otra reservación se cruce (se excluye a sí misma).
+        validarDisponibilidad(new ReservacionRequest(r.getClienteId(), r.getVehiculoId(),
+                r.getFechaInicio(), r.getFechaFin(), r.getObservaciones()), id);
+
+        String vehiculoAntes = jdbc.queryForObject(
+                "SELECT estado FROM vehiculos WHERE id = ?", String.class, r.getVehiculoId());
+        r.setEstado("CONFIRMADA");
+        jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' WHERE id = ?", r.getVehiculoId());
+        Reservacion guardada = reservaciones.saveAndFlush(r);
+
+        auditoria.registrarEvento(usuarioActualId(), "CONFIRMAR_RESERVACION", "Reservacion", id,
+                "EXITOSO",
+                "{\"reservacion\":\"PENDIENTE\",\"vehiculo\":\"" + vehiculoAntes + "\"}",
+                "{\"reservacion\":\"CONFIRMADA\",\"vehiculo\":\"RESERVADO\"}",
+                null);
+        return ReservacionResponse.desde(guardada);
+    }
+
+    private Long usuarioActualId() {
+        String correo = SecurityContextHolder.getContext().getAuthentication().getName();
+        return usuarios.findByCorreo(correo)
+                .orElseThrow(() -> new ReservacionException(HttpStatus.UNAUTHORIZED,
+                        "La sesión ya no corresponde a un usuario válido"))
+                .getId();
     }
 
     private Reservacion buscar(Long id) {
