@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarifas - RentaDeAutos</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tarifas.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/panel.css">
+</head>
+
+<body class="dashboard-body tarifas-page">
+    <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel">
+                <img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos">
+            </a>
+        </div>
+        <nav class="sidebar-menu" aria-label="Menú principal">
+            <a href="dashboard.html"   class="sidebar-link"><i class="fa-solid fa-house"          aria-hidden="true"></i><span>Dashboard</span></a>
+            <a href="vehiculos.html"   class="sidebar-link"><i class="fa-solid fa-car"             aria-hidden="true"></i><span>Vehículos</span></a>
+            <a href="categorias.html"  class="sidebar-link"><i class="fa-solid fa-tags"            aria-hidden="true"></i><span>Categorías</span></a>
+            <a href="tarifas.html"     class="sidebar-link active" aria-current="page"><i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i><span>Tarifas</span></a>
+            <a href="clientes.html"    class="sidebar-link"><i class="fa-solid fa-users"           aria-hidden="true"></i><span>Clientes</span></a>
+            <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+            <a href="reportes.html"    class="sidebar-link"><i class="fa-solid fa-chart-column"    aria-hidden="true"></i><span>Reportes</span></a>
+            <a href="auditoria.html"   class="sidebar-link"><i class="fa-solid fa-clipboard-list"  aria-hidden="true"></i><span>Auditoría</span></a>
+        </nav>
+        <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+    </aside>
+
+    <!-- ═══════════════════════════════ CONTENIDO PRINCIPAL ═══════════════════ -->
+    <div class="dashboard-main">
+        <header class="dashboard-topbar">
+            <div class="panel-ubicacion">
+                <i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i>
+                <span>Administración / Tarifas</span>
+            </div>
+            <div class="dashboard-user-area">
+                <div class="dashboard-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+                    <div class="user-info">
+                        <strong id="nombre-usuario">Usuario</strong>
+                        <small data-panel-rol>Sesión</small>
+                    </div>
+                </div>
+                <button id="cerrar-sesion-panel" class="dashboard-logout"
+                        type="button" aria-label="Cerrar sesión" title="Cerrar sesión"
+                        data-panel-logout>
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Título y acción principal -->
+            <section class="dashboard-title">
+                <div>
+                    <h1>Tarifas</h1>
+                    <p>Gestiona las tarifas por categoría de vehículo y su periodo de vigencia</p>
+                </div>
+                <button id="nueva-tarifa" class="tar-btn" type="button" disabled
+                        aria-label="Registrar nueva tarifa">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    Nueva tarifa
+                </button>
+            </section>
+
+            <!-- Alerta global -->
+            <p id="mensaje" role="status" aria-live="polite" hidden></p>
+
+            <!-- Panel principal de tarifas -->
+            <section class="dashboard-panel tar-panel" aria-label="Catálogo de tarifas">
+                <div class="panel-header">
+                    <h2>
+                        <i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i>
+                        Catálogo de tarifas
+                    </h2>
+                </div>
+
+                <!-- Herramientas: filtros + botón actualizar -->
+                <div class="tar-herramientas">
+                    <div class="tar-filtros">
+                        <div class="tar-filtro">
+                            <label for="filtro-categoria">Categoría</label>
+                            <select id="filtro-categoria" disabled>
+                                <option value="">Todas las categorías</option>
+                            </select>
+                        </div>
+                        <div class="tar-filtro">
+                            <label for="filtro-estado">Estado</label>
+                            <select id="filtro-estado" disabled>
+                                <option value="">Todos</option>
+                                <option value="activo">Activas</option>
+                                <option value="inactivo">Inactivas</option>
+                            </select>
+                        </div>
+                        <div class="tar-filtro">
+                            <label for="filtro-vigencia">Vigencia</label>
+                            <select id="filtro-vigencia" disabled>
+                                <option value="">Todas</option>
+                                <option value="vigente">Vigente</option>
+                                <option value="futura">Próxima / Futura</option>
+                                <option value="vencida">Vencida</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="recargar" class="tar-btn secundario" type="button" disabled>
+                        <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                        Actualizar
+                    </button>
+                </div>
+
+                <!-- Tabla -->
+                <div class="tar-tabla-contenedor" tabindex="0"
+                     role="region" aria-label="Tabla de tarifas desplazable">
+                    <table class="tar-tabla">
+                        <caption class="solo-lector">Tarifas registradas en el sistema</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Categoría</th>
+                                <th scope="col">Precio / día</th>
+                                <th scope="col">Cargo atraso / día</th>
+                                <th scope="col">Inicio vigencia</th>
+                                <th scope="col">Fin vigencia</th>
+                                <th scope="col">Vigencia</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-tarifas">
+                            <tr>
+                                <td colspan="8">Verificando sesión…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="total-tarifas" class="tar-total"></p>
+            </section>
+
+            <footer class="dashboard-footer">
+                <span>RentaDeAutos © 2026. Todos los derechos reservados.</span>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ═══════════════════════════════ MODAL TARIFA ════════════════════════════ -->
+    <dialog id="dialogo-tarifa" class="tar-dialogo" aria-labelledby="titulo-formulario">
+        <form id="formulario-tarifa" novalidate>
+            <div class="tar-dialogo-cabecera">
+                <h2 id="titulo-formulario">Nueva tarifa</h2>
+                <p>Los campos marcados con <abbr title="obligatorio">*</abbr> son obligatorios.</p>
+            </div>
+
+            <div class="tar-campos">
+
+                <!-- Categoría -->
+                <label for="campo-categoria">Categoría *</label>
+                <select id="campo-categoria" name="categoriaId" required>
+                    <option value="">— Selecciona una categoría —</option>
+                </select>
+
+                <!-- Precio por día -->
+                <label for="campo-precio">Precio por día (MXN) *</label>
+                <input id="campo-precio" name="precioDia" type="number"
+                       min="0.01" max="99999999.99" step="0.01"
+                       placeholder="0.00" required>
+
+                <!-- Cargo por atraso -->
+                <label for="campo-cargo">Cargo por atraso / día (MXN) *</label>
+                <input id="campo-cargo" name="cargoAtrasoDia" type="number"
+                       min="0" max="99999999.99" step="0.01"
+                       placeholder="0.00" required>
+
+                <!-- Fecha inicio -->
+                <label for="campo-inicio">Fecha de inicio *</label>
+                <input id="campo-inicio" name="fechaInicio" type="date" required>
+
+                <!-- Fecha fin -->
+                <label for="campo-fin">Fecha de fin <small>(opcional)</small></label>
+                <input id="campo-fin" name="fechaFin" type="date">
+
+                <!-- Error del formulario -->
+                <p id="error-formulario" class="mensaje-error" role="alert" hidden></p>
+            </div>
+
+            <div class="tar-dialogo-acciones">
+                <button id="cancelar-tarifa" class="tar-btn secundario" type="button">
+                    Cancelar
+                </button>
+                <button id="guardar-tarifa" class="tar-btn" type="submit">
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="js/client.js"></script>
+    <script src="js/tarifas.js"></script>
+    <script src="js/panel.js"></script>
+</body>
+</html>

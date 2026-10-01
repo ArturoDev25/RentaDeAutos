@@ -1,0 +1,308 @@
+/* ═══════════════════════════════════════════════════════════════
+   css/tarifas.css  —  Estilos complementarios de la pantalla de Tarifas
+   Hereda el diseño del panel (panel.css + style.css).
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Variables de la pantalla ─────────────────────────────────── */
+.tarifas-page {
+    --tar-verde:       #27856d;
+    --tar-verde-oscuro:#145b49;
+    --tar-borde:       #dce5e1;
+    --tar-texto:       #172033;
+    --tar-secundario:  #637087;
+}
+
+/* ── Utilidades básicas ────────────────────────────────────────── */
+.tarifas-page [hidden] { display: none !important; }
+
+.tarifas-page :focus-visible {
+    outline: 3px solid var(--tar-verde);
+    outline-offset: 3px;
+}
+
+.tarifas-page .dashboard-main    { min-width: 0; }
+.tarifas-page .dashboard-sidebar { overflow-y: auto; }
+.tarifas-page .dashboard-title   { gap: 20px; }
+.tarifas-page .dashboard-title > div { min-width: 0; }
+
+/* ── Botones ────────────────────────────────────────────────────── */
+.tarifas-page .tar-btn,
+.tarifas-page .tar-acciones button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 17px;
+    border: 1px solid var(--tar-verde);
+    border-radius: 8px;
+    background: var(--tar-verde);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.tarifas-page .tar-btn:hover:not(:disabled) {
+    background: #206f5b;
+    border-color: #206f5b;
+}
+
+.tarifas-page .tar-btn.secundario {
+    background: #fff;
+    border-color: var(--tar-borde);
+    color: var(--tar-verde-oscuro);
+}
+
+.tarifas-page .tar-btn.secundario:hover:not(:disabled) {
+    background: #eef8f3;
+    border-color: #8acbb3;
+}
+
+.tarifas-page .tar-btn.peligro {
+    background: #fff;
+    border-color: #f1cccc;
+    color: #9f2929;
+}
+
+.tarifas-page .tar-btn.peligro:hover:not(:disabled) {
+    background: #fff0f0;
+    border-color: #e88;
+}
+
+.tarifas-page button:disabled,
+.tarifas-page select:disabled,
+.tarifas-page input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ── Panel de herramientas (filtros + actualizar) ───────────────── */
+.tarifas-page .tar-panel { margin-bottom: 24px; }
+
+.tarifas-page .tar-herramientas {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.tarifas-page .tar-filtros {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.tarifas-page .tar-filtro { min-width: 160px; flex: 1; }
+
+.tarifas-page .tar-filtro label,
+.tarifas-page .tar-campos  label {
+    display: block;
+    margin-bottom: 7px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.tarifas-page select,
+.tarifas-page .tar-campos input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--tar-borde);
+    border-radius: 8px;
+    background: #fbfcfc;
+    color: var(--tar-texto);
+    font-size: 14px;
+}
+
+/* ── Tabla ──────────────────────────────────────────────────────── */
+.tarifas-page .tar-tabla-contenedor {
+    overflow-x: auto;
+    padding: 0 20px;
+}
+
+.tarifas-page .tar-tabla {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.tarifas-page .tar-tabla th {
+    padding: 14px 16px;
+    background: #e9f5ef;
+    color: #243344;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tarifas-page .tar-tabla td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf1ef;
+    color: #465267;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.tarifas-page .tar-tabla tbody tr:hover { background: #fbfefd; }
+
+.tarifas-page .tar-tabla .col-categoria {
+    min-width: 140px;
+    color: #243344;
+    font-weight: 600;
+}
+
+.tarifas-page .tar-tabla .col-monto {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tarifas-page .tar-tabla .col-fecha { white-space: nowrap; }
+
+/* ── Badges de estado activo / inactivo ─────────────────────────── */
+.tarifas-page .estado {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tarifas-page .estado.activa  { background: #ddf3e6; color: #18734d; }
+.tarifas-page .estado.inactiva{ background: #edf0f3; color: #536177; }
+
+/* ── Badges de vigencia ─────────────────────────────────────────── */
+.tarifas-page .vigencia {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tarifas-page .vigencia.vigente { background: #ddf3e6; color: #18734d; }
+.tarifas-page .vigencia.futura  { background: #dbeafe; color: #1e4da1; }
+.tarifas-page .vigencia.vencida { background: #fef3c7; color: #92400e; }
+.tarifas-page .vigencia.sin-fin { background: #f0f4f8; color: #637087; }
+
+/* ── Celda de acciones ──────────────────────────────────────────── */
+.tarifas-page .tar-acciones {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tarifas-page .tar-acciones button {
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+/* ── Contador ───────────────────────────────────────────────────── */
+.tarifas-page .tar-total {
+    padding: 14px 20px;
+    color: var(--tar-secundario);
+    font-size: 13px;
+}
+
+/* ── Alertas globales ───────────────────────────────────────────── */
+.tarifas-page #mensaje,
+.tarifas-page #error-formulario {
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.tarifas-page #mensaje { margin-bottom: 20px; }
+
+.tarifas-page .mensaje-exito {
+    background: #e7f6ee;
+    color: #176443;
+    border: 1px solid #bde4ce;
+}
+
+.tarifas-page .mensaje-error {
+    background: #fff0f0;
+    color: #9f2929;
+    border: 1px solid #f1cccc;
+}
+
+.tarifas-page .mensaje-advertencia {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+.tarifas-page .tar-dialogo {
+    width: min(540px, calc(100% - 32px));
+    max-height: 92vh;
+    margin: auto;
+    padding: 0;
+    overflow-y: auto;
+    border: 1px solid var(--tar-borde);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--tar-texto);
+    box-shadow: 0 20px 60px #17203333;
+}
+
+.tarifas-page .tar-dialogo::backdrop { background: #152e2670; }
+
+.tarifas-page .tar-dialogo-cabecera {
+    padding: 24px;
+    border-bottom: 1px solid #e7eeeb;
+}
+
+.tarifas-page .tar-dialogo-cabecera h2 {
+    margin-bottom: 8px;
+    font-size: 22px;
+}
+
+.tarifas-page .tar-dialogo-cabecera p {
+    color: var(--tar-secundario);
+    font-size: 13px;
+}
+
+.tarifas-page .tar-campos { padding: 24px; }
+
+.tarifas-page .tar-campos input,
+.tarifas-page .tar-campos select { margin-bottom: 18px; }
+
+.tarifas-page .tar-campos small {
+    font-weight: 400;
+    color: var(--tar-secundario);
+}
+
+.tarifas-page .tar-dialogo-acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 18px 24px;
+    border-top: 1px solid #e7eeeb;
+    background: #fbfefd;
+}
+
+/* ── Accesibilidad ──────────────────────────────────────────────── */
+.tarifas-page .solo-lector {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .tarifas-page .tar-herramientas { flex-direction: column; align-items: stretch; }
+    .tarifas-page .tar-filtros      { flex-direction: column; }
+    .tarifas-page .tar-filtro       { min-width: unset; }
+}
