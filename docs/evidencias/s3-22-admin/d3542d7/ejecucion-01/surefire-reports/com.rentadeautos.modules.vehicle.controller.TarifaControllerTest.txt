@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.rentadeautos.modules.vehicle.controller.TarifaControllerTest
+-------------------------------------------------------------------------------
+Tests run: 36, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.533 s -- in com.rentadeautos.modules.vehicle.controller.TarifaControllerTest

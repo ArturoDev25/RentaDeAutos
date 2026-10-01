@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.rentadeautos.modules.audit.controller.AuditControllerTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.806 s -- in com.rentadeautos.modules.audit.controller.AuditControllerTest
