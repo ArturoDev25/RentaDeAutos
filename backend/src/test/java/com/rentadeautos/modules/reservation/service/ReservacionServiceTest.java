@@ -118,4 +118,77 @@ class ReservacionServiceTest {
         assertEquals(409, assertThrows(ReservacionException.class,
                 () -> servicio.cancelar(4L)).getStatus().value());
     }
+
+    private Reservacion pendiente() {
+        Reservacion r = new Reservacion();
+        r.setClienteId(2L);
+        r.setVehiculoId(3L);
+        r.setFechaInicio(inicio);
+        r.setFechaFin(inicio.plusDays(2));
+        r.setEstado("PENDIENTE");
+        return r;
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void vehiculoApto() {
+        doReturn(List.of(4L)).when(jdbc).query(startsWith("SELECT categoria_id"), any(RowMapper.class), eq(3L));
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void traslapes(List<Long> ids) {
+        doReturn(ids).when(jdbc).query(startsWith("SELECT id FROM reservaciones"),
+                any(RowMapper.class), eq(3L), eq(8L), any(), any());
+    }
+
+    @Test void confirmarValidaCambiaEstadosYAudita() {
+        Reservacion r = pendiente();
+        when(reservaciones.findById(8L)).thenReturn(Optional.of(r));
+        vehiculoApto();
+        traslapes(List.of());
+        doReturn("DISPONIBLE").when(jdbc).queryForObject(startsWith("SELECT estado"), eq(String.class), eq(3L));
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin@ejemplo.test", null));
+        UsuarioApp usuario = new UsuarioApp();
+        ReflectionTestUtils.setField(usuario, "id", 7L);
+        when(usuarios.findByCorreo("admin@ejemplo.test")).thenReturn(Optional.of(usuario));
+        when(reservaciones.saveAndFlush(r)).thenReturn(r);
+
+        var respuesta = servicio.confirmar(8L);
+
+        assertEquals("CONFIRMADA", respuesta.estado());
+        verify(jdbc).update(startsWith("UPDATE vehiculos SET estado = 'RESERVADO'"), eq(3L));
+        verify(auditoria).registrarEvento(eq(7L), eq("CONFIRMAR_RESERVACION"), eq("Reservacion"),
+                eq(8L), eq("EXITOSO"), contains("PENDIENTE"), contains("CONFIRMADA"), isNull());
+    }
+
+    @Test void confirmarRechazaSiNoEstaPendienteSinTocarNada() {
+        Reservacion r = pendiente();
+        r.setEstado("CONFIRMADA");
+        when(reservaciones.findById(8L)).thenReturn(Optional.of(r));
+
+        assertEquals(409, assertThrows(ReservacionException.class,
+                () -> servicio.confirmar(8L)).getStatus().value());
+        verifyNoInteractions(jdbc, auditoria);
+        verify(reservaciones, never()).saveAndFlush(any());
+    }
+
+    @Test void confirmarRechazaTraslapeYNoCambiaEstado() {
+        Reservacion r = pendiente();
+        when(reservaciones.findById(8L)).thenReturn(Optional.of(r));
+        vehiculoApto();
+        traslapes(List.of(9L));
+
+        assertEquals(409, assertThrows(ReservacionException.class,
+                () -> servicio.confirmar(8L)).getStatus().value());
+        assertEquals("PENDIENTE", r.getEstado());
+        verify(reservaciones, never()).saveAndFlush(any());
+        verifyNoInteractions(auditoria);
+    }
+
+    @Test void confirmarReservacionInexistenteDevuelve404() {
+        when(reservaciones.findById(99L)).thenReturn(Optional.empty());
+        assertEquals(404, assertThrows(ReservacionException.class,
+                () -> servicio.confirmar(99L)).getStatus().value());
+        verifyNoInteractions(jdbc, auditoria);
+    }
 }
