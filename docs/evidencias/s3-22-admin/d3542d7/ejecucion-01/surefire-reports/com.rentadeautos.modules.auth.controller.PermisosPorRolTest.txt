@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.rentadeautos.modules.auth.controller.PermisosPorRolTest
+-------------------------------------------------------------------------------
+Tests run: 100, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.930 s -- in com.rentadeautos.modules.auth.controller.PermisosPorRolTest
