@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
  * vehículos capturados a mano.</p>
  */
 @Component
+@Order(10)
 @Profile({"dev", "default"})
 public class VehiculoDataInitializer implements CommandLineRunner {
 
