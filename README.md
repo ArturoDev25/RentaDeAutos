@@ -70,3 +70,11 @@ cd backend
 Login con JWT y BCrypt. Requiere las variables `JWT_SECRET` y `JWT_EXPIRATION_MINUTES`.
 
 📖 **Guía completa:** [`docs/autenticacion.md`](docs/autenticacion.md)
+
+
+## Tarifas por categoría — Sprint 3
+
+El backend permite alta, consulta, edición y baja lógica de tarifas, con validación
+de vigencias sin traslape y conservación de la tarifa histórica de reservaciones.
+
+Contrato REST, permisos y guía de comprobación: [docs/tarifas-api.md](docs/tarifas-api.md).
