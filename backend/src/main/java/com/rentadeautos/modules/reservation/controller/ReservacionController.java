@@ -42,4 +42,8 @@ public class ReservacionController {
     public ApiResponse<ReservacionResponse> cancelar(@PathVariable Long id) {
         return ApiResponse.success(servicio.cancelar(id));
     }
+    @PostMapping("/{id}/confirmar")
+    public ApiResponse<ReservacionResponse> confirmar(@PathVariable Long id) {
+        return ApiResponse.success(servicio.confirmar(id));
+    }
 }
