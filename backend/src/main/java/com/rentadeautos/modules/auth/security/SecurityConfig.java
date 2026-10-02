@@ -59,6 +59,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
                     .hasRole("ADMINISTRADOR")
 
+                // S3-11: consulta de rentas activas del panel de Administrador.
+                .requestMatchers(HttpMethod.GET, "/api/v1/rentas/activas")
+                    .hasRole("ADMINISTRADOR")
+                .requestMatchers("/api/v1/rentas/activas", "/api/v1/rentas/activas/**")
+                    .denyAll()
+
                 // S3-09: entrega de vehículos (matriz de roles: Admin, Agente y Supervisor
                 // registran; el Auditor solo consulta).
                 .requestMatchers(HttpMethod.POST, "/api/v1/entregas")
