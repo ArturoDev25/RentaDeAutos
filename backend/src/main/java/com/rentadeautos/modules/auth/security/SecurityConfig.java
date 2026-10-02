@@ -68,6 +68,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/entregas", "/api/v1/entregas/**")
                     .denyAll()
 
+                // S3-10: devolución de vehículos (Admin, Agente y Supervisor registran;
+                // el Auditor no tiene acceso → 403 Forbidden).
+                .requestMatchers(HttpMethod.POST, "/api/v1/devoluciones")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers("/api/v1/devoluciones", "/api/v1/devoluciones/**")
+                    .denyAll()
+
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,
                     "/api/v1/clientes", "/api/v1/clientes/**",
