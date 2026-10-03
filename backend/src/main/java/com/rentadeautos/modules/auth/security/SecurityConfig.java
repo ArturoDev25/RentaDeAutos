@@ -55,9 +55,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/categorias", "/api/categorias/**")
                     .hasRole("ADMINISTRADOR")
 
-                // Sprint 2: el panel de reservaciones lo opera el Administrador.
+                // S3-12: reservaciones. Consulta: todo el personal, incluido el Auditor.
+                .requestMatchers(HttpMethod.GET, "/api/reservaciones", "/api/reservaciones/**")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+                // Operacion (crear, editar, confirmar, cancelar): Admin, Agente y Supervisor.
+                // El orden importa: la regla de GET debe ir antes que la general.
                 .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
-                    .hasRole("ADMINISTRADOR")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
 
                 // S3-09: entrega de vehículos (matriz de roles: Admin, Agente y Supervisor
                 // registran; el Auditor solo consulta).
