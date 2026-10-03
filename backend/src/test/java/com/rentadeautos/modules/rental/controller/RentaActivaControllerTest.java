@@ -87,7 +87,17 @@ class RentaActivaControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"AGENTE", "SUPERVISOR", "AUDITOR", "CLIENTE", "RENTERO"})
+    @ValueSource(strings = {"AGENTE", "SUPERVISOR", "AUDITOR"})
+    void personalAutorizadoPuedeConsultar(String rol) throws Exception {
+        when(servicio.listar()).thenReturn(List.of());
+        mvc.perform(get(RUTA).with(user("usuario").roles(rol)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"CLIENTE", "RENTERO"})
     void otrosRolesNoConsultanRentasActivas(String rol) throws Exception {
         mvc.perform(get(RUTA).with(user("usuario").roles(rol)))
                 .andExpect(status().isForbidden())

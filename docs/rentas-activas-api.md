@@ -19,9 +19,8 @@ vehículo (S3-09). La consulta no modifica datos ni calcula cargos.
 
 `GET /api/v1/rentas/activas`
 
-Requiere `Authorization: Bearer <token>`. En esta entrega el acceso es exclusivo
-para **ADMINISTRADOR**, siguiendo el alcance del panel de reservaciones.
-La ampliación a otros roles debe acordarse con el equipo y la matriz de permisos.
+Requiere `Authorization: Bearer <token>`. La consulta está permitida a
+**ADMINISTRADOR, AGENTE, SUPERVISOR y AUDITOR**, conforme a US-11.
 No recibe parámetros ni cuerpo; devuelve todas las rentas activas sin paginación.
 
 ### Respuesta 200
@@ -53,9 +52,9 @@ Sin rentas activas devuelve HTTP 200 y `{"success":true,"data":[]}`.
 
 | Caso | HTTP |
 |---|---|
-| Consulta de Administrador, con o sin resultados | 200 |
+| Consulta de personal autorizado, con o sin resultados | 200 |
 | Sin autenticación válida | 401 |
-| Otro rol autenticado | 403 |
+| Rol sin permisos (por ejemplo, Cliente o Rentero) | 403 |
 | POST, PUT, PATCH o DELETE, incluso de Administrador | 403 |
 
 Los errores de seguridad usan `success: false` y un `message` descriptivo.
@@ -88,7 +87,7 @@ ni Docker en ejecución.
 - `RentaActivaRepositoryTest`: 6 casos sobre consulta vacía, estados, datos
   operativos, orden, rentas vencidas con cliente inactivo y cierre de la renta.
 - `RentaActivaControllerTest`: 12 casos contando parámetros; datos JSON,
-  lista vacía, ausencia de autenticación, cinco roles rechazados y cuatro
+  lista vacía, ausencia de autenticación, tres roles adicionales autorizados, dos roles rechazados y cuatro
   métodos de escritura bloqueados.
 
 Validación reportada en el equipo del desarrollador: **344 pruebas, 0 fallos,
@@ -108,7 +107,7 @@ Con el backend y su base de desarrollo disponibles:
    vehículo y fecha de devolución coincidentes con la reservación.
 6. Comprobar que la tarifa y el total coincidan con los valores históricos,
    aunque se edite después el catálogo de tarifas.
-7. Consultar sin token (401) y con otro rol autenticado (403).
+7. Consultar sin token (401) y con Agente, Supervisor y Auditor (200), y con un rol sin permisos (403).
 8. Cuando esté integrada la devolución (S3-10), finalizar esa renta y comprobar
    que desaparece. El caso equivalente ya se verifica con H2 en el repositorio.
 

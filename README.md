@@ -99,7 +99,7 @@ Contrato REST, reglas y guía de comprobación: [docs/entregas-api.md](docs/entr
 
 `GET /api/v1/rentas/activas` consulta las reservaciones `EN_CURSO`, incluidas
 las vencidas, con cliente, vehículo y fecha prevista de devolución.
-Acceso de Administrador en esta entrega.
+Consulta permitida a Administrador, Agente, Supervisor y Auditor.
 
 Contrato REST, pruebas y guion de comprobación:
 [docs/rentas-activas-api.md](docs/rentas-activas-api.md).
