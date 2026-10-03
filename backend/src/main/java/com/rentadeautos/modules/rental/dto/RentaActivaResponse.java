@@ -8,5 +8,5 @@ public record RentaActivaResponse(Long reservacionId, Long clienteId,
         String clienteNombre, String clienteTelefono, Long vehiculoId,
         String marca, String modelo, String placa, LocalDateTime fechaInicio,
         LocalDateTime fechaDevolucionPrevista, String estado,
-        BigDecimal tarifaDia, BigDecimal totalEstimado) {
+        BigDecimal tarifaDia, BigDecimal totalEstimado, boolean retrasada) {
 }

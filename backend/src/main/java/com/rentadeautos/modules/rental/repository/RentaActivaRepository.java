@@ -4,17 +4,29 @@ import com.rentadeautos.modules.rental.dto.RentaActivaResponse;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Repository
 public class RentaActivaRepository {
     private final JdbcTemplate jdbc;
 
+    private final Clock reloj;
+
+    @Autowired
     public RentaActivaRepository(JdbcTemplate jdbc) {
+        this(jdbc, Clock.systemDefaultZone());
+    }
+
+    RentaActivaRepository(JdbcTemplate jdbc, Clock reloj) {
         this.jdbc = jdbc;
+        this.reloj = reloj;
     }
 
     /** Incluye las vencidas mientras sigan EN_CURSO; no filtra por fecha actual. */
     public List<RentaActivaResponse> listar() {
+        LocalDateTime ahora = LocalDateTime.now(reloj);
         return jdbc.query("""
                 SELECT r.id AS reservacion_id, c.id AS cliente_id, c.nombre, c.apellidos,
                        c.telefono, v.id AS vehiculo_id, v.marca, v.modelo, v.placa,
@@ -31,6 +43,7 @@ public class RentaActivaRepository {
                 rs.getString("marca"), rs.getString("modelo"), rs.getString("placa"),
                 rs.getTimestamp("fecha_inicio").toLocalDateTime(),
                 rs.getTimestamp("fecha_fin").toLocalDateTime(), rs.getString("estado"),
-                rs.getBigDecimal("tarifa_dia"), rs.getBigDecimal("total_estimado")));
+                rs.getBigDecimal("tarifa_dia"), rs.getBigDecimal("total_estimado"),
+                rs.getTimestamp("fecha_fin").toLocalDateTime().isBefore(ahora)));
     }
 }

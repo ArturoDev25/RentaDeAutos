@@ -46,7 +46,7 @@ class RentaActivaControllerTest {
                 "8441234567", 3L, "Nissan", "Kicks", "DEM1234",
                 LocalDateTime.of(2026, 10, 1, 10, 0),
                 LocalDateTime.of(2026, 10, 4, 10, 0), "EN_CURSO",
-                new BigDecimal("850.00"), new BigDecimal("2550.00"));
+                new BigDecimal("850.00"), new BigDecimal("2550.00"), true);
         when(servicio.listar()).thenReturn(List.of(renta));
 
         mvc.perform(get(RUTA))
@@ -64,6 +64,7 @@ class RentaActivaControllerTest {
                 .andExpect(jsonPath("$.data[0].fechaInicio").value("2026-10-01T10:00:00"))
                 .andExpect(jsonPath("$.data[0].fechaDevolucionPrevista").value("2026-10-04T10:00:00"))
                 .andExpect(jsonPath("$.data[0].estado").value("EN_CURSO"))
+                .andExpect(jsonPath("$.data[0].retrasada").value(true))
                 .andExpect(jsonPath("$.data[0].tarifaDia").value(850.0))
                 .andExpect(jsonPath("$.data[0].totalEstimado").value(2550.0));
     }

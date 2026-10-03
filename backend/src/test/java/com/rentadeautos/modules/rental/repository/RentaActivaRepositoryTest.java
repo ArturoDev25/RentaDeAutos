@@ -22,6 +22,8 @@ class RentaActivaRepositoryTest {
     private final LocalDateTime inicio = LocalDateTime.of(2026, 10, 1, 10, 0);
 
     @BeforeEach void datosOperativos() {
+        rentas = new RentaActivaRepository(jdbc, java.time.Clock.fixed(
+                java.time.Instant.parse("2026-10-03T12:00:00Z"), java.time.ZoneOffset.UTC));
         jdbc.update("INSERT INTO categorias (id, nombre, deposito_base, activo) VALUES (1, 'SUV', 0, TRUE)");
         jdbc.update("""
                 INSERT INTO clientes (id, nombre, apellidos, telefono, numero_licencia,
@@ -89,4 +91,19 @@ class RentaActivaRepositoryTest {
         jdbc.update("UPDATE reservaciones SET estado = 'FINALIZADA' WHERE id = 1");
         assertTrue(rentas.listar().isEmpty());
     }
+    @Test void devolucionAnteriorAlMomentoDeConsultaEstaRetrasada() {
+        reserva(1, "EN_CURSO", LocalDateTime.of(2026, 10, 3, 11, 59, 59));
+        assertTrue(rentas.listar().get(0).retrasada());
+    }
+
+    @Test void devolucionFuturaNoEstaRetrasada() {
+        reserva(1, "EN_CURSO", LocalDateTime.of(2026, 10, 3, 12, 0, 1));
+        assertFalse(rentas.listar().get(0).retrasada());
+    }
+
+    @Test void devolucionExactamenteAhoraNoEstaRetrasada() {
+        reserva(1, "EN_CURSO", LocalDateTime.of(2026, 10, 3, 12, 0));
+        assertFalse(rentas.listar().get(0).retrasada());
+    }
+
 }

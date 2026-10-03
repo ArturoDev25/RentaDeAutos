@@ -6,6 +6,9 @@ Consulta las reservaciones cuyo estado es `EN_CURSO`, iniciado por la entrega de
 vehículo (S3-09). La consulta no modifica datos ni calcula cargos.
 
 - Incluye rentas vencidas mientras continúen `EN_CURSO`.
+- `retrasada` es verdadero cuando la devolución prevista es anterior al momento
+  de consulta. Si coincide exactamente o está en el futuro, es falso. Se toma
+  un único momento de referencia por consulta, usando la zona local del servidor.
 - Excluye `PENDIENTE`, `CONFIRMADA`, `CANCELADA` y `FINALIZADA`.
 - Ordena por devolución prevista ascendente y, en empate, por ID de reservación.
 - Conserva la visibilidad de una renta aunque el cliente esté inactivo.
@@ -42,7 +45,8 @@ No recibe parámetros ni cuerpo; devuelve todas las rentas activas sin paginaci�
       "fechaDevolucionPrevista": "2026-10-04T10:00:00",
       "estado": "EN_CURSO",
       "tarifaDia": 850.00,
-      "totalEstimado": 2550.00
+      "totalEstimado": 2550.00,
+      "retrasada": true
     }
   ]
 }
@@ -84,15 +88,17 @@ cd backend
 Requiere Java 21. Las pruebas usan H2 en memoria y mocks; no necesitan MySQL
 ni Docker en ejecución.
 
-- `RentaActivaRepositoryTest`: 6 casos sobre consulta vacía, estados, datos
-  operativos, orden, rentas vencidas con cliente inactivo y cierre de la renta.
+- `RentaActivaRepositoryTest`: 9 casos sobre consulta vacía, estados, datos
+  operativos, orden, rentas vencidas con cliente inactivo y cierre de la renta, más tres límites de retraso con reloj fijo.
 - `RentaActivaControllerTest`: 12 casos contando parámetros; datos JSON,
   lista vacía, ausencia de autenticación, tres roles adicionales autorizados, dos roles rechazados y cuatro
   métodos de escritura bloqueados.
 
 Validación reportada en el equipo del desarrollador: **344 pruebas, 0 fallos,
 0 errores, 0 omitidas**, el 2 de octubre de 2026. El total corresponde a todo el
-backend; este issue agregó 18 casos. No acredita una prueba manual contra MySQL.
+backend; la versión inicial del issue agregó 18 casos.
+Las correcciones de permisos y retraso requieren una nueva ejecución; agregan
+3 casos respecto a esa versión. No acredita una prueba manual contra MySQL.
 
 ## Guion de comprobación manual
 
@@ -105,6 +111,8 @@ Con el backend y su base de desarrollo disponibles:
 4. Registrar su entrega siguiendo [entregas-api.md](entregas-api.md).
 5. Volver a consultar GET: debe aparecer el ID con `EN_CURSO`, cliente,
    vehículo y fecha de devolución coincidentes con la reservación.
+   Verificar además `retrasada`: true si ya pasó la devolución prevista,
+   false si aún no pasó.
 6. Comprobar que la tarifa y el total coincidan con los valores históricos,
    aunque se edite después el catálogo de tarifas.
 7. Consultar sin token (401) y con Agente, Supervisor y Auditor (200), y con un rol sin permisos (403).
