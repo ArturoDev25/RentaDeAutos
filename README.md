@@ -94,3 +94,12 @@ kilometraje, combustible y condición de salida, pasa la reservación a `EN_CURS
 vehículo a `RENTADO` en una sola transacción, y genera auditoría.
 
 Contrato REST, reglas y guía de comprobación: [docs/entregas-api.md](docs/entregas-api.md).
+
+## Rentas activas — S3-11
+
+`GET /api/v1/rentas/activas` consulta las reservaciones `EN_CURSO`, incluidas
+las vencidas, con cliente, vehículo y fecha prevista de devolución.
+Acceso de Administrador en esta entrega.
+
+Contrato REST, pruebas y guion de comprobación:
+[docs/rentas-activas-api.md](docs/rentas-activas-api.md).
