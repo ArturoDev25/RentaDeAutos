@@ -128,4 +128,62 @@ Invoke-RestMethod -Method Get `
   -Headers @{ Authorization = "Bearer $tokenAdministrador" }
 ```
 
-Pendiente para la revisión: ejecutar el guion contra MySQL y adjuntar evidencia.
+## Evidencia de comprobación manual contra MySQL
+
+**Fecha:** 4 de octubre de 2026
+**Rama:** `feature/S3-11-rentas-activas`
+**Entorno:** MySQL 8.0 en Docker, backend Spring Boot en `localhost:8080`
+
+### Conectividad y flujo principal
+
+- MySQL: `Up (healthy)`.
+- `GET /api/v1/health`: HTTP 200, `status: UP`, `database: UP`.
+- Login de Administrador: correcto; rol `ADMINISTRADOR`.
+- Consulta inicial de `GET /api/v1/rentas/activas`: HTTP 200, 0 rentas activas.
+- Reservación de prueba creada con ID `4`: `PENDIENTE`.
+- Reservación confirmada mediante `POST /api/reservaciones/4/confirmar`: `CONFIRMADA`.
+- La reservación confirmada no apareció en rentas activas.
+- Entrega registrada mediante `POST /api/v1/entregas`: HTTP 201,
+  reservación `EN_CURSO` y vehículo `RENTADO`.
+- `GET /api/v1/rentas/activas`: HTTP 200; apareció la reservación `4`.
+
+### Comparación API contra MySQL
+
+La consulta SQL equivalente devolvió:
+
+| ID | Cliente | Vehículo | Estado | Fecha de devolución | Tarifa diaria | Total estimado |
+|---:|---|---|---|---|---:|---:|
+| 4 | s s | Audi Q7 / STU-9012 | EN_CURSO | 2026-10-06 21:11:06 | 1800.00 | 5400.00 |
+
+La respuesta JSON devolvió los mismos valores:
+
+```json
+{
+  "reservacionId": 4,
+  "clienteId": 2,
+  "clienteNombre": "s s",
+  "clienteTelefono": "844355557799",
+  "vehiculoId": 7,
+  "marca": "Audi",
+  "modelo": "Q7",
+  "placa": "STU-9012",
+  "estado": "EN_CURSO",
+  "tarifaDia": 1800.00,
+  "totalEstimado": 5400.00,
+  "retrasada": false
+}
+```
+
+- La reservación vencida se probó temporalmente conservando `fecha_fin` posterior
+  a `fecha_inicio`; el endpoint mantuvo el registro y devolvió `retrasada: true`.
+- La fecha de devolución original se restauró después de la prueba.
+- La tarifa diaria y el total estimado coincidieron con los valores históricos
+  almacenados en `reservaciones`.
+- El orden de la consulta SQL y de la respuesta siguió `fecha_fin ASC, id ASC`.
+
+
+### Resultado
+
+**Comprobación manual contra MySQL ejecutada y aprobada.** El endpoint cumple el
+flujo de consulta de rentas `EN_CURSO`, incluye rentas vencidas, conserva los
+valores históricos, ordena correctamente y aplica los permisos documentados.
