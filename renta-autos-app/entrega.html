@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrega de vehículo - RentaDeAutos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/reservaciones.css">
+  <link rel="stylesheet" href="css/entrega.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="dashboard-body">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-logo">
+      <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+    </div>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+      <a href="tarifas.html" class="sidebar-link"><i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i><span>Tarifas</span></a>
+      <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
+    </nav>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+  </aside>
+  <div class="dashboard-main">
+    <header class="dashboard-topbar">
+      <div class="panel-ubicacion"><i class="fa-solid fa-key" aria-hidden="true"></i><span>Administración / Reservaciones / Entrega</span></div>
+      <div class="dashboard-user-area">
+        <div class="dashboard-user">
+          <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+          <div class="user-info">
+            <strong id="operador">Usuario</strong>
+            <small data-panel-rol>Sesión</small>
+          </div>
+        </div>
+        <button id="salir" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+        </button>
+      </div>
+    </header>
+    <main class="dashboard-content">
+      <section class="dashboard-title">
+        <div><h1>Entrega de vehículo</h1><p>Registra la salida del vehículo a partir de una reservación confirmada</p></div>
+      </section>
+      <p id="mensaje" role="status" aria-live="polite"></p>
+
+      <!-- 1. Elegir reservación (solo si se abrió la pantalla sin ?reservacion=ID) -->
+      <section id="panel-seleccion" class="dashboard-panel reservation-panel" aria-labelledby="seleccion-titulo" hidden>
+        <div class="panel-header"><h2 id="seleccion-titulo"><i class="fa-solid fa-magnifying-glass"></i>Elige una reservación confirmada</h2></div>
+        <form id="form-seleccion">
+          <div class="reservation-fields">
+            <label class="reservation-wide">Reservación
+              <select name="reservacionId" required><option value="">Cargando reservaciones…</option></select>
+            </label>
+          </div>
+          <div class="reservation-actions"><button type="submit">Continuar</button><a class="entrega-link" href="reservaciones.html">Volver a reservaciones</a></div>
+        </form>
+      </section>
+
+      <!-- 2. Resumen de la reservación y validación previa -->
+      <section id="panel-resumen" class="dashboard-panel reservation-panel" aria-labelledby="resumen-titulo" hidden>
+        <div class="panel-header">
+          <h2 id="resumen-titulo"><i class="fa-solid fa-file-contract"></i>Reservación <span id="r-id"></span></h2>
+          <a href="reservaciones.html"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Reservaciones</a>
+        </div>
+        <dl class="entrega-resumen">
+          <div><dt>Cliente</dt><dd id="r-cliente">—</dd></div>
+          <div><dt>Vehículo</dt><dd id="r-vehiculo">—</dd></div>
+          <div><dt>Periodo</dt><dd id="r-periodo">—</dd></div>
+          <div><dt>Estado de la reservación</dt><dd><span id="r-estado" class="entrega-badge">—</span></dd></div>
+          <div><dt>Estado del vehículo</dt><dd><span id="r-estado-vehiculo" class="entrega-badge">—</span></dd></div>
+          <div><dt>Kilometraje registrado</dt><dd id="r-km">—</dd></div>
+        </dl>
+        <div id="bloqueo" class="entrega-bloqueo" role="alert" hidden>
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <div><strong>No se puede iniciar la entrega</strong><p id="bloqueo-texto"></p></div>
+        </div>
+      </section>
+
+      <!-- 3. Formulario de entrega -->
+      <section id="panel-form" class="dashboard-panel reservation-panel" aria-labelledby="form-titulo" hidden>
+        <div class="panel-header"><h2 id="form-titulo"><i class="fa-solid fa-key"></i>Datos de salida</h2></div>
+        <form id="form-entrega" novalidate>
+          <div class="reservation-fields">
+            <label>Kilometraje de salida (km)
+              <input name="kilometrajeSalida" type="number" inputmode="decimal" step="0.1" min="0" required aria-describedby="km-ayuda km-error">
+              <small id="km-ayuda" class="entrega-ayuda"></small>
+              <small id="km-error" class="entrega-error" data-error-de="kilometrajeSalida"></small>
+            </label>
+
+            <label>Combustible (%)
+              <div class="entrega-combustible">
+                <input name="combustibleRango" type="range" min="0" max="100" step="5" value="100" aria-label="Nivel de combustible (control deslizante)">
+                <input name="combustibleSalida" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="100" required aria-describedby="comb-ayuda comb-error">
+              </div>
+              <small id="comb-ayuda" class="entrega-ayuda">Tanque lleno</small>
+              <small id="comb-error" class="entrega-error" data-error-de="combustibleSalida"></small>
+            </label>
+
+            <label>Condición general
+              <select name="condicionGeneral" required aria-describedby="cond-gen-error">
+                <option value="">Selecciona una opción</option>
+                <option>Excelente</option>
+                <option>Buena</option>
+                <option>Regular</option>
+                <option>Con daños</option>
+              </select>
+              <small id="cond-gen-error" class="entrega-error" data-error-de="condicionGeneral"></small>
+            </label>
+
+            <div class="entrega-espacio" aria-hidden="true"></div>
+
+            <label class="reservation-wide">Descripción de la condición
+              <textarea name="condicionDetalle" rows="3" maxlength="1900" required placeholder="Ej. Sin golpes; rayón leve en defensa trasera; llantas en buen estado" aria-describedby="cond-error cond-contador"></textarea>
+              <small id="cond-contador" class="entrega-ayuda">0 / 1900</small>
+              <small id="cond-error" class="entrega-error" data-error-de="condicionDetalle"></small>
+            </label>
+
+            <label class="reservation-wide">Observaciones (opcional)
+              <textarea name="observaciones" rows="2" maxlength="2000" placeholder="Ej. Se entregó con silla para bebé" aria-describedby="obs-error"></textarea>
+              <small id="obs-error" class="entrega-error" data-error-de="observaciones"></small>
+            </label>
+
+            <label class="reservation-wide entrega-check">
+              <input name="revisado" type="checkbox" required aria-describedby="rev-error">
+              <span>Revisé el vehículo junto con el cliente y los datos capturados son correctos.</span>
+            </label>
+            <small id="rev-error" class="entrega-error reservation-wide" data-error-de="revisado"></small>
+          </div>
+          <p class="reservation-note">Al registrar la entrega, la reservación pasa a <strong>EN_CURSO</strong> y el vehículo a <strong>RENTADO</strong>. Esta acción no se puede deshacer desde esta pantalla.</p>
+          <div class="reservation-actions">
+            <button id="registrar" type="submit"><i class="fa-solid fa-check" aria-hidden="true"></i> Registrar entrega</button>
+            <a class="entrega-link" href="reservaciones.html">Cancelar</a>
+          </div>
+        </form>
+      </section>
+
+      <!-- 4. Resultado / entrega ya registrada -->
+      <section id="panel-resultado" class="dashboard-panel reservation-panel" aria-labelledby="resultado-titulo" hidden>
+        <div class="panel-header"><h2 id="resultado-titulo"><i class="fa-solid fa-circle-check"></i>Entrega registrada</h2></div>
+        <dl class="entrega-resumen">
+          <div><dt>Folio de entrega</dt><dd id="e-id">—</dd></div>
+          <div><dt>Fecha de entrega</dt><dd id="e-fecha">—</dd></div>
+          <div><dt>Kilometraje de salida</dt><dd id="e-km">—</dd></div>
+          <div><dt>Combustible</dt><dd id="e-comb">—</dd></div>
+          <div class="entrega-ancho"><dt>Condición</dt><dd id="e-cond">—</dd></div>
+          <div class="entrega-ancho"><dt>Observaciones</dt><dd id="e-obs">—</dd></div>
+          <div><dt>Reservación</dt><dd><span id="e-estado" class="entrega-badge">—</span></dd></div>
+          <div><dt>Vehículo</dt><dd><span id="e-estado-vehiculo" class="entrega-badge">—</span></dd></div>
+        </dl>
+        <div class="reservation-actions entrega-acciones-fin"><a class="entrega-boton" href="reservaciones.html">Volver a reservaciones</a></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/client.js"></script>
+  <script src="js/entrega.js"></script>
+  <script src="js/panel.js"></script>
+</body>
+</html>

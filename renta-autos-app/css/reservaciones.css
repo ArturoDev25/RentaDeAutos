@@ -21,4 +21,8 @@
 #mensaje { min-height: 25px; font-weight: 600; }
 #mensaje.error { color: #a41f2b; }
 #mensaje.ok { color: #146653; }
+/* S3-14: acceso a la pantalla de entrega */
+.reservation-panel .accion-entregar { display: inline-block; margin: 2px; padding: 7px 9px; font-size: 13px; border-radius: 8px; background: #1d4f91; color: white; text-decoration: none; }
+.reservation-panel .accion-entregar:hover { background: #163d70; }
+.reservation-panel .accion-entregar.secondary { color: #1d4f91; background: #e3effd; }
 @media (max-width: 650px) { .reservation-fields { grid-template-columns: 1fr; } }
