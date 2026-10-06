@@ -104,8 +104,8 @@ class DevolucionServiceTest {
         // Configurar mocks.
         when(entregas.findById(50L)).thenReturn(Optional.of(entrega));
         when(devoluciones.existsByEntregaId(50L)).thenReturn(false);
-        when(reservaciones.findById(10L)).thenReturn(Optional.of(reservacion));
-        when(vehiculos.findById(3L)).thenReturn(Optional.of(vehiculo));
+        when(reservaciones.findByIdParaActualizar(10L)).thenReturn(Optional.of(reservacion));
+        when(vehiculos.findByIdParaActualizar(3L)).thenReturn(Optional.of(vehiculo));
 
         when(devoluciones.saveAndFlush(any())).thenAnswer(inv -> {
             Devolucion d = inv.getArgument(0);
@@ -170,7 +170,7 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("Condición con daño: vehículo pasa a MANTENIMIENTO")
+    @DisplayName("Cargo por daños (> 0): vehículo pasa a MANTENIMIENTO")
     void condicionDanioMandaVehiculoAMantenimiento() {
         DevolucionRequest req = new DevolucionRequest(
                 50L,
@@ -179,7 +179,7 @@ class DevolucionServiceTest {
                 "Golpe en puerta delantera izquierda",
                 new BigDecimal("1500.00"),
                 null,
-                false); // requiereMantenimiento=false, pero la condición tiene "Golpe"
+                false); // requiereMantenimiento=false, pero hay cargo por daños (1500)
 
         servicio.registrar(req, "10.0.0.5");
 
@@ -292,23 +292,36 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("determinarEstadoVehiculo: sin daño y sin mantenimiento → DISPONIBLE")
+    @DisplayName("determinarEstadoVehiculo: sin cargo por daños y sin mantenimiento → DISPONIBLE")
     void determinarEstadoSinDanioEsDisponible() {
         assertEquals(EstadoVehiculo.DISPONIBLE,
-                DevolucionService.determinarEstadoVehiculo("Buen estado", false));
+                DevolucionService.determinarEstadoVehiculo(false, BigDecimal.ZERO));
     }
 
     @Test
-    @DisplayName("determinarEstadoVehiculo: condición con 'daño' → MANTENIMIENTO")
+    @DisplayName("determinarEstadoVehiculo: con cargo por daños (> 0) → MANTENIMIENTO")
     void determinarEstadoConDanioEsMantenimiento() {
         assertEquals(EstadoVehiculo.MANTENIMIENTO,
-                DevolucionService.determinarEstadoVehiculo("Daño en costado derecho", false));
+                DevolucionService.determinarEstadoVehiculo(false, new BigDecimal("1500.00")));
     }
 
     @Test
     @DisplayName("determinarEstadoVehiculo: requiereMantenimiento=true → MANTENIMIENTO siempre")
     void determinarEstadoRequiereMantenimientoEsMantenimiento() {
         assertEquals(EstadoVehiculo.MANTENIMIENTO,
-                DevolucionService.determinarEstadoVehiculo("Perfecto estado", true));
+                DevolucionService.determinarEstadoVehiculo(true, BigDecimal.ZERO));
+    }
+
+    @Test
+    @DisplayName("Regresión: condición 'Sin daños' sin cargo ni flag → DISPONIBLE (ya no va a mantenimiento)")
+    void condicionSinDanosNoMandaAMantenimiento() {
+        DevolucionRequest req = new DevolucionRequest(
+                50L, new BigDecimal("15100.0"), new BigDecimal("70.00"),
+                "Sin daños", BigDecimal.ZERO, null, false);
+
+        DevolucionResponse respuesta = servicio.registrar(req, "10.0.0.5");
+
+        assertEquals("DISPONIBLE", respuesta.estadoVehiculo());
+        assertEquals(EstadoVehiculo.DISPONIBLE, vehiculo.getEstado());
     }
 }
