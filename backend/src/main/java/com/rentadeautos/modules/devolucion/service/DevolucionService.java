@@ -92,8 +92,8 @@ public class DevolucionService {
                     "La entrega " + entrega.getId() + " ya tiene una devolución registrada");
         }
 
-        // 3. Obtener reservación y validar que esté EN_CURSO.
-        Reservacion reservacion = reservaciones.findById(entrega.getReservacionId())
+        // 3. Obtener reservación (con bloqueo FOR UPDATE) y validar que esté EN_CURSO.
+        Reservacion reservacion = reservaciones.findByIdParaActualizar(entrega.getReservacionId())
                 .orElseThrow(() -> new DevolucionException(HttpStatus.NOT_FOUND,
                         "Reservación no encontrada para la entrega " + entrega.getId()));
 
@@ -103,8 +103,8 @@ public class DevolucionService {
                     + "(estado actual: " + reservacion.getEstado() + ")");
         }
 
-        // 4. Obtener vehículo con bloqueo para actualización.
-        Vehiculo vehiculo = vehiculos.findById(reservacion.getVehiculoId())
+        // 4. Obtener vehículo con bloqueo FOR UPDATE para actualización.
+        Vehiculo vehiculo = vehiculos.findByIdParaActualizar(reservacion.getVehiculoId())
                 .orElseThrow(() -> new DevolucionException(HttpStatus.CONFLICT,
                         "El vehículo de la reservación no existe"));
 
@@ -124,14 +124,14 @@ public class DevolucionService {
         LocalDateTime ahora           = LocalDateTime.now();
         BigDecimal    tarifaDia       = reservacion.getTarifaDia();
         LocalDateTime fechaFinPactada = reservacion.getFechaFin();
-        LocalDateTime fechaEntrega    = entrega.getFechaEntrega();
 
-        // Días reales = horas desde entrega hasta devolución, redondeadas hacia arriba.
-        long horasReales  = ChronoUnit.HOURS.between(fechaEntrega, ahora);
-        long diasReales   = (horasReales + 23) / 24; // ceil sin BigDecimal
-        if (diasReales < 1) diasReales = 1;
+        // Subtotal por los días PACTADOS (inicio -> fin pactada), NO por los días reales:
+        // los días de atraso se cobran aparte (cargoAtraso) y no deben contarse dos veces.
+        long horasPactadas = ChronoUnit.HOURS.between(reservacion.getFechaInicio(), fechaFinPactada);
+        long diasPactados  = (horasPactadas + 23) / 24; // ceil sin BigDecimal
+        if (diasPactados < 1) diasPactados = 1;
 
-        BigDecimal subtotal = tarifaDia.multiply(BigDecimal.valueOf(diasReales))
+        BigDecimal subtotal = tarifaDia.multiply(BigDecimal.valueOf(diasPactados))
                                        .setScale(2, RoundingMode.HALF_UP);
 
         // Cargo por atraso: días extra después de la fecha fin pactada.
@@ -175,7 +175,7 @@ public class DevolucionService {
         // 10. Transición de Vehículo: actualizar kilometraje y estado.
         vehiculo.setKilometraje(kmEntrada);
         EstadoVehiculo nuevoEstadoVehiculo = determinarEstadoVehiculo(
-                datos.condicionEntrada(), datos.requiereMantenimiento());
+                datos.requiereMantenimiento(), cargoDanos);
         vehiculo.setEstado(nuevoEstadoVehiculo);
         vehiculos.saveAndFlush(vehiculo);
 
@@ -198,19 +198,14 @@ public class DevolucionService {
 
     /**
      * Determina el estado del vehículo al finalizar la renta.
-     * Pasa a MANTENIMIENTO si el agente lo solicita explícitamente,
-     * o si la condición de entrada contiene palabras que indican daño.
+     * Pasa a MANTENIMIENTO cuando el agente lo solicita explícitamente
+     * (requiereMantenimiento) o cuando se registró un cargo por daños (> 0).
+     * Ya NO se infiere del texto de la condición: "Sin daños" contiene la
+     * palabra "daño" y antes mandaba por error un vehículo sano a mantenimiento.
      */
-    static EstadoVehiculo determinarEstadoVehiculo(String condicion, Boolean requiereMantenimiento) {
-        if (Boolean.TRUE.equals(requiereMantenimiento)) {
-            return EstadoVehiculo.MANTENIMIENTO;
-        }
-        // Palabras clave que señalan condición de daño evidente.
-        String condLower = condicion.toLowerCase();
-        if (condLower.contains("daño") || condLower.contains("golpe")
-                || condLower.contains("rayón") || condLower.contains("rayon")
-                || condLower.contains("roto") || condLower.contains("avería")
-                || condLower.contains("averia") || condLower.contains("dañado")) {
+    static EstadoVehiculo determinarEstadoVehiculo(Boolean requiereMantenimiento, BigDecimal cargoDanos) {
+        boolean hayCargoDanos = cargoDanos != null && cargoDanos.compareTo(BigDecimal.ZERO) > 0;
+        if (Boolean.TRUE.equals(requiereMantenimiento) || hayCargoDanos) {
             return EstadoVehiculo.MANTENIMIENTO;
         }
         return EstadoVehiculo.DISPONIBLE;
