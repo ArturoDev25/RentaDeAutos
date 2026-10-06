@@ -44,6 +44,13 @@
         select.add(new Option(item.nombre, item.id));
       });
     }
+    // S3-14: los vehículos RENTADOS no vienen en /opciones; se toman del catálogo
+    // para que la tabla muestre su nombre en las rentas EN_CURSO.
+    try {
+      (await peticion('/v1/vehiculos')).data.forEach(v => {
+        if (!nombresVehiculos.has(v.id)) nombresVehiculos.set(v.id, `${v.marca} ${v.modelo} · ${v.placa}`);
+      });
+    } catch (_) { /* si falla, se muestra el ID como antes */ }
     pintar();
     if (!clientes.length || !vehiculos.length) aviso('Registra primero un cliente activo y un vehículo disponible.');
   }
@@ -68,6 +75,15 @@
         editar.addEventListener('click', () => comenzarEdicion(r)); celda.append(editar);
         const cancelar = document.createElement('button'); cancelar.textContent = 'Cancelar';
         cancelar.addEventListener('click', () => cancelarReservacion(r)); celda.append(cancelar);
+      }
+      // S3-14: la entrega solo se inicia desde una reservación CONFIRMADA.
+      if (r.estado === 'CONFIRMADA') {
+        const entregar = document.createElement('a'); entregar.textContent = 'Entregar'; entregar.className = 'accion-entregar';
+        entregar.href = `entrega.html?reservacion=${r.id}`; celda.append(entregar);
+      }
+      if (['EN_CURSO', 'FINALIZADA'].includes(r.estado)) {
+        const ver = document.createElement('a'); ver.textContent = 'Ver entrega'; ver.className = 'accion-entregar secondary';
+        ver.href = `entrega.html?reservacion=${r.id}`; celda.append(ver);
       }
     });
   }
