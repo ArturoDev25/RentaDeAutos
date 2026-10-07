@@ -31,6 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -135,18 +136,29 @@ class EntregaServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void entregaGeneraAuditoriaConEstadosAnterioresYNuevos() {
         servicio.registrar(datos("15020.5"), "10.0.0.5");
 
-        ArgumentCaptor<String> antes = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> despues = ArgumentCaptor.forClass(String.class);
-        verify(auditoria).registrarEvento(eq(7L), eq("ENTREGAR_VEHICULO"), eq("Entrega"), eq(99L),
+        ArgumentCaptor<Object> antes = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<Object> despues = ArgumentCaptor.forClass(Object.class);
+        verify(auditoria).registrarEvento(eq(7L), eq("ENTREGAR_VEHICULO"), eq("ENTREGA"), eq(99L),
                 eq("EXITOSO"), antes.capture(), despues.capture(), eq("10.0.0.5"));
-        assertTrue(antes.getValue().contains("\"estadoReservacion\":\"CONFIRMADA\""));
-        assertTrue(antes.getValue().contains("\"estadoVehiculo\":\"RESERVADO\""));
-        assertTrue(despues.getValue().contains("\"estadoReservacion\":\"EN_CURSO\""));
-        assertTrue(despues.getValue().contains("\"estadoVehiculo\":\"RENTADO\""));
-        assertTrue(despues.getValue().contains("\"combustibleSalida\":75.50"));
+
+        Map<String, Object> a = (Map<String, Object>) antes.getValue();
+        assertEquals(10L, a.get("reservacionId"));
+        assertEquals("CONFIRMADA", a.get("estadoReservacion"));
+        assertEquals(3L, a.get("vehiculoId"));
+        assertEquals("RESERVADO", a.get("estadoVehiculo"));
+
+        Map<String, Object> d = (Map<String, Object>) despues.getValue();
+        assertEquals(99L, d.get("entregaId"));
+        assertEquals(10L, d.get("reservacionId"));
+        assertEquals("EN_CURSO", d.get("estadoReservacion"));
+        assertEquals(3L, d.get("vehiculoId"));
+        assertEquals("RENTADO", d.get("estadoVehiculo"));
+        assertEquals(new BigDecimal("15020.5"), d.get("kilometrajeSalida"));
+        assertEquals(new BigDecimal("75.50"), d.get("combustibleSalida"));
     }
 
     @Test

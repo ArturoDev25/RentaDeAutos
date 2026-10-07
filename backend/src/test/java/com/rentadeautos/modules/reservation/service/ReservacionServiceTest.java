@@ -10,6 +10,8 @@ import com.rentadeautos.modules.reservation.repository.ReservacionRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -140,8 +143,14 @@ class ReservacionServiceTest {
                 any(RowMapper.class), eq(3L), eq(8L), any(), any());
     }
 
-    @Test void confirmarValidaCambiaEstadosYAudita() {
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void confirmarValidaCambiaEstadosYAudita() {
         Reservacion r = pendiente();
+        ReflectionTestUtils.setField(r, "id", 8L);
+        r.setTarifaDia(new BigDecimal("850.00"));
+        r.setTotalEstimado(new BigDecimal("1700.00"));
         when(reservaciones.findById(8L)).thenReturn(Optional.of(r));
         vehiculoApto();
         traslapes(List.of());
@@ -157,8 +166,28 @@ class ReservacionServiceTest {
 
         assertEquals("CONFIRMADA", respuesta.estado());
         verify(jdbc).update(startsWith("UPDATE vehiculos SET estado = 'RESERVADO'"), eq(3L));
-        verify(auditoria).registrarEvento(eq(7L), eq("CONFIRMAR_RESERVACION"), eq("Reservacion"),
-                eq(8L), eq("EXITOSO"), contains("PENDIENTE"), contains("CONFIRMADA"), isNull());
+
+        ArgumentCaptor<Object> antes = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<Object> despues = ArgumentCaptor.forClass(Object.class);
+        verify(auditoria).registrarEvento(eq(7L), eq("CONFIRMAR_RESERVACION"), eq("RESERVACION"),
+                eq(8L), eq("EXITOSO"), antes.capture(), despues.capture(), isNull());
+
+        Map<String, Object> a = (Map<String, Object>) antes.getValue();
+        assertEquals(8L, a.get("reservacionId"));
+        assertEquals("PENDIENTE", a.get("estado"));
+        assertEquals(3L, a.get("vehiculoId"));
+        assertEquals("DISPONIBLE", a.get("estadoVehiculo"));
+        assertEquals(inicio, a.get("fechaInicio"));
+        assertEquals(inicio.plusDays(2), a.get("fechaFin"));
+        assertEquals(new BigDecimal("850.00"), a.get("tarifaDia"));
+
+        Map<String, Object> d = (Map<String, Object>) despues.getValue();
+        assertEquals("CONFIRMADA", d.get("estado"));
+        assertEquals("RESERVADO", d.get("estadoVehiculo"));
+        assertEquals(3L, d.get("vehiculoId"));
+        // RN-07: la tarifa histórica no cambia al confirmar.
+        assertEquals(new BigDecimal("850.00"), d.get("tarifaDia"));
+        assertEquals(new BigDecimal("1700.00"), d.get("totalEstimado"));
     }
 
     @Test void confirmarRechazaSiNoEstaPendienteSinTocarNada() {

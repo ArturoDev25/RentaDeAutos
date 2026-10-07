@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.reservation.service;
 
 import com.rentadeautos.modules.audit.service.AuditService;
+import com.rentadeautos.modules.audit.service.AuditoriaOperativa;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.reservation.dto.ReservacionRequest;
 import com.rentadeautos.modules.reservation.dto.ReservacionResponse;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,16 +120,32 @@ public class ReservacionService {
 
         String vehiculoAntes = jdbc.queryForObject(
                 "SELECT estado FROM vehiculos WHERE id = ?", String.class, r.getVehiculoId());
+        Map<String, Object> antes = snapshotConfirmacion(r, vehiculoAntes);
+
         r.setEstado("CONFIRMADA");
         jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' WHERE id = ?", r.getVehiculoId());
         Reservacion guardada = reservaciones.saveAndFlush(r);
 
-        auditoria.registrarEvento(usuarioActualId(), "CONFIRMAR_RESERVACION", "Reservacion", id,
-                "EXITOSO",
-                "{\"reservacion\":\"PENDIENTE\",\"vehiculo\":\"" + vehiculoAntes + "\"}",
-                "{\"reservacion\":\"CONFIRMADA\",\"vehiculo\":\"RESERVADO\"}",
-                null);
+        // S3-17: auditoría dentro de la misma transacción (todo o nada, RN-09).
+        auditoria.registrarEvento(usuarioActualId(), AuditoriaOperativa.CONFIRMAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, id, AuditoriaOperativa.EXITOSO,
+                antes, snapshotConfirmacion(guardada, "RESERVADO"), null);
         return ReservacionResponse.desde(guardada);
+    }
+
+    /** Estado de la reservación y su vehículo; incluye la tarifa histórica aceptada (RN-07). */
+    private static Map<String, Object> snapshotConfirmacion(Reservacion r, String estadoVehiculo) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("reservacionId", r.getId());
+        m.put("estado", r.getEstado());
+        m.put("clienteId", r.getClienteId());
+        m.put("vehiculoId", r.getVehiculoId());
+        m.put("estadoVehiculo", estadoVehiculo);
+        m.put("fechaInicio", r.getFechaInicio());
+        m.put("fechaFin", r.getFechaFin());
+        m.put("tarifaDia", r.getTarifaDia());
+        m.put("totalEstimado", r.getTotalEstimado());
+        return m;
     }
 
     private Long usuarioActualId() {

@@ -1,8 +1,7 @@
 package com.rentadeautos.modules.devolucion.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentadeautos.modules.audit.service.AuditService;
+import com.rentadeautos.modules.audit.service.AuditoriaOperativa;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.devolucion.dto.DevolucionRequest;
 import com.rentadeautos.modules.devolucion.dto.DevolucionResponse;
@@ -46,11 +45,9 @@ import java.util.Map;
 @Service
 public class DevolucionService {
 
-    static final String ACCION_AUDITORIA   = "DEVOLVER_VEHICULO";
+    static final String ACCION_AUDITORIA   = AuditoriaOperativa.DEVOLVER_VEHICULO;
     static final String ESTADO_FINALIZADA  = "FINALIZADA";
     static final String ESTADO_EN_CURSO    = "EN_CURSO";
-
-    private static final ObjectMapper JSON = new ObjectMapper();
 
     private final DevolucionRepository devoluciones;
     private final EntregaRepository    entregas;
@@ -194,8 +191,8 @@ public class DevolucionService {
         // 11. Auditoría dentro de la misma transacción.
         Map<String, Object> despues = capturarEstadoDespues(guardada, reservacion, vehiculo,
                 subtotal, nuevoEstadoVehiculo);
-        auditoria.registrarEvento(actorId, ACCION_AUDITORIA, "Devolucion", guardada.getId(),
-                "EXITOSO", aJson(antes), aJson(despues), direccionIp);
+        auditoria.registrarEvento(actorId, ACCION_AUDITORIA, AuditoriaOperativa.DEVOLUCION, guardada.getId(),
+                AuditoriaOperativa.EXITOSO, antes, despues, direccionIp);
 
         return DevolucionResponse.desde(
                 guardada,
@@ -259,14 +256,7 @@ public class DevolucionService {
         m.put("cargoAtraso",      d.getCargoAtraso());
         m.put("cargoDanos",       d.getCargoDanos());
         m.put("totalFinal",       d.getTotalFinal());
+        m.put("fechaDevolucion",  d.getFechaDevolucion());
         return m;
-    }
-
-    private static String aJson(Map<String, Object> valores) {
-        try {
-            return JSON.writeValueAsString(valores);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("No se pudo serializar la auditoría", e);
-        }
     }
 }

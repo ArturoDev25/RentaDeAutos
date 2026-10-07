@@ -32,6 +32,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -223,27 +224,37 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("AuditService.registrarEvento es invocado con la acción correcta")
+    @DisplayName("AuditService.registrarEvento es invocado con la acción correcta y snapshots correspondientes")
+    @SuppressWarnings("unchecked")
     void auditServiceEsInvocadoConAccionCorrecta() {
         servicio.registrar(request("15100.0", false), "192.168.1.1");
 
-        ArgumentCaptor<String> antesCaptor   = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> despuesCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> antesCaptor   = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<Object> despuesCaptor = ArgumentCaptor.forClass(Object.class);
         verify(auditoria).registrarEvento(
                 eq(7L),
                 eq("DEVOLVER_VEHICULO"),
-                eq("Devolucion"),
+                eq("DEVOLUCION"),
                 eq(200L),
                 eq("EXITOSO"),
                 antesCaptor.capture(),
                 despuesCaptor.capture(),
                 eq("192.168.1.1"));
 
-        // El JSON anterior debe contener el estado EN_CURSO.
-        assertTrue(antesCaptor.getValue().contains("\"estadoReservacion\":\"EN_CURSO\""));
-        // El JSON posterior debe contener FINALIZADA y DISPONIBLE.
-        assertTrue(despuesCaptor.getValue().contains("\"estadoReservacion\":\"FINALIZADA\""));
-        assertTrue(despuesCaptor.getValue().contains("\"estadoVehiculo\":\"DISPONIBLE\""));
+        Map<String, Object> a = (Map<String, Object>) antesCaptor.getValue();
+        assertEquals(10L, a.get("reservacionId"));
+        assertEquals("EN_CURSO", a.get("estadoReservacion"));
+        assertEquals(3L, a.get("vehiculoId"));
+        assertEquals("RENTADO", a.get("estadoVehiculo"));
+
+        Map<String, Object> d = (Map<String, Object>) despuesCaptor.getValue();
+        assertEquals(200L, d.get("devolucionId"));
+        assertEquals(10L, d.get("reservacionId"));
+        assertEquals("FINALIZADA", d.get("estadoReservacion"));
+        assertEquals(3L, d.get("vehiculoId"));
+        assertEquals("DISPONIBLE", d.get("estadoVehiculo"));
+        assertEquals(new BigDecimal("15100.0"), d.get("kilometrajeEntrada"));
+        assertNotNull(d.get("totalFinal"));
     }
 
     // ── Casos de error ────────────────────────────────────────────────────────

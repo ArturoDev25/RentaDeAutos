@@ -1,8 +1,7 @@
 package com.rentadeautos.modules.rental.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentadeautos.modules.audit.service.AuditService;
+import com.rentadeautos.modules.audit.service.AuditoriaOperativa;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.client.model.Cliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
@@ -39,9 +38,7 @@ public class EntregaService {
 
     static final String ESTADO_VALIDO = "CONFIRMADA";
     static final String ESTADO_EN_CURSO = "EN_CURSO";
-    static final String ACCION_AUDITORIA = "ENTREGAR_VEHICULO";
-
-    private static final ObjectMapper JSON = new ObjectMapper();
+    static final String ACCION_AUDITORIA = AuditoriaOperativa.ENTREGAR_VEHICULO;
 
     private final EntregaRepository entregas;
     private final ReservacionRepository reservaciones;
@@ -129,8 +126,9 @@ public class EntregaService {
         despues.put("kilometrajeSalida", guardada.getKilometrajeSalida());
         despues.put("combustibleSalida", guardada.getCombustibleSalida());
         despues.put("condicionSalida", guardada.getCondicionSalida());
-        auditoria.registrarEvento(actorId, ACCION_AUDITORIA, "Entrega", guardada.getId(),
-                "EXITOSO", aJson(antes), aJson(despues), direccionIp);
+        despues.put("fechaEntrega", guardada.getFechaEntrega());
+        auditoria.registrarEvento(actorId, ACCION_AUDITORIA, AuditoriaOperativa.ENTREGA, guardada.getId(),
+                AuditoriaOperativa.EXITOSO, antes, despues, direccionIp);
 
         return EntregaResponse.desde(guardada, vehiculoId, ESTADO_EN_CURSO,
                 EstadoVehiculo.RENTADO.name());
@@ -201,13 +199,5 @@ public class EntregaService {
                 .orElseThrow(() -> new EntregaException(HttpStatus.UNAUTHORIZED,
                         "La sesión ya no corresponde a un usuario válido"))
                 .getId();
-    }
-
-    private static String aJson(Map<String, Object> valores) {
-        try {
-            return JSON.writeValueAsString(valores);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("No se pudo serializar la auditoría", e);
-        }
     }
 }
