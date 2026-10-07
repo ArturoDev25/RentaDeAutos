@@ -92,21 +92,33 @@ public class DevolucionService {
                     "La entrega " + entrega.getId() + " ya tiene una devolución registrada");
         }
 
-        // 3. Obtener reservación (con bloqueo FOR UPDATE) y validar que esté EN_CURSO.
-        Reservacion reservacion = reservaciones.findByIdParaActualizar(entrega.getReservacionId())
+        // 3. Bloquear primero el vehículo y después la reservación (FOR UPDATE), en el
+        //    mismo orden que EntregaService y crear/editar/confirmar reservación,
+        //    para evitar interbloqueos.
+        Long reservacionId = entrega.getReservacionId();
+        Long vehiculoId = reservaciones.findVehiculoIdById(reservacionId)
                 .orElseThrow(() -> new DevolucionException(HttpStatus.NOT_FOUND,
                         "Reservación no encontrada para la entrega " + entrega.getId()));
 
+        Vehiculo vehiculo = vehiculos.findByIdParaActualizar(vehiculoId)
+                .orElseThrow(() -> new DevolucionException(HttpStatus.CONFLICT,
+                        "El vehículo de la reservación no existe"));
+
+        Reservacion reservacion = reservaciones.findByIdParaActualizar(reservacionId)
+                .orElseThrow(() -> new DevolucionException(HttpStatus.NOT_FOUND,
+                        "Reservación no encontrada para la entrega " + entrega.getId()));
+
+        if (!vehiculoId.equals(reservacion.getVehiculoId())) {
+            throw new DevolucionException(HttpStatus.CONFLICT,
+                    "La reservación cambió de vehículo mientras se procesaba; intente de nuevo");
+        }
+
+        // 4. Validar que la reservación esté EN_CURSO.
         if (!ESTADO_EN_CURSO.equals(reservacion.getEstado())) {
             throw new DevolucionException(HttpStatus.CONFLICT,
                     "Solo se puede devolver un vehículo de una reservación EN_CURSO "
                     + "(estado actual: " + reservacion.getEstado() + ")");
         }
-
-        // 4. Obtener vehículo con bloqueo FOR UPDATE para actualización.
-        Vehiculo vehiculo = vehiculos.findByIdParaActualizar(reservacion.getVehiculoId())
-                .orElseThrow(() -> new DevolucionException(HttpStatus.CONFLICT,
-                        "El vehículo de la reservación no existe"));
 
         // 5. RN-08: kilometrajeEntrada ≥ kilometrajeSalida (400 Bad Request).
         BigDecimal kmEntrada = datos.kilometrajeEntrada();
@@ -175,7 +187,7 @@ public class DevolucionService {
         // 10. Transición de Vehículo: actualizar kilometraje y estado.
         vehiculo.setKilometraje(kmEntrada);
         EstadoVehiculo nuevoEstadoVehiculo = determinarEstadoVehiculo(
-                datos.requiereMantenimiento(), cargoDanos);
+                datos.requiereMantenimiento());
         vehiculo.setEstado(nuevoEstadoVehiculo);
         vehiculos.saveAndFlush(vehiculo);
 
@@ -198,17 +210,16 @@ public class DevolucionService {
 
     /**
      * Determina el estado del vehículo al finalizar la renta.
-     * Pasa a MANTENIMIENTO cuando el agente lo solicita explícitamente
-     * (requiereMantenimiento) o cuando se registró un cargo por daños (> 0).
-     * Ya NO se infiere del texto de la condición: "Sin daños" contiene la
-     * palabra "daño" y antes mandaba por error un vehículo sano a mantenimiento.
+     * Pasa a MANTENIMIENTO única y exclusivamente cuando el agente lo solicita
+     * explícitamente (requiereMantenimiento = true); en cualquier otro caso queda DISPONIBLE.
+     * Ya NO se infiere del texto de la condición ("Sin daños" contiene la palabra
+     * "daño" y antes mandaba por error un vehículo sano a mantenimiento) ni del
+     * cargo por daños (un daño cosmético ya cobrado no impide rentar el vehículo).
      */
-    static EstadoVehiculo determinarEstadoVehiculo(Boolean requiereMantenimiento, BigDecimal cargoDanos) {
-        boolean hayCargoDanos = cargoDanos != null && cargoDanos.compareTo(BigDecimal.ZERO) > 0;
-        if (Boolean.TRUE.equals(requiereMantenimiento) || hayCargoDanos) {
-            return EstadoVehiculo.MANTENIMIENTO;
-        }
-        return EstadoVehiculo.DISPONIBLE;
+    static EstadoVehiculo determinarEstadoVehiculo(Boolean requiereMantenimiento) {
+        return Boolean.TRUE.equals(requiereMantenimiento)
+                ? EstadoVehiculo.MANTENIMIENTO
+                : EstadoVehiculo.DISPONIBLE;
     }
 
     private Long usuarioActualId() {
