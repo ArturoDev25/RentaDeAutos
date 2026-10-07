@@ -1,0 +1,35 @@
+/* S3-15 — Pantalla de devolución. Reutiliza reservaciones.css y entrega.css; solo agrega lo propio. */
+.entrega-badge[data-estado="FINALIZADA"] { background: #ece9fb; color: #4b3a99; }
+
+/* Aviso de a qué estado pasará el vehículo */
+.devolucion-destino { display: flex; gap: 10px; align-items: baseline; padding: 12px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; background: #e5f5ed; color: #146653; }
+.devolucion-destino:empty { display: none; }
+.devolucion-destino[data-estado="MANTENIMIENTO"] { background: #fff4d6; color: #7a5300; }
+
+/* Vista previa del cobro dentro del formulario */
+.devolucion-preview { margin: 22px 0 6px; padding: 16px 18px; border: 1px dashed #cbd8d2; border-radius: 10px; background: #f8fbfa; }
+.devolucion-preview h3 { margin: 0 0 12px; font-size: 15px; color: #263c48; }
+.devolucion-preview dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 20px; margin: 0 0 10px; }
+.devolucion-preview dt { font-size: 12px; color: #637087; margin-bottom: 3px; }
+.devolucion-preview dd { margin: 0; font-size: 15px; font-weight: 600; color: #172033; font-variant-numeric: tabular-nums; }
+.devolucion-preview + .reservation-note { margin-top: 16px; }
+.devolucion-preview .devolucion-total dd { color: #146653; font-size: 17px; }
+
+/* Resultado: costo final */
+.devolucion-costo { display: grid; grid-template-columns: minmax(200px, 1fr) 2fr; gap: 24px; padding: 22px 22px 6px; align-items: stretch; }
+.devolucion-costo-total { display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 20px; border-radius: 12px; background: #146653; color: #fff; }
+.devolucion-costo-total span { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; opacity: .85; }
+.devolucion-costo-total strong { font-size: 32px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.devolucion-costo-total small { font-size: 13px; opacity: .9; }
+.devolucion-desglose { width: 100%; border-collapse: collapse; align-self: center; }
+.devolucion-desglose th, .devolucion-desglose td { padding: 10px 4px; border-bottom: 1px solid #e1e9e5; font-size: 14px; }
+.devolucion-desglose th { text-align: left; font-weight: 500; color: #42526b; }
+.devolucion-desglose td { text-align: right; font-variant-numeric: tabular-nums; color: #172033; }
+.devolucion-desglose .devolucion-total th, .devolucion-desglose .devolucion-total td { border-bottom: 0; font-weight: 700; font-size: 16px; color: #146653; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 900px) {
+  .devolucion-preview dl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .devolucion-costo { grid-template-columns: 1fr; }
+}

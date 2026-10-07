@@ -25,4 +25,7 @@
 .reservation-panel .accion-entregar { display: inline-block; margin: 2px; padding: 7px 9px; font-size: 13px; border-radius: 8px; background: #1d4f91; color: white; text-decoration: none; }
 .reservation-panel .accion-entregar:hover { background: #163d70; }
 .reservation-panel .accion-entregar.secondary { color: #1d4f91; background: #e3effd; }
+/* S3-15: acceso a la pantalla de devolución */
+.reservation-panel .accion-devolver { background: #146653; }
+.reservation-panel .accion-devolver:hover { background: #0f4f40; }
 @media (max-width: 650px) { .reservation-fields { grid-template-columns: 1fr; } }
