@@ -32,6 +32,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,8 +105,10 @@ class DevolucionServiceTest {
         // Configurar mocks.
         when(entregas.findById(50L)).thenReturn(Optional.of(entrega));
         when(devoluciones.existsByEntregaId(50L)).thenReturn(false);
-        when(reservaciones.findByIdParaActualizar(10L)).thenReturn(Optional.of(reservacion));
+        // Orden de bloqueo: vehiculoId (sin bloqueo) → vehículo FOR UPDATE → reservación FOR UPDATE.
+        when(reservaciones.findVehiculoIdById(10L)).thenReturn(Optional.of(3L));
         when(vehiculos.findByIdParaActualizar(3L)).thenReturn(Optional.of(vehiculo));
+        when(reservaciones.findByIdParaActualizar(10L)).thenReturn(Optional.of(reservacion));
 
         when(devoluciones.saveAndFlush(any())).thenAnswer(inv -> {
             Devolucion d = inv.getArgument(0);
@@ -170,8 +173,8 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("Cargo por daños (> 0): vehículo pasa a MANTENIMIENTO")
-    void condicionDanioMandaVehiculoAMantenimiento() {
+    @DisplayName("Cargo por daños sin flag de mantenimiento: vehículo queda DISPONIBLE")
+    void cargoDanosSinFlagNoMandaAMantenimiento() {
         DevolucionRequest req = new DevolucionRequest(
                 50L,
                 new BigDecimal("15200.0"),
@@ -179,11 +182,12 @@ class DevolucionServiceTest {
                 "Golpe en puerta delantera izquierda",
                 new BigDecimal("1500.00"),
                 null,
-                false); // requiereMantenimiento=false, pero hay cargo por daños (1500)
+                false); // requiereMantenimiento=false: ni el texto ni el cargo deciden el estado
 
-        servicio.registrar(req, "10.0.0.5");
+        DevolucionResponse respuesta = servicio.registrar(req, "10.0.0.5");
 
-        assertEquals(EstadoVehiculo.MANTENIMIENTO, vehiculo.getEstado());
+        assertEquals(EstadoVehiculo.DISPONIBLE, vehiculo.getEstado());
+        assertEquals(new BigDecimal("1500.00"), respuesta.cargoDanos());
         assertEquals("FINALIZADA", reservacion.getEstado());
     }
 
@@ -220,27 +224,37 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("AuditService.registrarEvento es invocado con la acción correcta")
+    @DisplayName("AuditService.registrarEvento es invocado con la acción correcta y snapshots correspondientes")
+    @SuppressWarnings("unchecked")
     void auditServiceEsInvocadoConAccionCorrecta() {
         servicio.registrar(request("15100.0", false), "192.168.1.1");
 
-        ArgumentCaptor<String> antesCaptor   = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> despuesCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> antesCaptor   = ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<Object> despuesCaptor = ArgumentCaptor.forClass(Object.class);
         verify(auditoria).registrarEvento(
                 eq(7L),
                 eq("DEVOLVER_VEHICULO"),
-                eq("Devolucion"),
+                eq("DEVOLUCION"),
                 eq(200L),
                 eq("EXITOSO"),
                 antesCaptor.capture(),
                 despuesCaptor.capture(),
                 eq("192.168.1.1"));
 
-        // El JSON anterior debe contener el estado EN_CURSO.
-        assertTrue(antesCaptor.getValue().contains("\"estadoReservacion\":\"EN_CURSO\""));
-        // El JSON posterior debe contener FINALIZADA y DISPONIBLE.
-        assertTrue(despuesCaptor.getValue().contains("\"estadoReservacion\":\"FINALIZADA\""));
-        assertTrue(despuesCaptor.getValue().contains("\"estadoVehiculo\":\"DISPONIBLE\""));
+        Map<String, Object> a = (Map<String, Object>) antesCaptor.getValue();
+        assertEquals(10L, a.get("reservacionId"));
+        assertEquals("EN_CURSO", a.get("estadoReservacion"));
+        assertEquals(3L, a.get("vehiculoId"));
+        assertEquals("RENTADO", a.get("estadoVehiculo"));
+
+        Map<String, Object> d = (Map<String, Object>) despuesCaptor.getValue();
+        assertEquals(200L, d.get("devolucionId"));
+        assertEquals(10L, d.get("reservacionId"));
+        assertEquals("FINALIZADA", d.get("estadoReservacion"));
+        assertEquals(3L, d.get("vehiculoId"));
+        assertEquals("DISPONIBLE", d.get("estadoVehiculo"));
+        assertEquals(new BigDecimal("15100.0"), d.get("kilometrajeEntrada"));
+        assertNotNull(d.get("totalFinal"));
     }
 
     // ── Casos de error ────────────────────────────────────────────────────────
@@ -292,24 +306,24 @@ class DevolucionServiceTest {
     }
 
     @Test
-    @DisplayName("determinarEstadoVehiculo: sin cargo por daños y sin mantenimiento → DISPONIBLE")
+    @DisplayName("determinarEstadoVehiculo: requiereMantenimiento=false → DISPONIBLE")
     void determinarEstadoSinDanioEsDisponible() {
         assertEquals(EstadoVehiculo.DISPONIBLE,
-                DevolucionService.determinarEstadoVehiculo(false, BigDecimal.ZERO));
+                DevolucionService.determinarEstadoVehiculo(false));
     }
 
     @Test
-    @DisplayName("determinarEstadoVehiculo: con cargo por daños (> 0) → MANTENIMIENTO")
-    void determinarEstadoConDanioEsMantenimiento() {
-        assertEquals(EstadoVehiculo.MANTENIMIENTO,
-                DevolucionService.determinarEstadoVehiculo(false, new BigDecimal("1500.00")));
+    @DisplayName("determinarEstadoVehiculo: requiereMantenimiento=null → DISPONIBLE")
+    void determinarEstadoNullEsDisponible() {
+        assertEquals(EstadoVehiculo.DISPONIBLE,
+                DevolucionService.determinarEstadoVehiculo(null));
     }
 
     @Test
     @DisplayName("determinarEstadoVehiculo: requiereMantenimiento=true → MANTENIMIENTO siempre")
     void determinarEstadoRequiereMantenimientoEsMantenimiento() {
         assertEquals(EstadoVehiculo.MANTENIMIENTO,
-                DevolucionService.determinarEstadoVehiculo(true, BigDecimal.ZERO));
+                DevolucionService.determinarEstadoVehiculo(true));
     }
 
     @Test
@@ -323,5 +337,67 @@ class DevolucionServiceTest {
 
         assertEquals("DISPONIBLE", respuesta.estadoVehiculo());
         assertEquals(EstadoVehiculo.DISPONIBLE, vehiculo.getEstado());
+    }
+
+    // ── Fórmula exacta (Bug 2) ────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Fórmula exacta: 3 días pactados + 2 de atraso, tarifa 400 → 1200 + 800 + 0 = 2000")
+    void formulaExactaSinDobleCobro() {
+        LocalDateTime base = LocalDateTime.now();
+        reservacion.setFechaInicio(base.minusDays(5)); // 3 días pactados (72 h exactas)
+        reservacion.setFechaFin(base.minusDays(2));    // 2 días de atraso
+        reservacion.setTarifaDia(new BigDecimal("400.00"));
+
+        DevolucionResponse respuesta = servicio.registrar(request("15300.0", false), "10.0.0.5");
+
+        assertEquals(new BigDecimal("1200.00"), respuesta.subtotal());    // solo días pactados
+        assertEquals(new BigDecimal("800.00"),  respuesta.cargoAtraso()); // solo días excedentes
+        assertEquals(new BigDecimal("0.00"),    respuesta.cargoDanos());
+        assertEquals(new BigDecimal("2000.00"), respuesta.totalFinal());
+    }
+
+    @Test
+    @DisplayName("Fórmula exacta: mismos datos + cargo por daños 350 → total 2350")
+    void formulaExactaConDanos() {
+        LocalDateTime base = LocalDateTime.now();
+        reservacion.setFechaInicio(base.minusDays(5));
+        reservacion.setFechaFin(base.minusDays(2));
+        reservacion.setTarifaDia(new BigDecimal("400.00"));
+        DevolucionRequest req = new DevolucionRequest(
+                50L, new BigDecimal("15300.0"), new BigDecimal("70.00"),
+                "Rayón leve en defensa", new BigDecimal("350.00"), null, false);
+
+        DevolucionResponse respuesta = servicio.registrar(req, "10.0.0.5");
+
+        assertEquals(new BigDecimal("1200.00"), respuesta.subtotal());
+        assertEquals(new BigDecimal("800.00"),  respuesta.cargoAtraso());
+        assertEquals(new BigDecimal("350.00"),  respuesta.cargoDanos());
+        assertEquals(new BigDecimal("2350.00"), respuesta.totalFinal());
+    }
+
+    // ── Orden de bloqueo (Bug 6) ──────────────────────────────────────────────
+
+    @Test
+    @DisplayName("Bloqueo: primero vehículo y después reservación (mismo orden que EntregaService)")
+    void bloqueaVehiculoAntesQueReservacion() {
+        servicio.registrar(request("15100.0", false), "10.0.0.5");
+
+        org.mockito.InOrder orden = inOrder(reservaciones, vehiculos);
+        orden.verify(reservaciones).findVehiculoIdById(10L);
+        orden.verify(vehiculos).findByIdParaActualizar(3L);
+        orden.verify(reservaciones).findByIdParaActualizar(10L);
+        verify(reservaciones, never()).findById(anyLong());
+        verify(vehiculos, never()).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("La reservación cambió de vehículo entre lectura y bloqueo → 409 y nada se guarda")
+    void reservacionCambioDeVehiculoLanza409() {
+        reservacion.setVehiculoId(99L); // tras el bloqueo apunta a otro vehículo
+        DevolucionException error = assertThrows(DevolucionException.class,
+                () -> servicio.registrar(request("15100.0", false), null));
+        assertEquals(409, error.getStatus().value());
+        assertNadaGuardado();
     }
 }

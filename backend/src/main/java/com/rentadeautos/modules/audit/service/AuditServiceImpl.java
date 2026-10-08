@@ -1,5 +1,15 @@
 package com.rentadeautos.modules.audit.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamWriteFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.rentadeautos.modules.audit.dto.AuditDetailDTO;
 import com.rentadeautos.modules.audit.dto.AuditFilterOptionsDTO;
 import com.rentadeautos.modules.audit.dto.AuditMetricsDTO;
@@ -9,30 +19,61 @@ import com.rentadeautos.modules.audit.repository.AuditRepository;
 import com.rentadeautos.modules.audit.repository.AuditSpecification;
 import com.rentadeautos.modules.auth.model.UsuarioApp;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class AuditServiceImpl implements AuditService {
 
+    private static final Logger log = LoggerFactory.getLogger(AuditServiceImpl.class);
+
+    /** Serializador de snapshots: fechas ISO-8601, BigDecimal sin notación científica. */
+    static final ObjectMapper JSON = JsonMapper.builder()
+            .addModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
+            .build();
+
+    /** Política de cero secretos en la bitácora (doc S2-18 §2.5). */
+    private static final Pattern CLAVE_SENSIBLE = Pattern.compile(
+            "(?i)(password|contrasena|contraseña|passwd|hash|token|secret|jwt|authorization)");
+    static final String REDACTADO = "[REDACTADO]";
+
     private final AuditRepository auditRepository;
     private final UsuarioAppRepository usuarioRepository;
+    private final PlatformTransactionManager transactionManager;
 
-    public AuditServiceImpl(AuditRepository auditRepository, UsuarioAppRepository usuarioRepository) {
+    public AuditServiceImpl(AuditRepository auditRepository, UsuarioAppRepository usuarioRepository,
+                            PlatformTransactionManager transactionManager) {
         this.auditRepository = auditRepository;
         this.usuarioRepository = usuarioRepository;
+        this.transactionManager = transactionManager;
     }
 
     @Override
@@ -76,18 +117,118 @@ public class AuditServiceImpl implements AuditService {
     
     @Override
     @Transactional
-    public void registrarEvento(Long usuarioId, String accion, String entidad, Long entidadId, String resultado, String valoresAnteriores, String valoresNuevos, String direccionIp) {
-        UsuarioApp usuario = null;
-        if (usuarioId != null) {
-            usuario = usuarioRepository.findById(usuarioId).orElse(null);
+    public void registrarEvento(Long usuarioId, String accion, String entidad, Long entidadId, String resultado,
+                                Object valoresAnteriores, Object valoresNuevos, String direccionIp) {
+        String resultadoNormalizado = normalizarResultado(resultado);
+        // Serializar ANTES de tocar la BD: un snapshot inválido no deja registros a medias.
+        String antesJson = aJson(valoresAnteriores);
+        String despuesJson = aJson(valoresNuevos);
+        String ip = direccionIp != null ? direccionIp : ipDePeticionActual();
+
+        Runnable guardar = () -> {
+            Auditoria auditoria = new Auditoria(
+                resolverActor(usuarioId), accion, entidad, entidadId, resultadoNormalizado,
+                antesJson, despuesJson, ip, LocalDateTime.now()
+            );
+            auditRepository.save(auditoria);
+        };
+
+        if (AuditoriaOperativa.FALLIDO.equals(resultadoNormalizado)) {
+            // Un intento rechazado hace rollback de la operación de negocio; la bitácora
+            // del fallo se confirma en su propia transacción para no perderse con él.
+            TransactionTemplate nueva = new TransactionTemplate(transactionManager);
+            nueva.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            try {
+                nueva.executeWithoutResult(estado -> guardar.run());
+            } catch (RuntimeException e) {
+                // No ocultar el error de negocio original; el log no incluye snapshots.
+                log.warn("No se pudo registrar auditoría FALLIDO de {} sobre {}: {}",
+                        accion, entidad, e.getClass().getSimpleName());
+            }
+        } else {
+            // EXITOSO: misma transacción que la operación → todo o nada (RN-09).
+            guardar.run();
         }
-        
-        Auditoria auditoria = new Auditoria(
-            usuario, accion, entidad, entidadId, resultado, 
-            valoresAnteriores, valoresNuevos, direccionIp, LocalDateTime.now()
-        );
-        
-        auditRepository.save(auditoria);
+    }
+
+    // ── Soporte de registrarEvento (S3-17) ──────────────────────────────────
+
+    private static String normalizarResultado(String resultado) {
+        String r = resultado == null ? "" : resultado.strip().toUpperCase(Locale.ROOT);
+        if (!AuditoriaOperativa.EXITOSO.equals(r) && !AuditoriaOperativa.FALLIDO.equals(r)) {
+            throw new IllegalArgumentException("Resultado de auditoría inválido: " + resultado);
+        }
+        return r;
+    }
+
+    /** Actor explícito; si no viene, el usuario autenticado; si no hay sesión, null ("Sistema"). */
+    private UsuarioApp resolverActor(Long usuarioId) {
+        if (usuarioId != null) {
+            return usuarioRepository.findById(usuarioId).orElse(null);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth instanceof AnonymousAuthenticationToken
+                || auth.getName() == null || auth.getName().isBlank()) {
+            return null;
+        }
+        return usuarioRepository.findByCorreo(auth.getName()).orElse(null);
+    }
+
+    /** IP del request HTTP en curso (misma fuente que los controladores: getRemoteAddr). */
+    private static String ipDePeticionActual() {
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes atributos) {
+            return atributos.getRequest().getRemoteAddr();
+        }
+        return null;
+    }
+
+    /**
+     * Convierte un snapshot a JSON limpio. Acepta objetos (Map, record, DTO) o una cadena
+     * JSON ya formada; los atributos null se conservan como null y las fechas salen en ISO-8601.
+     * Cualquier clave sensible (contraseña, token, hash, secreto) se enmascara.
+     */
+    static String aJson(Object valores) {
+        if (valores == null) {
+            return null;
+        }
+        try {
+            JsonNode nodo;
+            if (valores instanceof String texto) {
+                if (texto.isBlank()) {
+                    return null;
+                }
+                try {
+                    nodo = JSON.readTree(texto);
+                } catch (JsonProcessingException noEsJson) {
+                    nodo = TextNode.valueOf(texto); // texto plano → cadena JSON válida
+                }
+            } else {
+                nodo = JSON.valueToTree(valores);
+            }
+            if (nodo == null || nodo.isNull() || nodo.isMissingNode()) {
+                return null;
+            }
+            return JSON.writeValueAsString(enmascararSensibles(nodo));
+        } catch (JsonProcessingException | IllegalArgumentException e) {
+            throw new IllegalStateException("No se pudo serializar el snapshot de auditoría", e);
+        }
+    }
+
+    private static JsonNode enmascararSensibles(JsonNode nodo) {
+        if (nodo instanceof ObjectNode objeto) {
+            List<String> claves = new ArrayList<>();
+            objeto.fieldNames().forEachRemaining(claves::add);
+            for (String clave : claves) {
+                if (CLAVE_SENSIBLE.matcher(clave).find()) {
+                    objeto.put(clave, REDACTADO);
+                } else {
+                    enmascararSensibles(objeto.get(clave));
+                }
+            }
+        } else if (nodo instanceof ArrayNode arreglo) {
+            arreglo.forEach(AuditServiceImpl::enmascararSensibles);
+        }
+        return nodo;
     }
 
     private AuditResponseDTO mapToResponseDTO(Auditoria a) {
