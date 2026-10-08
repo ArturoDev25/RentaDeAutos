@@ -123,7 +123,6 @@
 
     // Si ya existe una entrega, se muestra en modo consulta.
     if (entrega) {
-      bloquear('Esta reservación ya tiene una entrega registrada.');
       mostrarResultado(entrega, 'Entrega registrada');
       return;
     }

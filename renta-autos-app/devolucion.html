@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devolución de vehículo - RentaDeAutos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/reservaciones.css">
+  <link rel="stylesheet" href="css/entrega.css">
+  <link rel="stylesheet" href="css/devolucion.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="dashboard-body">
+  <aside class="dashboard-sidebar">
+    <div class="sidebar-logo">
+      <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+    </div>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+      <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
+    </nav>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+  </aside>
+  <div class="dashboard-main">
+    <header class="dashboard-topbar">
+      <div class="panel-ubicacion"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span>Administración / Reservaciones / Devolución</span></div>
+      <div class="dashboard-user-area">
+        <div class="dashboard-user">
+          <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+          <div class="user-info">
+            <strong id="operador">Usuario</strong>
+            <small data-panel-rol>Sesión</small>
+          </div>
+        </div>
+        <button id="salir" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+        </button>
+      </div>
+    </header>
+    <main class="dashboard-content">
+      <section class="dashboard-title">
+        <div><h1>Devolución de vehículo</h1><p>Recibe el vehículo, registra cómo regresa y calcula el costo final de la renta</p></div>
+      </section>
+      <p id="mensaje" role="status" aria-live="polite"></p>
+
+      <!-- 1. Elegir renta en curso (solo si se abrió la pantalla sin ?reservacion=ID) -->
+      <section id="panel-seleccion" class="dashboard-panel reservation-panel" aria-labelledby="seleccion-titulo" hidden>
+        <div class="panel-header"><h2 id="seleccion-titulo"><i class="fa-solid fa-magnifying-glass"></i>Elige una renta en curso</h2></div>
+        <form id="form-seleccion">
+          <div class="reservation-fields">
+            <label class="reservation-wide">Reservación
+              <select name="reservacionId" required><option value="">Cargando rentas…</option></select>
+            </label>
+          </div>
+          <div class="reservation-actions"><button type="submit">Continuar</button><a class="entrega-link" href="reservaciones.html">Volver a reservaciones</a></div>
+        </form>
+      </section>
+
+      <!-- 2. Resumen de la renta (datos de salida como referencia) -->
+      <section id="panel-resumen" class="dashboard-panel reservation-panel" aria-labelledby="resumen-titulo" hidden>
+        <div class="panel-header">
+          <h2 id="resumen-titulo"><i class="fa-solid fa-file-contract"></i>Renta de la reservación <span id="r-id"></span></h2>
+          <a href="reservaciones.html"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Reservaciones</a>
+        </div>
+        <dl class="entrega-resumen">
+          <div><dt>Cliente</dt><dd id="r-cliente">—</dd></div>
+          <div><dt>Vehículo</dt><dd id="r-vehiculo">—</dd></div>
+          <div><dt>Periodo pactado</dt><dd id="r-periodo">—</dd></div>
+          <div><dt>Estado de la reservación</dt><dd><span id="r-estado" class="entrega-badge">—</span></dd></div>
+          <div><dt>Estado del vehículo</dt><dd><span id="r-estado-vehiculo" class="entrega-badge">—</span></dd></div>
+          <div><dt>Tarifa diaria</dt><dd id="r-tarifa">—</dd></div>
+          <div><dt>Entregado el</dt><dd id="r-fecha-salida">—</dd></div>
+          <div><dt>Kilometraje de salida</dt><dd id="r-km-salida">—</dd></div>
+          <div><dt>Combustible de salida</dt><dd id="r-comb-salida">—</dd></div>
+          <div class="entrega-ancho"><dt>Condición de salida</dt><dd id="r-cond-salida">—</dd></div>
+        </dl>
+        <div id="bloqueo" class="entrega-bloqueo" role="alert" hidden>
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          <div><strong>No se puede registrar la devolución</strong><p id="bloqueo-texto"></p></div>
+        </div>
+      </section>
+
+      <!-- 3. Formulario de devolución -->
+      <section id="panel-form" class="dashboard-panel reservation-panel" aria-labelledby="form-titulo" hidden>
+        <div class="panel-header"><h2 id="form-titulo"><i class="fa-solid fa-rotate-left"></i>Datos de entrada</h2></div>
+        <form id="form-devolucion" novalidate>
+          <div class="reservation-fields">
+            <label>Kilometraje de entrada (km)
+              <input name="kilometrajeEntrada" type="number" inputmode="decimal" step="0.1" min="0" required aria-describedby="km-ayuda km-error">
+              <small id="km-ayuda" class="entrega-ayuda"></small>
+              <small id="km-error" class="entrega-error" data-error-de="kilometrajeEntrada"></small>
+            </label>
+
+            <label>Combustible (%)
+              <div class="entrega-combustible">
+                <input name="combustibleRango" type="range" min="0" max="100" step="5" value="100" aria-label="Nivel de combustible (control deslizante)">
+                <input name="combustibleEntrada" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="100" required aria-describedby="comb-ayuda comb-error">
+              </div>
+              <small id="comb-ayuda" class="entrega-ayuda">Tanque lleno</small>
+              <small id="comb-error" class="entrega-error" data-error-de="combustibleEntrada"></small>
+            </label>
+
+            <label>Condición general
+              <select name="condicionGeneral" required aria-describedby="cond-gen-error">
+                <option value="">Selecciona una opción</option>
+                <option>Excelente</option>
+                <option>Buena</option>
+                <option>Regular</option>
+                <option>Con daños</option>
+              </select>
+              <small id="cond-gen-error" class="entrega-error" data-error-de="condicionGeneral"></small>
+            </label>
+
+            <label>Cargo por daños (MXN, opcional)
+              <input name="cargoDanos" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" aria-describedby="danos-ayuda danos-error">
+              <small id="danos-ayuda" class="entrega-ayuda">Solo si hay daños o faltantes que se cobran al cliente. Con cargo, el vehículo pasa a mantenimiento.</small>
+              <small id="danos-error" class="entrega-error" data-error-de="cargoDanos"></small>
+            </label>
+
+            <label class="reservation-wide">Descripción de la condición de entrada
+              <textarea name="condicionDetalle" rows="3" maxlength="1900" required placeholder="Ej. Limpio, llantas en buen estado, mismo estado que a la salida" aria-describedby="cond-error cond-contador"></textarea>
+              <small id="cond-contador" class="entrega-ayuda">0 / 1900</small>
+              <small id="cond-error" class="entrega-error" data-error-de="condicionDetalle"></small>
+            </label>
+
+            <label class="reservation-wide">Observaciones (opcional)
+              <textarea name="observaciones" rows="2" maxlength="2000" placeholder="Ej. El cliente devolvió la silla para bebé" aria-describedby="obs-error"></textarea>
+              <small id="obs-error" class="entrega-error" data-error-de="observaciones"></small>
+            </label>
+
+            <label class="reservation-wide entrega-check">
+              <input name="requiereMantenimiento" type="checkbox">
+              <span>Enviar el vehículo a <strong>mantenimiento</strong> aunque no tenga daños visibles.</span>
+            </label>
+
+            <div id="destino-vehiculo" class="devolucion-destino reservation-wide" aria-live="polite"></div>
+
+            <label class="reservation-wide entrega-check">
+              <input name="revisado" type="checkbox" required aria-describedby="rev-error">
+              <span>Revisé el vehículo junto con el cliente y los datos capturados son correctos.</span>
+            </label>
+            <small id="rev-error" class="entrega-error reservation-wide" data-error-de="revisado"></small>
+          </div>
+
+          <!-- Vista previa del cobro (informativa; el backend calcula el definitivo) -->
+          <div class="devolucion-preview" aria-labelledby="preview-titulo">
+            <h3 id="preview-titulo"><i class="fa-solid fa-calculator" aria-hidden="true"></i> Cobro estimado si se devuelve ahora</h3>
+            <dl>
+              <div><dt id="p-dias-texto">Renta</dt><dd id="p-subtotal">—</dd></div>
+              <div><dt id="p-atraso-texto">Atraso</dt><dd id="p-atraso">—</dd></div>
+              <div><dt>Daños</dt><dd id="p-danos">—</dd></div>
+              <div class="devolucion-total"><dt>Total estimado</dt><dd id="p-total">—</dd></div>
+            </dl>
+            <small class="entrega-ayuda">El costo final lo calcula el sistema al registrar la devolución.</small>
+          </div>
+
+          <p class="reservation-note">Al registrar la devolución, la reservación pasa a <strong>FINALIZADA</strong> y el vehículo a <strong>DISPONIBLE</strong> (o <strong>MANTENIMIENTO</strong>). Esta acción no se puede deshacer.</p>
+          <div class="reservation-actions">
+            <button id="registrar" type="submit"><i class="fa-solid fa-check" aria-hidden="true"></i> Registrar devolución</button>
+            <a class="entrega-link" href="reservaciones.html">Cancelar</a>
+          </div>
+        </form>
+      </section>
+
+      <!-- 4. Resultado: costo final -->
+      <section id="panel-resultado" class="dashboard-panel reservation-panel" aria-labelledby="resultado-titulo" hidden>
+        <div class="panel-header"><h2 id="resultado-titulo"><i class="fa-solid fa-circle-check"></i>Devolución registrada</h2></div>
+        <div class="devolucion-costo">
+          <div class="devolucion-costo-total">
+            <span>Costo final</span>
+            <strong id="d-total">—</strong>
+            <small id="d-comparacion"></small>
+          </div>
+          <table class="devolucion-desglose">
+            <caption class="sr-only">Desglose del costo final</caption>
+            <tbody>
+              <tr><th scope="row" id="d-subtotal-texto">Renta</th><td id="d-subtotal">—</td></tr>
+              <tr><th scope="row">Cargo por atraso</th><td id="d-atraso">—</td></tr>
+              <tr><th scope="row">Cargo por daños</th><td id="d-danos">—</td></tr>
+              <tr class="devolucion-total"><th scope="row">Total</th><td id="d-total-fila">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <dl class="entrega-resumen">
+          <div><dt>Folio de devolución</dt><dd id="d-id">—</dd></div>
+          <div><dt>Fecha de devolución</dt><dd id="d-fecha">—</dd></div>
+          <div><dt>Vehículo</dt><dd id="d-placa">—</dd></div>
+          <div><dt>Kilometraje de entrada</dt><dd id="d-km">—</dd></div>
+          <div><dt>Combustible de entrada</dt><dd id="d-comb">—</dd></div>
+          <div><dt>Recorrido</dt><dd id="d-recorrido">—</dd></div>
+          <div class="entrega-ancho"><dt>Condición de entrada</dt><dd id="d-cond">—</dd></div>
+          <div><dt>Estado de la reservación</dt><dd><span id="d-estado" class="entrega-badge">—</span></dd></div>
+          <div><dt>Estado del vehículo</dt><dd><span id="d-estado-vehiculo" class="entrega-badge">—</span></dd></div>
+        </dl>
+        <div class="reservation-actions entrega-acciones-fin"><a class="entrega-boton" href="reservaciones.html">Volver a reservaciones</a></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/client.js"></script>
+  <script src="js/devolucion.js"></script>
+  <script src="js/panel.js"></script>
+</body>
+</html>

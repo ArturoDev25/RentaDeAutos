@@ -137,6 +137,11 @@
         const ver = document.createElement('a'); ver.textContent = 'Ver entrega'; ver.className = 'accion-entregar secondary';
         ver.href = `entrega.html?reservacion=${r.id}`; celda.append(ver);
       }
+      // S3-15: la devolución solo se registra sobre una renta EN_CURSO (el Auditor solo consulta).
+      if (puedeOperar && r.estado === 'EN_CURSO') {
+        const devolver = document.createElement('a'); devolver.textContent = 'Devolver'; devolver.className = 'accion-entregar accion-devolver';
+        devolver.href = `devolucion.html?reservacion=${r.id}`; celda.append(devolver);
+      }
       if (!celda.hasChildNodes()) celda.textContent = puedeOperar ? 'Sin acciones disponibles' : 'Solo consulta';
     });
   }
