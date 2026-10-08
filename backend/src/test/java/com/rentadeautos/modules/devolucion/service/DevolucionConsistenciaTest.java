@@ -31,6 +31,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,6 +90,7 @@ class DevolucionConsistenciaTest {
 
         when(entregas.findById(50L)).thenReturn(Optional.of(entrega));
         when(devoluciones.existsByEntregaId(50L)).thenReturn(false);
+        when(reservaciones.findVehiculoIdById(10L)).thenReturn(Optional.of(3L));
         when(reservaciones.findByIdParaActualizar(10L)).thenReturn(Optional.of(reservacion));
         when(vehiculos.findByIdParaActualizar(3L)).thenReturn(Optional.of(vehiculo));
         when(devoluciones.saveAndFlush(any())).thenAnswer(inv -> {
@@ -129,8 +131,16 @@ class DevolucionConsistenciaTest {
         verify(devoluciones).saveAndFlush(any());
         verify(reservaciones).saveAndFlush(reservacion);
         verify(vehiculos).saveAndFlush(vehiculo);
-        verify(auditoria).registrarEvento(eq(7L), eq("DEVOLVER_VEHICULO"), eq("Devolucion"),
-                eq(200L), eq("EXITOSO"), contains("EN_CURSO"), contains("FINALIZADA"),
+        verify(auditoria).registrarEvento(eq(7L), eq("DEVOLVER_VEHICULO"), eq("DEVOLUCION"),
+                eq(200L), eq("EXITOSO"),
+                argThat(valor -> valor instanceof Map<?, ?> mapa
+                        && "EN_CURSO".equals(mapa.get("estadoReservacion"))
+                        && "RENTADO".equals(mapa.get("estadoVehiculo"))
+                        && Long.valueOf(10L).equals(mapa.get("reservacionId"))),
+                argThat(valor -> valor instanceof Map<?, ?> mapa
+                        && "FINALIZADA".equals(mapa.get("estadoReservacion"))
+                        && "DISPONIBLE".equals(mapa.get("estadoVehiculo"))
+                        && Long.valueOf(10L).equals(mapa.get("reservacionId"))),
                 eq("10.0.0.5"));
     }
 
