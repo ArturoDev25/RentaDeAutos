@@ -1,0 +1,36 @@
+/* S3-14 — Pantalla de entrega. Reutiliza reservaciones.css y solo agrega lo propio. */
+.entrega-resumen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 24px; margin: 0; padding: 22px; }
+.entrega-resumen div { min-width: 0; }
+.entrega-resumen .entrega-ancho { grid-column: 1 / -1; }
+.entrega-resumen dt { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #637087; margin-bottom: 4px; }
+.entrega-resumen dd { margin: 0; font-size: 15px; color: #172033; overflow-wrap: anywhere; white-space: pre-line; }
+
+.entrega-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #eef1f5; color: #42526b; }
+.entrega-badge[data-estado="CONFIRMADA"], .entrega-badge[data-estado="DISPONIBLE"], .entrega-badge[data-estado="RESERVADO"] { background: #e5f5ed; color: #146653; }
+.entrega-badge[data-estado="EN_CURSO"], .entrega-badge[data-estado="RENTADO"] { background: #e3effd; color: #1d4f91; }
+.entrega-badge[data-estado="PENDIENTE"] { background: #fff4d6; color: #7a5300; }
+.entrega-badge[data-estado="CANCELADA"], .entrega-badge[data-estado="MANTENIMIENTO"], .entrega-badge[data-estado="BAJA"] { background: #fde8ea; color: #a41f2b; }
+
+.entrega-bloqueo { display: flex; gap: 12px; margin: 0 22px 22px; padding: 14px 16px; border-radius: 8px; background: #fde8ea; color: #7d1720; }
+.entrega-bloqueo[hidden] { display: none; }
+.entrega-bloqueo i { margin-top: 3px; }
+.entrega-bloqueo p { margin: 4px 0 0; }
+
+.entrega-combustible { display: grid; grid-template-columns: 1fr 96px; gap: 12px; align-items: center; }
+.reservation-fields .entrega-combustible input[type="range"] { padding: 0; border: 0; accent-color: #27856d; }
+.entrega-ayuda { font-weight: 400; color: #637087; font-size: 13px; }
+.entrega-error { display: block; font-weight: 600; color: #a41f2b; font-size: 13px; line-height: 1.35; min-height: 1.35em; }
+.reservation-fields [aria-invalid="true"] { border-color: #a41f2b; background: #fff7f8; }
+
+.reservation-fields .entrega-check { display: flex; align-items: flex-start; gap: 10px; font-weight: 500; }
+.reservation-fields .entrega-check input { width: auto; margin-top: 3px; accent-color: #27856d; }
+
+.entrega-link, .entrega-boton { display: inline-flex; align-items: center; border-radius: 8px; padding: 11px 15px; text-decoration: none; font-weight: 600; color: #146653; background: #e5f5ed; }
+.entrega-link:hover, .entrega-boton:hover { background: #d3eee0; }
+.entrega-acciones-fin { padding: 0 22px 22px; }
+
+@media (max-width: 900px) { .entrega-resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) {
+  .entrega-resumen { grid-template-columns: 1fr; }
+  .entrega-espacio { display: none; }
+}

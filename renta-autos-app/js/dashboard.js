@@ -75,13 +75,12 @@ async function cargarDashboard() {
     try {
 
         console.log('Cargando información del dashboard...');
-
-        // Consultar los reportes del backend
-        const [inventario, clientes, reservaciones] =
+        const [inventario, clientes, reservaciones, rentasActivas] =
             await Promise.all([
                 fetchAPI('/reportes/inventario'),
                 fetchAPI('/reportes/clientes'),
-                fetchAPI('/reportes/reservaciones')
+                fetchAPI('/reportes/reservaciones'),
+                fetchAPI('/v1/rentas/activas')
             ]);
 
         console.log('Inventario:', inventario);
@@ -98,6 +97,7 @@ async function cargarDashboard() {
         // Actualizar gráfica de vehículos
         actualizarEstadoVehiculos(inventario);
         actualizarReservaciones(reservaciones);
+        actualizarRentasActivas(rentasActivas);
 
         // Actualizar fecha
         actualizarFecha();
@@ -432,5 +432,161 @@ function actualizarReservaciones(reservaciones) {
         `;
 
         tbody.appendChild(fila);
+    });
+}
+
+// =========================================================
+// RENTAS ACTIVAS
+// =========================================================
+
+function actualizarRentasActivas(rentasActivas) {
+
+    const tbody =
+        document.getElementById(
+            'rentasActivasDashboardBody'
+        );
+
+    if (!tbody) {
+        return;
+    }
+
+    tbody.innerHTML = '';
+
+    const data = obtenerData(rentasActivas);
+
+    if (!Array.isArray(data) || data.length === 0) {
+
+        const fila =
+            document.createElement('tr');
+
+        fila.innerHTML = `
+            <td colspan="5" style="text-align: center;">
+                No hay rentas activas.
+            </td>
+        `;
+
+        tbody.appendChild(fila);
+
+        return;
+    }
+
+    data.forEach(renta => {
+
+        const fila =
+            document.createElement('tr');
+
+        const fechaDevolucion =
+            formatearFechaHora(
+                renta.fechaDevolucionPrevista
+            );
+
+        const estado =
+            renta.retrasada
+                ? 'RETRASADA'
+                : 'EN_CURSO';
+
+        fila.innerHTML = `
+            <td>
+                ${renta.clienteNombre || 'Sin cliente'}
+            </td>
+
+            <td>
+                ${renta.marca || ''} ${renta.modelo || ''}
+            </td>
+
+            <td>
+                ${renta.placa || 'Sin placa'}
+            </td>
+
+            <td>
+                ${fechaDevolucion}
+            </td>
+
+            <td>
+                <span class="reservation-status ${
+                    renta.retrasada
+                        ? 'delayed'
+                        : 'confirmed'
+                }">
+                    ${estado}
+                </span>
+            </td>
+        `;
+
+        tbody.appendChild(fila);
+    });
+}
+
+function formatearFechaHora(fecha) {
+
+    if (!fecha) {
+        return 'Sin fecha';
+    }
+
+    const fechaObj = new Date(fecha);
+
+    if (Number.isNaN(fechaObj.getTime())) {
+        return 'Fecha inválida';
+    }
+
+    return fechaObj.toLocaleString(
+        'es-MX',
+        {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+    );
+}
+
+// =========================================================
+// ACTUALIZAR RENTAS ACTIVAS
+// =========================================================
+
+const btnActualizarRentas =
+    document.getElementById('btnActualizarRentas');
+
+if (btnActualizarRentas) {
+
+    btnActualizarRentas.addEventListener('click', async () => {
+
+        btnActualizarRentas.disabled = true;
+
+        const icono =
+            btnActualizarRentas.querySelector('i');
+
+        if (icono) {
+            icono.classList.add('fa-spin');
+        }
+
+        try {
+
+            const rentasActivas =
+                await fetchAPI('/v1/rentas/activas');
+
+            actualizarRentasActivas(rentasActivas);
+
+        } catch (error) {
+
+            console.error(
+                'Error al actualizar las rentas activas:',
+                error
+            );
+
+            mostrarErrorDashboard(
+                error.message ||
+                'No se pudieron actualizar las rentas activas.'
+            );
+
+        } finally {
+
+            btnActualizarRentas.disabled = false;
+
+            if (icono) {
+                icono.classList.remove('fa-spin');
+            }
+        }
     });
 }

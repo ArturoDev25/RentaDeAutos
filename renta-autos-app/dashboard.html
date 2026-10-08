@@ -447,6 +447,49 @@
 
             </section>
 
+            
+
+            <!-- RENTAS ACTIVAS -->
+            <section class="dashboard-panel active-rentals-panel">
+                <div class="panel-header">
+                    <h2>
+                        <i class="fa-solid fa-car-side">
+                        </i>Rentas activas
+                    </h2>
+
+        <button
+            type="button"
+            id="btnActualizarRentas"
+            class="dashboard-refresh-button">
+            <i class="fa-solid fa-rotate"></i>
+            Actualizar
+        </button>
+
+    </div>
+
+    <div class="reservations-table-container">
+
+        <table class="reservations-table">
+
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Vehículo</th>
+                    <th>Placa</th>
+                    <th>Devolución prevista</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+
+            <tbody id="rentasActivasDashboardBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
 
 
             <!-- GESTIÓN DEL SISTEMA-->

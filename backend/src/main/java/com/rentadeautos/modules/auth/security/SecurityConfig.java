@@ -63,6 +63,12 @@ public class SecurityConfig {
                 .requestMatchers("/api/reservaciones", "/api/reservaciones/**")
                     .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
 
+                // S3-11: consulta de rentas activas para el personal autorizado.
+                .requestMatchers(HttpMethod.GET, "/api/v1/rentas/activas")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
+                .requestMatchers("/api/v1/rentas/activas", "/api/v1/rentas/activas/**")
+                    .denyAll()
+
                 // S3-09: entrega de vehículos (matriz de roles: Admin, Agente y Supervisor
                 // registran; el Auditor solo consulta).
                 .requestMatchers(HttpMethod.POST, "/api/v1/entregas")
@@ -70,6 +76,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/entregas/**")
                     .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR")
                 .requestMatchers("/api/v1/entregas", "/api/v1/entregas/**")
+                    .denyAll()
+
+                // S3-10: devolución de vehículos (Admin, Agente y Supervisor registran;
+                // el Auditor no tiene acceso → 403 Forbidden).
+                .requestMatchers(HttpMethod.POST, "/api/v1/devoluciones")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers("/api/v1/devoluciones", "/api/v1/devoluciones/**")
                     .denyAll()
 
                 // Consultas de los catálogos del Sprint 2.

@@ -84,6 +84,13 @@
         select.add(new Option(item.nombre, item.id));
       });
     }
+    // S3-14: los vehículos RENTADOS no vienen en /opciones; se toman del catálogo
+    // para que la tabla muestre su nombre en las rentas EN_CURSO.
+    try {
+      (await peticion('/v1/vehiculos')).data.forEach(v => {
+        if (!nombresVehiculos.has(v.id)) nombresVehiculos.set(v.id, `${v.marca} ${v.modelo} · ${v.placa}`);
+      });
+    } catch (_) { /* si falla, se muestra el ID como antes */ }
     pintar();
   }
 
@@ -120,6 +127,15 @@
       if (puedeOperar && ['PENDIENTE', 'CONFIRMADA'].includes(r.estado)) {
         botonAccion(celda, 'Editar', () => comenzarEdicion(r), 'secondary');
         botonAccion(celda, 'Cancelar', () => cambiarEstado(r, 'cancelar'), 'secondary');
+      }
+      // S3-14: la entrega solo se inicia desde una reservación CONFIRMADA.
+      if (r.estado === 'CONFIRMADA') {
+        const entregar = document.createElement('a'); entregar.textContent = 'Entregar'; entregar.className = 'accion-entregar';
+        entregar.href = `entrega.html?reservacion=${r.id}`; celda.append(entregar);
+      }
+      if (['EN_CURSO', 'FINALIZADA'].includes(r.estado)) {
+        const ver = document.createElement('a'); ver.textContent = 'Ver entrega'; ver.className = 'accion-entregar secondary';
+        ver.href = `entrega.html?reservacion=${r.id}`; celda.append(ver);
       }
       if (!celda.hasChildNodes()) celda.textContent = puedeOperar ? 'Sin acciones disponibles' : 'Solo consulta';
     });
