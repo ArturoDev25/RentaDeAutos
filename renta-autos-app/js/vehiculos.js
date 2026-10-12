@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ---------------------------------------------------------------
     async function cargarCategorias() {
         try {
-            const respuesta = await solicitar('/categorias');
+            const respuesta = await solicitar('/v1/categorias');
             categorias = respuesta?.data || [];
         } catch (error) {
             categorias = [];
