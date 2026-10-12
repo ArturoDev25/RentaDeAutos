@@ -23,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Es únicamente presentación; la seguridad real la impone Spring Security.
     const paginasSinAcceso = {
         ADMINISTRADOR: [],
-        AGENTE:        ['categorias.html', 'auditoria.html'],
-        SUPERVISOR:    ['categorias.html'],
-        AUDITOR:       ['categorias.html']
+        AGENTE:        ['categorias.html', 'auditoria.html', 'usuarios.html'],
+        SUPERVISOR:    ['categorias.html', 'usuarios.html'],
+        AUDITOR:       ['categorias.html', 'usuarios.html']
     };
     const ocultar = paginasSinAcceso[sesion?.rol] || [];
     if (ocultar.length) {
