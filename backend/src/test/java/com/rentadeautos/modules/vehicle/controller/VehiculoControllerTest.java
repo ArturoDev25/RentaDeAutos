@@ -76,7 +76,7 @@ class VehiculoControllerTest {
 
     private VehiculoResponse versa(EstadoVehiculo estado) {
         return new VehiculoResponse(1L, 1L, "Compacto", "FAK-1234", "3N1AB7AP0FY123456",
-                "Nissan", "Versa", 2022, "Blanco", new BigDecimal("15000.0"), estado);
+                "Nissan", "Versa", 2022, "Blanco", new BigDecimal("15000.0"), estado, null);
     }
 
     /** Cuerpo válido con un solo campo reemplazado. */

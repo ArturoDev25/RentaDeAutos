@@ -75,7 +75,7 @@ class VehiculoServiceTest {
 
     private VehiculoRequest peticion(Long categoriaId, String placa, String vin, int anio) {
         return new VehiculoRequest(categoriaId, placa, vin, "  Nissan ", " Versa ",
-                anio, "  ", new BigDecimal("15000.0"));
+                anio, "  ", new BigDecimal("15000.0"), null);
     }
 
     @Test
@@ -182,7 +182,7 @@ class VehiculoServiceTest {
                 .thenAnswer(invocacion -> invocacion.getArgument(0));
 
         VehiculoRequest cambios = new VehiculoRequest(1L, "FAK-1234", VIN, "Nissan",
-                "Versa Advance", 2023, "Rojo", new BigDecimal("16000.5"));
+                "Versa Advance", 2023, "Rojo", new BigDecimal("16000.5"), null);
 
         VehiculoResponse respuesta = vehiculoService.editar(1L, cambios);
 

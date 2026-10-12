@@ -48,7 +48,11 @@ public record VehiculoRequest(
         @NotNull(message = "El kilometraje es obligatorio")
         @DecimalMin(value = "0.0", message = "El kilometraje no puede ser negativo")
         @Digits(integer = 9, fraction = 1, message = "El kilometraje admite hasta 1 decimal")
-        BigDecimal kilometraje
+        BigDecimal kilometraje,
+
+        // Foto del vehículo como data URL en base64 (opcional).
+        @Size(max = 5_000_000, message = "La imagen es demasiado grande")
+        String imagen
 
 ) {
 }
