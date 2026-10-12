@@ -259,6 +259,17 @@
                     <span>Kilometraje *</span>
                     <input id="campo-kilometraje" name="kilometraje" type="number" min="0" step="0.1" required>
                 </label>
+
+                <label class="veh-campo veh-campo-completo">
+                    <span>Imagen del vehículo</span>
+                    <input id="campo-imagen" name="imagen" type="file" accept="image/*">
+                    <small style="color:#6b7a73;font-size:.8rem;margin-top:4px">Opcional. JPG o PNG, máximo 2 MB.</small>
+                </label>
+                <div class="veh-campo veh-campo-completo" id="imagen-preview-caja" hidden>
+                    <span>Vista previa</span>
+                    <img id="imagen-preview" alt="Vista previa del vehículo"
+                         style="max-width:200px;max-height:140px;border-radius:8px;border:1px solid #e0e6e3;margin-top:4px">
+                </div>
             </div>
 
             <p id="error-formulario" class="veh-error" role="alert" hidden></p>
