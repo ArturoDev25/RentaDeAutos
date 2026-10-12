@@ -18,6 +18,25 @@ document.addEventListener('DOMContentLoaded', () => {
         elemento.textContent = roles[sesion?.rol] || 'Usuario';
     });
 
+    // Menú según el rol: se ocultan los accesos que el backend bloquea con 403
+    // (Categorías es solo del Administrador; Auditoría no aplica al Agente).
+    // Es únicamente presentación; la seguridad real la impone Spring Security.
+    const paginasSinAcceso = {
+        ADMINISTRADOR: [],
+        AGENTE:        ['categorias.html', 'auditoria.html'],
+        SUPERVISOR:    ['categorias.html'],
+        AUDITOR:       ['categorias.html']
+    };
+    const ocultar = paginasSinAcceso[sesion?.rol] || [];
+    if (ocultar.length) {
+        const selector = ocultar
+            .map(p => `a.sidebar-link[href="${p}"], a.management-card[href="${p}"]`)
+            .join(', ');
+        document.querySelectorAll(selector).forEach(enlace => {
+            enlace.style.display = 'none';
+        });
+    }
+
     // Solo las pantallas que aún no tenían un manejador de cierre de sesión.
     document.querySelectorAll('[data-panel-logout]').forEach(boton => {
         boton.addEventListener('click', () => {
