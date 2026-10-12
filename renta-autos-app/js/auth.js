@@ -42,9 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
 
                     localStorage.setItem('usuarioSesion', JSON.stringify(usuario));
-                    if (usuario.rol === 'ADMINISTRADOR') {
+                    // Todo el personal (incluido Auditor) entra al panel; el rol decide qué puede operar.
+                    const rolesStaff = ['ADMINISTRADOR', 'AGENTE', 'SUPERVISOR', 'AUDITOR'];
+                    if (rolesStaff.includes(usuario.rol)) {
                         window.location.href = 'dashboard.html';
-                    } 
+                    }
                     else {
                         window.location.href = 'index.html';
                     }
