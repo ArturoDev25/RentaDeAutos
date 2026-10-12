@@ -85,6 +85,8 @@ public class ReservacionService {
         Reservacion r = buscar(id);
         validarEditable(r);
         validarCliente(datos.clienteId());
+        Long vehiculoAnterior = r.getVehiculoId();
+        boolean estabaConfirmada = "CONFIRMADA".equals(r.getEstado());
         Long categoriaId = bloquearYValidarVehiculo(datos.vehiculoId());
         validarDisponibilidad(datos, id);
         // RN-07: la tarifa aceptada no cambia si el catálogo cambia.
@@ -94,15 +96,41 @@ public class ReservacionService {
                 : tarifaVigente(categoriaId, datos.fechaInicio().toLocalDate());
         validarTotal(datos, tarifa);
         aplicar(r, datos, tarifa);
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        Reservacion guardada = reservaciones.saveAndFlush(r);
+        // Si estaba CONFIRMADA y cambió de vehículo, sincronizar estados:
+        // liberar el anterior (si nadie lo retiene) y apartar el nuevo.
+        if (estabaConfirmada && !vehiculoAnterior.equals(datos.vehiculoId())) {
+            liberarVehiculoSiNadieLoRetiene(vehiculoAnterior, id);
+            jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' "
+                    + "WHERE id = ? AND estado = 'DISPONIBLE'", datos.vehiculoId());
+        }
+        return ReservacionResponse.desde(guardada);
     }
 
     @Transactional
     public ReservacionResponse cancelar(Long id) {
         Reservacion r = buscar(id);
         validarEditable(r);
+        boolean estabaConfirmada = "CONFIRMADA".equals(r.getEstado());
         r.setEstado("CANCELADA");
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        Reservacion guardada = reservaciones.saveAndFlush(r);
+        // Si estaba CONFIRMADA, el vehículo quedó RESERVADO: liberarlo si nadie más lo retiene.
+        if (estabaConfirmada) {
+            liberarVehiculoSiNadieLoRetiene(r.getVehiculoId(), id);
+        }
+        return ReservacionResponse.desde(guardada);
+    }
+
+    /** Devuelve el vehículo a DISPONIBLE solo si ninguna otra reservación lo retiene. */
+    private void liberarVehiculoSiNadieLoRetiene(Long vehiculoId, Long reservacionExcluida) {
+        Integer otras = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM reservaciones WHERE vehiculo_id = ? AND id <> ? "
+                + "AND estado IN ('CONFIRMADA', 'EN_CURSO')", Integer.class, vehiculoId, reservacionExcluida);
+        if (otras != null && otras == 0) {
+            // El 'AND estado = RESERVADO' evita tocar un auto RENTADO, MANTENIMIENTO o BAJA.
+            jdbc.update("UPDATE vehiculos SET estado = 'DISPONIBLE' "
+                    + "WHERE id = ? AND estado = 'RESERVADO'", vehiculoId);
+        }
     }
 
     @Transactional

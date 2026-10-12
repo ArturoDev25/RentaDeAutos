@@ -45,7 +45,9 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Operaciones públicas existentes.
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                // S3 (fix seguridad): el registro de usuarios del personal es una
+                // operación administrativa; ya NO es público (evita autoaltas de AGENTE).
+                .requestMatchers(HttpMethod.POST, "/api/auth/register").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
 
                 // Administración de usuarios.
