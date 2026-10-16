@@ -1,5 +1,6 @@
 package com.rentadeautos.modules.client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,15 @@ public class Cliente {
     @Column(length = 150, unique = true)
     private String correo;
 
+    /**
+     * Hash BCrypt de la contraseña para el portal del cliente.
+     * Es nulo (NULL) para clientes registrados únicamente en mostrador/sucursal.
+     * Excluido de cualquier serialización JSON por seguridad.
+     */
+    @JsonIgnore
+    @Column(name = "password_hash", length = 255)
+    private String passwordHash;
+
     @Column(nullable = false, length = 20)
     private String telefono;
 
@@ -48,6 +58,8 @@ public class Cliente {
     public void setApellidos(String apellidos) { this.apellidos = apellidos; }
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public String getNumeroLicencia() { return numeroLicencia; }
@@ -58,4 +70,28 @@ public class Cliente {
     public void setDireccion(String direccion) { this.direccion = direccion; }
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+
+    /**
+     * Determina si el cliente cuenta con credenciales activas para acceder al portal.
+     * Requiere tanto el hash de contraseña como el correo electrónico de acceso.
+     */
+    public boolean tieneCuentaPortal() {
+        return passwordHash != null && correo != null && !correo.isBlank();
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", apellidos='" + apellidos + '\'' +
+                ", correo='" + correo + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", numeroLicencia='" + numeroLicencia + '\'' +
+                ", licenciaVencimiento=" + licenciaVencimiento +
+                ", direccion='" + direccion + '\'' +
+                ", activo=" + activo +
+                ", tieneCuentaPortal=" + tieneCuentaPortal() +
+                '}';
+    }
 }
