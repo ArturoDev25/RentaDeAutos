@@ -48,6 +48,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
 
+                // S4-05: catálogo público de solo lectura.
+                .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos").permitAll()
+                .requestMatchers("/api/v1/catalogo", "/api/v1/catalogo/**").denyAll()
+
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
