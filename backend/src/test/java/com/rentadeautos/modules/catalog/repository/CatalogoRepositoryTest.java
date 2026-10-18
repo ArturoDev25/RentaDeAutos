@@ -100,4 +100,57 @@ class CatalogoRepositoryTest {
                 """);
         assertTrue(catalogo.listar(ahora).isEmpty());
     }
+    private void segundoVehiculo() {
+        jdbc.update("INSERT INTO categorias (id, nombre, deposito_base, activo) VALUES (2, 'Lujo', 0, TRUE)");
+        jdbc.update("""
+                INSERT INTO vehiculos (id, categoria_id, placa, vin, marca, modelo, anio, kilometraje, estado)
+                VALUES (2, 2, 'DEMO2', '2HGCM82633A004352', 'BMW', 'Serie 3', 2025, 0, 'DISPONIBLE')
+                """);
+        jdbc.update("""
+                INSERT INTO tarifas (id, categoria_id, precio_dia, cargo_atraso_dia, fecha_inicio, activo)
+                VALUES (2, 2, 1800, 100, '2026-10-16', TRUE)
+                """);
+    }
+
+    @Test void filtraCategoriaSinMezclarVehiculos() {
+        segundoVehiculo();
+        assertEquals(java.util.List.of(1L), catalogo.listar(ahora, 1L, null, null)
+                .stream().map(v -> v.id()).toList());
+    }
+
+    @Test void filtraPrecioMinimoInclusivo() {
+        segundoVehiculo();
+        assertEquals(java.util.List.of(2L), catalogo.listar(ahora, null, new BigDecimal("1800"), null)
+                .stream().map(v -> v.id()).toList());
+    }
+
+    @Test void filtraPrecioMaximoInclusivo() {
+        segundoVehiculo();
+        assertEquals(java.util.List.of(1L), catalogo.listar(ahora, null, null, new BigDecimal("850"))
+                .stream().map(v -> v.id()).toList());
+    }
+
+    @Test void filtrosCombinadosRespetanLosDosLimites() {
+        segundoVehiculo();
+        assertEquals(1, catalogo.listar(ahora, 1L, new BigDecimal("850"), new BigDecimal("850")).size());
+        assertTrue(catalogo.listar(ahora, 2L, new BigDecimal("500"), new BigDecimal("1000")).isEmpty());
+    }
+
+    @Test void categoriaInexistenteDevuelveListaVacia() {
+        assertTrue(catalogo.listar(ahora, 999L, null, null).isEmpty());
+    }
+
+    @Test void filtraTarifaVigenteSinUsarPreciosFuturos() {
+        jdbc.update("""
+                INSERT INTO tarifas (id, categoria_id, precio_dia, cargo_atraso_dia, fecha_inicio, activo)
+                VALUES (2, 1, 100, 0, '2026-10-17', TRUE)
+                """);
+        assertTrue(catalogo.listar(ahora, null, null, new BigDecimal("500")).isEmpty());
+    }
+
+    @Test void filtrarNoVuelveOfertableUnAutoDeBaja() {
+        jdbc.update("UPDATE vehiculos SET estado = 'BAJA'");
+        assertTrue(catalogo.listar(ahora, 1L, BigDecimal.ZERO, new BigDecimal("1000")).isEmpty());
+    }
+
 }

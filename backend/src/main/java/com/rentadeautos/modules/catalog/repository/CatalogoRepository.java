@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.math.BigDecimal;
 
 @Repository
 public class CatalogoRepository {
@@ -18,7 +20,15 @@ public class CatalogoRepository {
 
     @Transactional(readOnly = true)
     public List<VehiculoCatalogoResponse> listar(LocalDateTime ahora) {
-        return jdbc.query("""
+        return listar(ahora, null, null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehiculoCatalogoResponse> listar(LocalDateTime ahora, Long categoriaId,
+            BigDecimal precioMin, BigDecimal precioMax) {
+        List<Object> parametros = new ArrayList<>(List.of(ahora.toLocalDate(),
+                ahora.toLocalDate(), ahora.toLocalDate(), ahora.toLocalDate(), ahora, ahora));
+        StringBuilder sql = new StringBuilder("""
                 SELECT v.id, v.marca, v.modelo, v.anio, v.color,
                        c.id AS categoria_id, c.nombre AS categoria, t.precio_dia
                 FROM vehiculos v
@@ -35,12 +45,24 @@ public class CatalogoRepository {
                        AND (r.estado = 'EN_CURSO' OR
                            (r.estado IN ('PENDIENTE', 'CONFIRMADA')
                             AND r.fecha_inicio <= ? AND r.fecha_fin > ?)))
-                ORDER BY v.marca, v.modelo, v.id
-                """, (rs, fila) -> new VehiculoCatalogoResponse(rs.getLong("id"),
+                """);
+        if (categoriaId != null) {
+            sql.append(" AND c.id = ?");
+            parametros.add(categoriaId);
+        }
+        if (precioMin != null) {
+            sql.append(" AND t.precio_dia >= ?");
+            parametros.add(precioMin);
+        }
+        if (precioMax != null) {
+            sql.append(" AND t.precio_dia <= ?");
+            parametros.add(precioMax);
+        }
+        sql.append(" ORDER BY v.marca, v.modelo, v.id");
+        return jdbc.query(sql.toString(), (rs, fila) -> new VehiculoCatalogoResponse(rs.getLong("id"),
                         rs.getString("marca"), rs.getString("modelo"), rs.getInt("anio"),
                         rs.getString("color"), rs.getLong("categoria_id"),
                         rs.getString("categoria"), rs.getBigDecimal("precio_dia")),
-                ahora.toLocalDate(), ahora.toLocalDate(), ahora.toLocalDate(),
-                ahora.toLocalDate(), ahora, ahora);
+                parametros.toArray());
     }
 }
