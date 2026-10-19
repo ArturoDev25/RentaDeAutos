@@ -65,6 +65,14 @@ public class Vehiculo {
     @Column(nullable = false, length = 30)
     private EstadoVehiculo estado = EstadoVehiculo.DISPONIBLE;
 
+    /**
+     * Foto del vehículo como data URL en base64 (opcional). En MySQL la columna
+     * es MEDIUMTEXT; se mapea como texto largo para que la validación de esquema coincida.
+     */
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "imagen")
+    private String imagen;
+
     public Long getId() {
         return id;
     }
@@ -139,5 +147,13 @@ public class Vehiculo {
 
     public void setEstado(EstadoVehiculo estado) {
         this.estado = estado;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

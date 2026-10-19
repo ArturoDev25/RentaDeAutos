@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Usuarios - RentaDeAutos</title>
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/panel.css">
+
+    <style>
+        .usuarios-card {
+            background: #fff;
+            border: 1px solid #e6ebe8;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+        }
+        .usuarios-card h2 {
+            margin: 0 0 4px;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .usuarios-card .sub {
+            margin: 0 0 18px;
+            color: #6b7a73;
+            font-size: .9rem;
+        }
+        .usuarios-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .usuarios-form .campo { display: flex; flex-direction: column; gap: 6px; }
+        .usuarios-form .campo.full { grid-column: 1 / -1; }
+        .usuarios-form label { font-size: .85rem; font-weight: 600; color: #35433d; }
+        .usuarios-form input,
+        .usuarios-form select {
+            padding: 10px 12px;
+            border: 1px solid #d4ddd8;
+            border-radius: 8px;
+            font-size: .95rem;
+            background: #f8faf9;
+        }
+        .usuarios-form input:focus,
+        .usuarios-form select:focus { outline: 2px solid #1f9d6b55; border-color: #1f9d6b; }
+        .btn-primario {
+            background: #157a52;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primario:hover { background: #11633f; }
+        .btn-primario:disabled { opacity: .6; cursor: not-allowed; }
+        .form-msg { margin-top: 14px; font-size: .9rem; display: none; }
+        .form-msg.ok { color: #157a52; display: block; }
+        .form-msg.err { color: #b3261e; display: block; }
+        .tabla-usuarios { width: 100%; border-collapse: collapse; }
+        .tabla-usuarios th, .tabla-usuarios td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid #eef2f0;
+            font-size: .92rem;
+        }
+        .tabla-usuarios th { color: #6b7a73; font-weight: 600; }
+        .badge {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+        .badge.activo { background: #e3f4ec; color: #157a52; }
+        .badge.inactivo { background: #fdeaea; color: #b3261e; }
+        .rol-chip {
+            padding: 3px 10px; border-radius: 6px; background: #eef2f0;
+            font-size: .8rem; color: #35433d;
+        }
+        .btn-estado {
+            border: 1px solid #d4ddd8; background: #fff; border-radius: 8px;
+            padding: 6px 12px; cursor: pointer; font-size: .85rem; font-weight: 600;
+        }
+        .btn-estado.activar { color: #157a52; border-color: #bfe3d2; }
+        .btn-estado.desactivar { color: #b3261e; border-color: #f2c9c6; }
+        @media (max-width: 640px) { .usuarios-form { grid-template-columns: 1fr; } }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <!-- BARRA LATERAL -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-logo">
+            <a href="dashboard.html" aria-label="RentaDeAutos: inicio del panel"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+        </div>
+        <nav class="sidebar-menu" aria-label="Menú principal">
+            <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+            <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+            <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+            <a href="tarifas.html" class="sidebar-link"><i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i><span>Tarifas</span></a>
+            <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+            <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+            <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+            <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
+            <a href="usuarios.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-user-gear" aria-hidden="true"></i><span>Usuarios</span></a>
+        </nav>
+        <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="dashboard-main">
+
+        <header class="dashboard-topbar">
+            <div class="panel-ubicacion"><i class="fa-solid fa-user-gear" aria-hidden="true"></i><span>Administración / Usuarios</span></div>
+            <div class="dashboard-user-area">
+                <div class="dashboard-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+                    <div class="user-info">
+                        <strong id="nombre-usuario">Usuario</strong>
+                        <small data-panel-rol>Sesión</small>
+                    </div>
+                </div>
+                <button id="cerrar-sesion" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-content usuarios-page">
+
+            <section class="dashboard-title">
+                <div>
+                    <h1>Usuarios</h1>
+                    <p>Crea y administra las cuentas del personal</p>
+                </div>
+            </section>
+
+            <!-- Crear cuenta -->
+            <div class="usuarios-card">
+                <h2><i class="fa-solid fa-user-plus" style="color:#157a52"></i> Crear cuenta</h2>
+                <p class="sub">Los campos marcados con * son obligatorios. La contraseña debe tener al menos 6 caracteres.</p>
+
+                <form id="form-crear" class="usuarios-form" autocomplete="off">
+                    <div class="campo">
+                        <label for="nombre">Nombre completo *</label>
+                        <input type="text" id="nombre" placeholder="Nombre del empleado" required>
+                    </div>
+                    <div class="campo">
+                        <label for="correo">Correo *</label>
+                        <input type="email" id="correo" placeholder="correo@empresa.com" required>
+                    </div>
+                    <div class="campo">
+                        <label for="password">Contraseña *</label>
+                        <input type="password" id="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="campo">
+                        <label for="rol">Rol *</label>
+                        <select id="rol" required>
+                            <option value="">— Selecciona un rol —</option>
+                            <option value="ADMINISTRADOR">Administrador</option>
+                            <option value="AGENTE">Agente</option>
+                            <option value="SUPERVISOR">Supervisor</option>
+                            <option value="AUDITOR">Auditor</option>
+                        </select>
+                    </div>
+                    <div class="campo full">
+                        <button type="submit" class="btn-primario" id="btn-crear">
+                            <i class="fa-solid fa-floppy-disk"></i> Crear cuenta
+                        </button>
+                        <div id="form-msg" class="form-msg"></div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lista de cuentas -->
+            <div class="usuarios-card">
+                <h2 style="justify-content:space-between">
+                    <span><i class="fa-solid fa-users" style="color:#157a52"></i> Cuentas registradas</span>
+                    <button class="btn-estado" id="btn-recargar" type="button"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                </h2>
+                <div style="overflow-x:auto">
+                    <table class="tabla-usuarios">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Correo</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-body">
+                            <tr><td colspan="5" style="text-align:center;color:#6b7a73">Cargando…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/client.js"></script>
+    <script src="js/usuarios.js?v=s3"></script>
+    <script src="js/panel.js?v=s3"></script>
+</body>
+</html>

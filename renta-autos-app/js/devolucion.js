@@ -34,7 +34,8 @@
 
   // ---------- Sesión (mismo criterio que reservaciones.js y entrega.js) ----------
   try { sesion = JSON.parse(localStorage.getItem('usuarioSesion')); } catch (_) { /* sesión inválida */ }
-  if (!sesion?.token || sesion.rol !== 'ADMINISTRADOR') {
+  // La devolución la opera el personal autorizado (Admin, Agente, Supervisor); el Auditor no.
+  if (!sesion?.token || !['ADMINISTRADOR', 'AGENTE', 'SUPERVISOR'].includes(sesion.rol)) {
     window.location.replace('login.html');
     return;
   }

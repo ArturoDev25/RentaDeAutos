@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectDestino.disabled  = true;
 
         try {
-            const res = await solicitar('/categorias?activo=true');
+            const res = await solicitar('/v1/categorias?activo=true');
             const cats = res?.data || [];
 
             selectDestino.innerHTML = '<option value="">— Selecciona una categoría —</option>';
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Cargar categorías en el filtro
     try {
-        const res  = await solicitar('/categorias?activo=true');
+        const res  = await solicitar('/v1/categorias?activo=true');
         const cats = res?.data || [];
         cats.forEach(cat => {
             const opt  = document.createElement('option');
