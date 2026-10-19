@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -101,5 +102,35 @@ class ClienteServiceTest {
 
         assertThrows(RuntimeException.class,
                 () -> clienteService.listar(new FiltroClientes(texto, null)));
+    }
+
+    @Test
+    void editarConservaPasswordHashExistente() {
+        Cliente cliente = new Cliente();
+        cliente.setNombre("Original");
+        cliente.setApellidos("Original");
+        cliente.setPasswordHash("$2a$10$abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqr");
+        
+        when(clienteRepository.findById(10L)).thenReturn(Optional.of(cliente));
+        when(clienteRepository.saveAndFlush(cliente)).thenReturn(cliente);
+
+        clienteService.editar(10L, peticion());
+
+        assertEquals("$2a$10$abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqr", cliente.getPasswordHash(),
+                "La edición de cliente por personal de mostrador no debe sobreescribir ni borrar el passwordHash");
+        verify(clienteRepository).saveAndFlush(cliente);
+    }
+
+    @Test
+    void crearDesdeMostradorDejaPasswordHashNull() {
+        when(clienteRepository.saveAndFlush(any(Cliente.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+
+        clienteService.crear(peticion());
+
+        org.mockito.ArgumentCaptor<Cliente> captor = org.mockito.ArgumentCaptor.forClass(Cliente.class);
+        verify(clienteRepository).saveAndFlush(captor.capture());
+        assertNull(captor.getValue().getPasswordHash(),
+                "El alta de mostrador debe crear el cliente sin passwordHash (NULL), sin contraseñas ficticias");
     }
 }
