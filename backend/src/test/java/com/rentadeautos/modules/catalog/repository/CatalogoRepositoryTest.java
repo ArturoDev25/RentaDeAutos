@@ -153,4 +153,34 @@ class CatalogoRepositoryTest {
         assertTrue(catalogo.listar(ahora, 1L, BigDecimal.ZERO, new BigDecimal("1000")).isEmpty());
     }
 
+    private void compromiso(String estado, LocalDateTime inicio, LocalDateTime fin) {
+        jdbc.update("""
+                INSERT INTO reservaciones (id, cliente_id, vehiculo_id, creado_por_id,
+                    fecha_inicio, fecha_fin, estado, tarifa_dia, total_estimado)
+                VALUES (1, 1, 1, 1, ?, ?, ?, 850, 850)
+                """, inicio, fin, estado);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"PENDIENTE", "CONFIRMADA"})
+    void compromisoActualImpideOferta(String estado) {
+        compromiso(estado, ahora, ahora.plusDays(1));
+        assertTrue(catalogo.listar(ahora).isEmpty());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"CANCELADA", "FINALIZADA"})
+    void compromisoCerradoNoImpideOferta(String estado) {
+        compromiso(estado, ahora.minusHours(1), ahora.plusDays(1));
+        assertEquals(1, catalogo.listar(ahora).size());
+    }
+
+    @Test void compromisoFuturoNoBloqueaConsultaDelMomentoActual() {
+        compromiso("PENDIENTE", ahora.plusDays(1), ahora.plusDays(2));
+        assertEquals(1, catalogo.listar(ahora).size());
+    }
+
+    @Test void compromisoQueTerminaAhoraNoBloqueaConsulta() {
+        compromiso("CONFIRMADA", ahora.minusDays(1), ahora);
+        assertEquals(1, catalogo.listar(ahora).size());
+    }
+
 }

@@ -95,4 +95,21 @@ class CatalogoControllerTest {
         verify(catalogo).listar(any(), isNull(), eq(BigDecimal.ZERO), eq(BigDecimal.ZERO));
     }
 
+    @Test void errorDeBaseDevuelve500SinExponerSql() throws Exception {
+        when(catalogo.listar(any(), any(), any(), any())).thenThrow(
+                new org.springframework.dao.DataAccessResourceFailureException("SELECT secreto FROM tabla_interna"));
+        mvc.perform(get(RUTA)).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Error interno del servidor"))
+                .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"POST", "PUT", "PATCH", "DELETE"})
+    void clienteTampocoPuedeEscribirPorElCatalogo(String metodo) throws Exception {
+        mvc.perform(request(HttpMethod.valueOf(metodo), RUTA)
+                .with(user("cliente").roles("CLIENTE")))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(catalogo);
+    }
+
 }
