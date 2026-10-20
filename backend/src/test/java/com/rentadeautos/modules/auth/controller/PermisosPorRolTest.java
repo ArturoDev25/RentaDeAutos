@@ -77,6 +77,13 @@ class PermisosPorRolTest {
         agregar(casos, "AUDITOR", "categorias", "SNNNN");
         agregar(casos, "AUDITOR", "tarifas",    "SNNNN");
 
+        
+        agregar(casos, "CLIENTE", "clientes",   "NNNNN");
+        agregar(casos, "CLIENTE", "vehiculos",  "NNNNN");
+        agregar(casos, "CLIENTE", "categorias", "NNNNN");
+        agregar(casos, "CLIENTE", "tarifas",    "NNNNN");
+
+
         return casos.stream();
     }
 
