@@ -103,3 +103,11 @@ Consulta permitida a Administrador, Agente, Supervisor y Auditor.
 
 Contrato REST, pruebas y guion de comprobación:
 [docs/rentas-activas-api.md](docs/rentas-activas-api.md).
+
+## Catálogo del cliente — S4-05
+
+`GET /api/v1/catalogo/vehiculos` consulta vehículos disponibles con categoría
+y tarifa vigente de hoy. Permite filtrar por categoría y rango de precio diario.
+
+Contrato, alcance de disponibilidad y guía de comprobación:
+[docs/catalogo-cliente-api.md](docs/catalogo-cliente-api.md).
