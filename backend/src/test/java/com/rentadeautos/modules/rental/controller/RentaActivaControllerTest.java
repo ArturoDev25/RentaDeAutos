@@ -6,6 +6,7 @@ import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
 import com.rentadeautos.modules.rental.dto.RentaActivaResponse;
 import com.rentadeautos.modules.rental.service.RentaActivaService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -39,7 +40,7 @@ class RentaActivaControllerTest {
     @MockBean RentaActivaService servicio;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
-
+    @MockBean ClienteRepository clientes;
     @Test @WithMockUser(roles = "ADMINISTRADOR")
     void administradorConsultaDatosOperativosYFechaPrevista() throws Exception {
         RentaActivaResponse renta = new RentaActivaResponse(10L, 2L, "Ana Pérez",

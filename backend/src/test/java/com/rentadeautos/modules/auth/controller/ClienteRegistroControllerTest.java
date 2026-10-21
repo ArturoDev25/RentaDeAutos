@@ -8,6 +8,7 @@ import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
 import com.rentadeautos.modules.auth.service.ClienteRegistroService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -33,6 +34,7 @@ class ClienteRegistroControllerTest {
     @Autowired ObjectMapper json;
     @MockBean ClienteRegistroService servicio;
     @MockBean JwtService jwt;
+    @MockBean ClienteRepository clientes;
     @MockBean UsuarioAppRepository usuarios;
     private static final String RUTA = "/api/auth/cliente/registro";
 

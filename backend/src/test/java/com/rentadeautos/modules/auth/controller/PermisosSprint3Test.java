@@ -19,6 +19,7 @@ import com.rentadeautos.modules.reservation.service.ReservacionService;
 import com.rentadeautos.modules.vehicle.controller.TarifaController;
 import com.rentadeautos.modules.vehicle.dto.TarifaRequest;
 import com.rentadeautos.modules.vehicle.service.TarifaService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -70,6 +71,7 @@ class PermisosSprint3Test {
     @MockBean RentaActivaService rentasActivas;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
+    @MockBean ClienteRepository clientes;
 
     private static final Set<String> CONSULTA = Set.of(
             "ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR");

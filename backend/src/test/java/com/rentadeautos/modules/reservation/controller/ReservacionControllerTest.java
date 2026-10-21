@@ -5,6 +5,7 @@ import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
 import com.rentadeautos.modules.reservation.service.ReservacionService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -31,6 +32,7 @@ class ReservacionControllerTest {
     @MockBean ReservacionService servicio;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
+    @MockBean ClienteRepository clientes;
 
     private static final String DATOS = """
             {"clienteId":2,"vehiculoId":3,"fechaInicio":"2030-01-01T10:00:00",

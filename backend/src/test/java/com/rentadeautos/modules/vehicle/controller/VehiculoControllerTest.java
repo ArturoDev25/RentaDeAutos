@@ -12,6 +12,7 @@ import com.rentadeautos.modules.vehicle.exception.VehiculoInvalidoException;
 import com.rentadeautos.modules.vehicle.exception.VehiculoNoEncontradoException;
 import com.rentadeautos.modules.vehicle.model.EstadoVehiculo;
 import com.rentadeautos.modules.vehicle.service.VehiculoService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,17 +63,11 @@ class VehiculoControllerTest {
             }
             """;
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private VehiculoService vehiculoService;
-
-    @MockBean
-    private JwtService jwtService;
-
-    @MockBean
-    private UsuarioAppRepository usuarioRepository;
+    @Autowired private MockMvc mockMvc;
+    @MockBean private VehiculoService vehiculoService;
+    @MockBean private JwtService jwtService;
+    @MockBean private UsuarioAppRepository usuarioRepository;
+    @MockBean private ClienteRepository clientes;
 
     private VehiculoResponse versa(EstadoVehiculo estado) {
         return new VehiculoResponse(1L, 1L, "Compacto", "FAK-1234", "3N1AB7AP0FY123456",

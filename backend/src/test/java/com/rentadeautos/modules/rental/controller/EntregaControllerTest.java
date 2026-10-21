@@ -7,6 +7,7 @@ import com.rentadeautos.modules.auth.security.SecurityConfig;
 import com.rentadeautos.modules.rental.dto.EntregaResponse;
 import com.rentadeautos.modules.rental.exception.EntregaException;
 import com.rentadeautos.modules.rental.service.EntregaService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,6 +37,7 @@ class EntregaControllerTest {
     @MockBean EntregaService servicio;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
+    @MockBean ClienteRepository clientes;
 
     private static final String DATOS = """
             {"reservacionId":10,"kilometrajeSalida":15020.5,"combustibleSalida":75.5,
