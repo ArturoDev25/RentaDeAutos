@@ -11,6 +11,8 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     boolean existsByCorreoIgnoreCase(String correo);
 
+    java.util.Optional<Cliente> findByCorreoIgnoreCase(String correo);
+
     boolean existsByCorreoIgnoreCaseAndIdNot(String correo, Long id);
 
     boolean existsByNumeroLicenciaIgnoreCase(String numeroLicencia);

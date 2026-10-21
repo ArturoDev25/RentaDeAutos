@@ -3,6 +3,7 @@ package com.rentadeautos.modules.auth.service;
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
 import com.rentadeautos.modules.auth.dto.RegisterRequest;
+import com.rentadeautos.modules.auth.dto.UsuarioAdminResponse;
 import com.rentadeautos.modules.auth.dto.UsuarioResponse;
 import com.rentadeautos.modules.auth.model.Rol;
 import com.rentadeautos.modules.auth.model.UsuarioApp;
@@ -107,12 +108,54 @@ public class AuthService {
         return aResponse(guardado);
     }
 
+    /**
+     * Crea una cuenta de personal con el rol indicado.
+     * Operación exclusiva del ADMINISTRADOR (ver AdminUsuarioController).
+     */
+    @Transactional
+    public UsuarioResponse crearUsuarioConRol(
+            String nombre, String correo, String password, String rolNombre) {
+
+        String correoNorm = correo.trim().toLowerCase();
+
+        if (usuarioRepository.findByCorreo(correoNorm).isPresent()) {
+            throw new IllegalArgumentException("El correo electrónico ya está registrado");
+        }
+
+        Rol rol = rolRepository.findByNombre(rolNombre.trim().toUpperCase())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "El rol indicado no existe: " + rolNombre));
+
+        UsuarioApp nuevoUsuario = new UsuarioApp();
+        nuevoUsuario.setNombre(nombre.trim());
+        nuevoUsuario.setCorreo(correoNorm);
+        nuevoUsuario.setPasswordHash(passwordEncoder.encode(password));
+        nuevoUsuario.setRol(rol);
+        nuevoUsuario.setActivo(true);
+
+        UsuarioApp guardado = usuarioRepository.save(nuevoUsuario);
+        log.info("Administrador creó un nuevo usuario {} con rol {}",
+                guardado.getCorreo(), rol.getNombre());
+
+        return aResponse(guardado);
+    }
+
     public UsuarioResponse aResponse(UsuarioApp usuario) {
         return new UsuarioResponse(
                 usuario.getId(),
                 usuario.getNombre(),
                 usuario.getCorreo(),
                 usuario.getRol().getNombre()
+        );
+    }
+
+    public UsuarioAdminResponse aResponseAdmin(UsuarioApp usuario) {
+        return new UsuarioAdminResponse(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getRol().getNombre(),
+                usuario.getActivo()
         );
     }
 }

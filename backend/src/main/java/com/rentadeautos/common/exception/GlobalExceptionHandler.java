@@ -71,6 +71,19 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja errores de validación de negocio (400), como un correo ya
+     * registrado o un rol inexistente. El mensaje es informativo y seguro de
+     * mostrar al cliente.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(
+                        ex.getMessage() == null ? "Solicitud inválida" : ex.getMessage()));
+    }
+
+    /**
      * Maneja cualquier excepción no controlada (500).
      * La traza se registra del lado del servidor; la respuesta no expone
      * detalles internos de la aplicación.

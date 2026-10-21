@@ -19,7 +19,8 @@ public record VehiculoResponse(
         Integer anio,
         String color,
         BigDecimal kilometraje,
-        EstadoVehiculo estado
+        EstadoVehiculo estado,
+        String imagen
 ) {
 
     public static VehiculoResponse desde(Vehiculo vehiculo) {
@@ -34,7 +35,8 @@ public record VehiculoResponse(
                 vehiculo.getAnio(),
                 vehiculo.getColor(),
                 vehiculo.getKilometraje(),
-                vehiculo.getEstado()
+                vehiculo.getEstado(),
+                vehiculo.getImagen()
         );
     }
 }

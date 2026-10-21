@@ -5,6 +5,9 @@
 - `database/setup/00_create_database.sql`: crea la base local una sola vez.
 - `backend/src/main/resources/db/migration/V1__init_schema.sql`: crea las tablas, relaciones, restricciones e índices mediante Flyway.
 - `backend/src/main/resources/db/migration/V2__seed_roles.sql`: registra el catálogo inicial de roles.
+- `backend/src/main/resources/db/migration/V3__seed_usuarios_demo.sql`: registra usuarios ficticios de prueba del personal (back-office).
+- `backend/src/main/resources/db/migration/V4__add_imagen_vehiculo.sql`: soporte de imagen en base64 para vehículos (reservada en rama remota `feat/s4-mejoras`).
+- `backend/src/main/resources/db/migration/V5__campos_acceso_clientes.sql`: credenciales y validaciones para portal de autoservicio de clientes (`password_hash`, checks).
 - `database/tests/schema_smoke_test.sql`: consultas y pruebas rápidas para reunir evidencia.
 
 ## Requisitos

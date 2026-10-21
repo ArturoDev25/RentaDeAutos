@@ -22,9 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Verificar que el usuario sea administrador
-    if (usuario.rol !== 'ADMINISTRADOR') {
-        alert('No tienes permisos para acceder al panel de administrador.');
+    // El panel lo ve todo el personal autorizado; cada rol opera según sus permisos.
+    const rolesStaff = ['ADMINISTRADOR', 'AGENTE', 'SUPERVISOR', 'AUDITOR'];
+    if (!rolesStaff.includes(usuario.rol)) {
+        alert('No tienes permisos para acceder al panel.');
         window.location.href = 'index.html';
         return;
     }

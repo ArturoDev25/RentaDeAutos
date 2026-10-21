@@ -3,102 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RentaAutos - Encuentra tu vehículo ideal</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>RentaDeAutos - Inicio</title>
+    <link rel="stylesheet" href="css/portal.css?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-sidebar" id="portalSidebar">
+            <a href="index.html" class="portal-brand"><svg viewBox="0 0 64 48" aria-hidden="true"><path fill="currentColor" d="M15.2 8h24.6a8 8 0 0 1 6.4 3.2L52.5 20H56a6 6 0 0 1 6 6v8a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-8a6 6 0 0 1 6-6h.6l3.3-9.2A4 4 0 0 1 15.2 8z"/><path fill="#fff" opacity=".7" d="M16.5 13H27v7H13.9zM31 13h8.3a3 3 0 0 1 2.4 1.2L46.3 20H31z"/><circle cx="17" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/><circle cx="47" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/></svg>RentaDeAutos</a>
+            <nav aria-label="Principal">
+                <ul class="portal-menu">
+                    <li><a href="index.html" class="active" aria-current="page"><i class="fa-solid fa-house"></i>Inicio</a></li>
+                    <li><a href="catalogo.html"><i class="fa-solid fa-car"></i>Catálogo</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-calendar-days"></i>Mis reservaciones</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-clock"></i>Mis rentas</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-chart-column"></i>Reportes</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-circle-question"></i>Ayuda</a></li>
+                </ul>
+            </nav>
+        </aside>
 
-    <header>
-        <div class="logo">
-            <a href="index.html">
-                <img src="assets/Imagenes/LogoCar.png" alt="RentaAutos">
-            </a>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Explorar</a></li>
-                <li><a href="#">Mis Reservas</a></li>
-                <li><a href="#">Ayuda</a></li>
-            </ul>
-        </nav>
-        <div id="userGreeting" class="user-greeting" style="margin-right: 1rem; font-weight: 600; color: var(--text-light);"></div>
-        <div class="auth-buttons" id="authButtons">
-            <a href="login.html" class="btn" id="btnLogin">Iniciar Sesión</a>
-            <a href="registro.html" class="btn btn-primary" id="btnRegister">Registrarse</a>
-        </div>
-    </header>
+        <div class="portal-main">
+            <header class="portal-topbar">
+                <button type="button" class="btn-menu" id="btnMenu" aria-controls="portalSidebar" aria-expanded="false" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <form class="topbar-search" id="buscadorGlobal" role="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <label for="buscarVehiculos" class="sr-only">Buscar vehículos</label>
+                    <input type="search" id="buscarVehiculos" name="q" placeholder="Buscar vehículos...">
+                </form>
+                <div class="portal-session" id="portalSession"></div>
+            </header>
 
-    <section class="hero">
-        <h1>¿A dónde quieres ir hoy?</h1>
-        <div class="search-container">
-            <div class="search-field">
-                <label>Destino</label>
-                <input type="text" placeholder="¿A dónde vas?" id="destination">
-            </div>
-            <div class="search-field">
-                <label>Fecha</label>
-                <input type="date" id="date">
-            </div>
-            <div class="search-field">
-                <label>Tipo de auto</label>
-                <input type="text" placeholder="SUV, Deportivo, etc." id="car-type">
-            </div>
-            <button class="search-btn">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </div>
-    </section>
+            <main class="portal-content">
+                <section class="hero">
+                    <h1>Tu próximo viaje comienza aquí</h1>
+                    <p>Renta un auto de forma rápida, segura y al mejor precio.</p>
+                    <a href="catalogo.html" class="pt-btn">Ver catálogo <i class="fa-solid fa-arrow-right"></i></a>
+                    <div class="hero-auto"><svg viewBox="0 0 64 48" aria-hidden="true"><path fill="currentColor" d="M15.2 8h24.6a8 8 0 0 1 6.4 3.2L52.5 20H56a6 6 0 0 1 6 6v8a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-8a6 6 0 0 1 6-6h.6l3.3-9.2A4 4 0 0 1 15.2 8z"/><path fill="#2b5bd7" opacity=".55" d="M16.5 13H27v7H13.9zM31 13h8.3a3 3 0 0 1 2.4 1.2L46.3 20H31z"/><circle cx="17" cy="38" r="7.5" fill="currentColor" stroke="#2b5bd7" stroke-width="3"/><circle cx="47" cy="38" r="7.5" fill="currentColor" stroke="#2b5bd7" stroke-width="3"/></svg></div>
+                </section>
 
-    <main class="main-content">
-        <h2>Autos recomendados para ti</h2>
-        <div class="car-grid" id="carGrid">
+                <section class="card">
+                    <h2 class="card-title"><i class="fa-solid fa-car"></i>Busca tu auto ideal</h2>
+                    <form class="busqueda" id="formBusqueda" novalidate>
+                        <div class="pt-field">
+                            <label for="lugar">Lugar de recogida</label>
+                            <div class="input-icono">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <input type="text" id="lugar" value="Sucursal Saltillo" readonly>
+                            </div>
+                        </div>
+                        <div class="pt-field">
+                            <label for="fechaInicio">Fecha de inicio</label>
+                            <input type="date" id="fechaInicio">
+                        </div>
+                        <div class="pt-field">
+                            <label for="fechaFin">Fecha de fin</label>
+                            <input type="date" id="fechaFin">
+                        </div>
+                        <button type="submit" class="pt-btn pt-btn-primary"><i class="fa-solid fa-magnifying-glass"></i>Buscar</button>
+                    </form>
+                    <p class="pt-error" id="errorBusqueda" role="alert" style="margin-top:.8rem"></p>
+                </section>
 
-            <div class="car-card">
-                <img src="assets/Imagenes/Carros/tesla.jpg" alt="Tesla" class="car-image">
-                <div class="car-info">
-                    <h3>Tesla Model 3</h3>
-                    <p>Eléctrico • 5 Personas</p>
-                    <p class="car-price">$120 / día</p>
-                </div>
-            </div>
-            <div class="car-card">
-                <img src="assets/Imagenes/Carros/Tsuru.jpg" alt="Tsuru Tuneado" class="car-image">
-                <div class="car-info">
-                    <h3>Tsuru Tuneado</h3>
-                    <p>Off-road • 4 Personas</p>
-                    <p class="car-price">$90 / día</p>
-                </div>
-            </div>
-            <div class="car-card">
-                <img src="assets/Imagenes/Carros/bmw.jpg" alt="BMW" class="car-image">
-                <div class="car-info">
-                    <h3>BMW M4 Competition</h3>
-                    <p>Lujo • 4 Personas</p>
-                    <p class="car-price">$180 / día</p>
-                </div>
-            </div>
-            <div class="car-card">
-                <img src="assets/Imagenes/Carros/Ferrari.jpg" alt="Ferrari" class="car-image">
-                <div class="car-info">
-                    <h3>Ferrari F8 Tributo</h3>
-                    <p>Superdeportivo • 2 Personas</p>
-                    <p class="car-price">$500 / día</p>
-                </div>
-            </div>
-            <div class="car-card">
-                <img src="assets/Imagenes/Carros/Audiq7.jpg" alt="Audi" class="car-image">
-                <div class="car-info">
-                    <h3>Audi Q7</h3>
-                    <p>SUV Familiar • 7 Personas</p>
-                    <p class="car-price">$110 / día</p>
-                </div>
-            </div>
+                <section class="accesos" aria-label="Accesos rápidos">
+                    <a href="catalogo.html" class="acceso">
+                        <i class="fa-solid fa-car"></i>
+                        <h3>Ver catálogo</h3>
+                        <p>Encuentra el auto perfecto</p>
+                    </a>
+                    <a href="#" class="acceso" data-pendiente title="Próximamente">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <h3>Mis reservaciones</h3>
+                        <p>Revisa y administra</p>
+                    </a>
+                    <a href="#" class="acceso" data-pendiente title="Próximamente">
+                        <i class="fa-solid fa-clock"></i>
+                        <h3>Mis rentas</h3>
+                        <p>Activas o pasadas</p>
+                    </a>
+                    <a href="#" class="acceso" data-pendiente title="Próximamente">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <h3>Reportes</h3>
+                        <p>Tu historial de rentas</p>
+                    </a>
+                </section>
+
+                <h2 class="seccion-titulo"><i class="fa-solid fa-star"></i>Vehículos destacados</h2>
+                <div class="vehiculos-grid" id="destacadosGrid" aria-live="polite"></div>
+            </main>
         </div>
-    </main>
+    </div>
 
     <script src="js/client.js"></script>
-    <script src="js/main.js"></script>
-
+    <script src="js/portal.js?v=4"></script>
+    <script src="js/inicio.js?v=4"></script>
 </body>
 </html>

@@ -167,6 +167,11 @@ public class VehiculoService {
         vehiculo.setAnio(peticion.anio());
         vehiculo.setColor(limpiarTexto(peticion.color()));
         vehiculo.setKilometraje(peticion.kilometraje());
+        // La imagen solo se actualiza si viene en la petición; así al editar otros
+        // campos sin reenviar la foto no se borra la que ya tenía el vehículo.
+        if (peticion.imagen() != null && !peticion.imagen().isBlank()) {
+            vehiculo.setImagen(peticion.imagen());
+        }
     }
 
     /** Placa y VIN se guardan sin espacios sobrantes y en mayúsculas. */

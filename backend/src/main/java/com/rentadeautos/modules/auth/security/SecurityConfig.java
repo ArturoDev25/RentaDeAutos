@@ -45,8 +45,18 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Operaciones públicas existentes.
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                // S3 (fix seguridad): el registro de usuarios del personal es una
+                // operación administrativa; ya NO es público (evita autoaltas de AGENTE).
+                .requestMatchers(HttpMethod.POST, "/api/auth/register").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.GET, "/api/v1/health").permitAll()
+
+                // S4-05: catálogo público de solo lectura.
+                .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos/*/imagen").permitAll()
+                .requestMatchers("/api/v1/catalogo", "/api/v1/catalogo/**").denyAll()
+
+                // S4-03: inicio de sesión del cliente del portal (público; devuelve token CLIENTE).
+                .requestMatchers(HttpMethod.POST, "/api/auth/cliente/login").permitAll()
 
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")

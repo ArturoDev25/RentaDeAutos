@@ -35,6 +35,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     const botonGuardar = $('guardar-vehiculo');
     const dialogoDetalle = $('dialogo-detalle');
 
+    // --- Imagen del vehículo (se envía como data URL en base64) ---
+    const inputImagen = $('campo-imagen');
+    const previewCaja = $('imagen-preview-caja');
+    const previewImg = $('imagen-preview');
+    let imagenSeleccionada = null;
+
+    function mostrarPreview(dataUrl) {
+        if (dataUrl) {
+            previewImg.src = dataUrl;
+            previewCaja.hidden = false;
+        } else {
+            previewImg.removeAttribute('src');
+            previewCaja.hidden = true;
+        }
+    }
+
+    inputImagen.addEventListener('change', () => {
+        const archivo = inputImagen.files && inputImagen.files[0];
+        if (!archivo) { imagenSeleccionada = null; mostrarPreview(null); return; }
+        if (!archivo.type.startsWith('image/')) {
+            errorFormulario.textContent = 'El archivo debe ser una imagen (JPG o PNG).';
+            errorFormulario.hidden = false;
+            inputImagen.value = ''; imagenSeleccionada = null; mostrarPreview(null);
+            return;
+        }
+        if (archivo.size > 2 * 1024 * 1024) {
+            errorFormulario.textContent = 'La imagen no debe superar 2 MB.';
+            errorFormulario.hidden = false;
+            inputImagen.value = ''; imagenSeleccionada = null; mostrarPreview(null);
+            return;
+        }
+        const lector = new FileReader();
+        lector.onload = () => {
+            imagenSeleccionada = lector.result;
+            mostrarPreview(imagenSeleccionada);
+            errorFormulario.hidden = true;
+        };
+        lector.onerror = () => {
+            errorFormulario.textContent = 'No se pudo leer la imagen.';
+            errorFormulario.hidden = false;
+        };
+        lector.readAsDataURL(archivo);
+    });
+
     let vehiculos = [];
     let categorias = [];
     let pagina = 1;
@@ -130,6 +174,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function miniatura(vehiculo) {
         const caja = crear('div', 'veh-miniatura');
+
+        // Prioridad: foto subida por el usuario (base64); si no, una local por marca; si no, un ícono.
+        if (vehiculo.imagen) {
+            const subida = document.createElement('img');
+            subida.src = vehiculo.imagen;
+            subida.alt = `${vehiculo.marca} ${vehiculo.modelo}`;
+            subida.loading = 'lazy';
+            subida.addEventListener('error', () => subida.replaceWith(icono('fa-solid fa-car-side')));
+            caja.append(subida);
+            return caja;
+        }
+
         const marca = (vehiculo.marca || '').toLowerCase();
         const modelo = (vehiculo.modelo || '').toLowerCase();
         const foto = FOTOS.find(f => marca.includes(f.marca) && (!f.modelo || modelo.includes(f.modelo)));
@@ -166,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ---------------------------------------------------------------
     async function cargarCategorias() {
         try {
-            const respuesta = await solicitar('/categorias');
+            const respuesta = await solicitar('/v1/categorias');
             categorias = respuesta?.data || [];
         } catch (error) {
             categorias = [];
@@ -459,6 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function abrirFormulario(vehiculo = null) {
         idEdicion = vehiculo?.id ?? null;
         formulario.reset();
+        imagenSeleccionada = null;
         errorFormulario.hidden = true;
         formulario.querySelectorAll('[aria-invalid]').forEach(e => e.removeAttribute('aria-invalid'));
 
@@ -480,6 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             campo('kilometraje').value = 0;
         }
 
+        mostrarPreview(vehiculo?.imagen || null);
         dialogoVehiculo.showModal();
         campo(vehiculo ? 'marca' : 'categoriaId').focus();
     }
@@ -524,6 +582,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             color: texto('color') || null,
             kilometraje: texto('kilometraje') === '' ? NaN : Number(texto('kilometraje'))
         };
+
+        // Solo se envía la imagen si el usuario eligió una nueva; al editar sin cambiarla,
+        // el backend conserva la que ya tenía el vehículo.
+        if (imagenSeleccionada) {
+            datos.imagen = imagenSeleccionada;
+        }
 
         const errores = validar(datos);
         if (errores.length > 0) {

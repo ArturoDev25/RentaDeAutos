@@ -75,6 +75,7 @@ Personas que reservan o rentan vehículos.
 | nombre | VARCHAR(100) | NOT NULL |
 | apellidos | VARCHAR(150) | NOT NULL |
 | correo | VARCHAR(150) | NULL, UNIQUE |
+| password_hash | VARCHAR(255) | NULL, DEFAULT NULL (BCrypt portal; >= 50 chars si not null) |
 | telefono | VARCHAR(20) | NOT NULL |
 | numero_licencia | VARCHAR(50) | NOT NULL, UNIQUE |
 | licencia_vencimiento | DATE | NOT NULL |
@@ -295,7 +296,10 @@ erDiagram
 |---|---|
 | usuarios_app | UNIQUE(correo) |
 | usuarios_app | INDEX(rol_id, activo) |
+| clientes | UNIQUE(correo) |
 | clientes | UNIQUE(numero_licencia) |
+| clientes | INDEX(apellidos, nombre) |
+| clientes | INDEX(activo) |
 | vehiculos | UNIQUE(placa) |
 | vehiculos | UNIQUE(vin) |
 | vehiculos | INDEX(categoria_id, estado) |
