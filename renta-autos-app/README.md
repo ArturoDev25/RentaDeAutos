@@ -11,10 +11,14 @@ No necesitas instalar ninguna dependencia. Para ver la aplicación:
 
 ## Estructura de Archivos
 
-- `index.html`: Página de inicio con el catálogo de autos y buscador.
+- `index.html`: Inicio del portal del cliente: buscador y vehículos disponibles.
+- `catalogo.html`: Catálogo con filtros por categoría y precio diario.
+- `vehiculo.html`: Detalle del vehículo (`?id=`) y botón para iniciar la reservación.
 - `login.html`: Interfaz de inicio de sesión.
 - `css/style.css`: Contiene todos los estilos globales, colores y diseño responsivo.
-- `js/main.js`: Maneja la interactividad de la página principal (filtros, búsqueda).
+- `css/portal.css`: Estilos del portal del cliente.
+- `js/portal.js`: Funciones compartidas del portal (consulta del catálogo, tarjetas, estados de carga, vacío y error, sesión).
+- `js/inicio.js`, `js/catalogo.js`, `js/vehiculo.js`: Lógica de cada página del portal.
 - `js/auth.js`: Controla la validación del formulario de login y la redirección.
 - `assets/`: Carpeta destinada a imágenes y recursos visuales.
 
@@ -24,4 +28,6 @@ No necesitas instalar ninguna dependencia. Para ver la aplicación:
 - **JavaScript (Vanilla)**: Lógica de cliente sin frameworks.
 
 ## Instrucciones para el equipo
-Para agregar nuevos autos al catálogo, busquen la sección de "Car Cards" en `index.html` y dupliquen el bloque de código del auto, cambiando la imagen y el precio.
+Los vehículos del portal ya no se escriben en el HTML. Inicio, catálogo y detalle los obtienen de `GET /api/v1/catalogo/vehiculos` (ver `docs/catalogo-cliente-api.md`). Para que aparezca un auto en el portal debe estar `DISPONIBLE`, con categoría activa y una tarifa vigente.
+
+Para probar el portal, levanta el backend en `http://localhost:8080` y abre `index.html`. Si el backend está apagado se muestra el mensaje de error de conexión con la opción de reintentar.

@@ -46,6 +46,25 @@ class CatalogoRepositoryTest {
         assertEquals(1L, v.categoriaId());
         assertEquals("SUV", v.categoria());
         assertEquals(new BigDecimal("850.00"), v.tarifaDia());
+        assertFalse(v.tieneImagen());
+    }
+
+    @Test void indicaSiElVehiculoTieneFotoSinIncluirla() {
+        jdbc.update("UPDATE vehiculos SET imagen = 'data:image/png;base64,AAAA' WHERE id = 1");
+        assertTrue(catalogo.listar(ahora).get(0).tieneImagen());
+        assertEquals("data:image/png;base64,AAAA", catalogo.imagen(1L).orElseThrow());
+    }
+
+    @Test void imagenVaciaSeTrataComoSinFoto() {
+        jdbc.update("UPDATE vehiculos SET imagen = '' WHERE id = 1");
+        assertFalse(catalogo.listar(ahora).get(0).tieneImagen());
+        assertTrue(catalogo.imagen(1L).isEmpty());
+    }
+
+    @Test void imagenDeVehiculoInexistenteOdeBajaNoSeEntrega() {
+        jdbc.update("UPDATE vehiculos SET imagen = 'data:image/png;base64,AAAA', estado = 'BAJA' WHERE id = 1");
+        assertTrue(catalogo.imagen(1L).isEmpty());
+        assertTrue(catalogo.imagen(999L).isEmpty());
     }
 
     @ParameterizedTest @ValueSource(strings = {"RESERVADO", "RENTADO", "MANTENIMIENTO", "BAJA"})

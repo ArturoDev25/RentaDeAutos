@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                 // S4-05: catálogo público de solo lectura.
                 .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos/*/imagen").permitAll()
                 .requestMatchers("/api/v1/catalogo", "/api/v1/catalogo/**").denyAll()
 
                 // S4-03: inicio de sesión del cliente del portal (público; devuelve token CLIENTE).
