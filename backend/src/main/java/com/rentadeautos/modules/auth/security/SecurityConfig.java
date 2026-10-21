@@ -58,6 +58,9 @@ public class SecurityConfig {
                 // S4-03: inicio de sesión del cliente del portal (público; devuelve token CLIENTE).
                 .requestMatchers(HttpMethod.POST, "/api/auth/cliente/login").permitAll()
 
+                // S4-02: alta pública de clientes; no permite crear personal.
+                .requestMatchers(HttpMethod.POST, "/api/auth/cliente/registro").permitAll()
+
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
