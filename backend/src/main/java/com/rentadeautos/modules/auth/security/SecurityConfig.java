@@ -54,6 +54,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/catalogo/vehiculos").permitAll()
                 .requestMatchers("/api/v1/catalogo", "/api/v1/catalogo/**").denyAll()
 
+                // S4-03: inicio de sesión del cliente del portal (público; devuelve token CLIENTE).
+                .requestMatchers(HttpMethod.POST, "/api/auth/cliente/login").permitAll()
+
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
