@@ -15,7 +15,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.web.servlet.MockMvc;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.math.BigDecimal;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -34,12 +36,14 @@ class CatalogoControllerTest {
 
     @Test void consultaPublicaSoloExponeDatosDelCatalogo() throws Exception {
         when(catalogo.listar(any(), any(), any(), any())).thenReturn(List.of(new VehiculoCatalogoResponse(
-                1L, "Nissan", "Kicks", 2024, "Blanco", 2L, "SUV", new BigDecimal("850.00"))));
+                1L, "Nissan", "Kicks", 2024, "Blanco", 2L, "SUV", new BigDecimal("850.00"), true)));
         mvc.perform(get(RUTA)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data[0].id").value(1))
                 .andExpect(jsonPath("$.data[0].categoria").value("SUV"))
                 .andExpect(jsonPath("$.data[0].tarifaDia").value(850.0))
+                .andExpect(jsonPath("$.data[0].tieneImagen").value(true))
+                .andExpect(jsonPath("$.data[0].imagen").doesNotExist())
                 .andExpect(jsonPath("$.data[0].placa").doesNotExist())
                 .andExpect(jsonPath("$.data[0].vin").doesNotExist())
                 .andExpect(jsonPath("$.data[0].kilometraje").doesNotExist());
@@ -102,6 +106,59 @@ class CatalogoControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Error interno del servidor"))
                 .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
+    private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', 1, 2, 3};
+
+    @Test void imagenEsPublicaYSeEntregaComoArchivo() throws Exception {
+        when(catalogo.imagen(1L)).thenReturn(Optional.of(
+                "data:image/png;base64," + Base64.getEncoder().encodeToString(PNG)));
+        mvc.perform(get(RUTA + "/1/imagen"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/png"))
+                .andExpect(content().bytes(PNG))
+                .andExpect(header().string("Cache-Control", org.hamcrest.Matchers.containsString("max-age=600")));
+    }
+
+    @Test void imagenJpgSeEntregaComoJpeg() throws Exception {
+        when(catalogo.imagen(1L)).thenReturn(Optional.of(
+                "data:image/jpg;base64," + Base64.getEncoder().encodeToString(PNG)));
+        mvc.perform(get(RUTA + "/1/imagen"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/jpeg"));
+    }
+
+    @Test void vehiculoSinImagenDevuelve404() throws Exception {
+        when(catalogo.imagen(5L)).thenReturn(Optional.empty());
+        mvc.perform(get(RUTA + "/5/imagen")).andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest @ValueSource(strings = {
+            "data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==",
+            "data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=",
+            "data:image/png;base64,@@@",
+            "https://ejemplo.com/foto.png"})
+    void contenidoQueNoEsImagenValidaDevuelve404(String guardado) throws Exception {
+        when(catalogo.imagen(1L)).thenReturn(Optional.of(guardado));
+        mvc.perform(get(RUTA + "/1/imagen")).andExpect(status().isNotFound());
+    }
+
+    @Test void idNoPositivoNoConsultaLaBase() throws Exception {
+        mvc.perform(get(RUTA + "/0/imagen")).andExpect(status().isNotFound());
+        verifyNoInteractions(catalogo);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"POST", "PUT", "PATCH", "DELETE"})
+    void nadiePuedeEscribirPorLaRutaDeImagen(String metodo) throws Exception {
+        mvc.perform(request(HttpMethod.valueOf(metodo), RUTA + "/1/imagen")
+                .with(user("admin").roles("ADMINISTRADOR")))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(catalogo);
+    }
+
+    @Test void otrasRutasDelCatalogoSiguenBloqueadas() throws Exception {
+        mvc.perform(get(RUTA + "/1")).andExpect(status().isUnauthorized());
+        verifyNoInteractions(catalogo);
     }
 
     @ParameterizedTest @ValueSource(strings = {"POST", "PUT", "PATCH", "DELETE"})
