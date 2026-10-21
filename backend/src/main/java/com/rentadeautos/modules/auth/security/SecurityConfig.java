@@ -61,6 +61,12 @@ public class SecurityConfig {
                 // S4-02: alta pública de clientes; no permite crear personal.
                 .requestMatchers(HttpMethod.POST, "/api/auth/cliente/registro").permitAll()
 
+                // S4-06: consultas del portal, aisladas por cliente autenticado.
+                .requestMatchers(HttpMethod.GET, "/api/v1/cliente/reservaciones",
+                        "/api/v1/cliente/reservaciones/*").hasRole("CLIENTE")
+                .requestMatchers("/api/v1/cliente/reservaciones",
+                        "/api/v1/cliente/reservaciones/**").denyAll()
+
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")
                     .hasRole("ADMINISTRADOR")
