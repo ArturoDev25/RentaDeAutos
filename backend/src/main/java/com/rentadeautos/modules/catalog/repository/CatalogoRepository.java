@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.math.BigDecimal;
 
 @Repository
@@ -30,7 +31,8 @@ public class CatalogoRepository {
                 ahora.toLocalDate(), ahora.toLocalDate(), ahora.toLocalDate(), ahora, ahora));
         StringBuilder sql = new StringBuilder("""
                 SELECT v.id, v.marca, v.modelo, v.anio, v.color,
-                       c.id AS categoria_id, c.nombre AS categoria, t.precio_dia
+                       c.id AS categoria_id, c.nombre AS categoria, t.precio_dia,
+                       (v.imagen IS NOT NULL AND v.imagen <> '') AS tiene_imagen
                 FROM vehiculos v
                 JOIN categorias c ON c.id = v.categoria_id
                 JOIN tarifas t ON t.categoria_id = c.id
@@ -62,7 +64,19 @@ public class CatalogoRepository {
         return jdbc.query(sql.toString(), (rs, fila) -> new VehiculoCatalogoResponse(rs.getLong("id"),
                         rs.getString("marca"), rs.getString("modelo"), rs.getInt("anio"),
                         rs.getString("color"), rs.getLong("categoria_id"),
-                        rs.getString("categoria"), rs.getBigDecimal("precio_dia")),
+                        rs.getString("categoria"), rs.getBigDecimal("precio_dia"),
+                        rs.getBoolean("tiene_imagen")),
                 parametros.toArray());
+    }
+
+    /** Foto del vehículo como data URL; vacío si no tiene o si está dado de baja. */
+    @Transactional(readOnly = true)
+    public Optional<String> imagen(Long vehiculoId) {
+        return jdbc.query("""
+                SELECT v.imagen FROM vehiculos v
+                WHERE v.id = ? AND v.estado <> 'BAJA'
+                  AND v.imagen IS NOT NULL AND v.imagen <> ''
+                """, (rs, fila) -> rs.getString("imagen"), vehiculoId)
+                .stream().findFirst();
     }
 }

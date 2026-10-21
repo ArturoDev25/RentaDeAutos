@@ -48,7 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = 'dashboard.html';
                     }
                     else {
-                        window.location.href = 'index.html';
+                        const redirect = new URLSearchParams(window.location.search).get('redirect');
+                        const destinoSeguro = redirect && /^[a-z0-9_-]+\.html(\?[\w=&%.-]*)?$/i.test(redirect);
+                        window.location.href = destinoSeguro ? redirect : 'index.html';
                     }
 
                 } else {

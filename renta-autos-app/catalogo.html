@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de vehículos - RentaDeAutos</title>
+    <link rel="stylesheet" href="css/portal.css?v=4">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-sidebar" id="portalSidebar">
+            <a href="index.html" class="portal-brand"><svg viewBox="0 0 64 48" aria-hidden="true"><path fill="currentColor" d="M15.2 8h24.6a8 8 0 0 1 6.4 3.2L52.5 20H56a6 6 0 0 1 6 6v8a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-8a6 6 0 0 1 6-6h.6l3.3-9.2A4 4 0 0 1 15.2 8z"/><path fill="#fff" opacity=".7" d="M16.5 13H27v7H13.9zM31 13h8.3a3 3 0 0 1 2.4 1.2L46.3 20H31z"/><circle cx="17" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/><circle cx="47" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/></svg>RentaDeAutos</a>
+            <nav aria-label="Principal">
+                <ul class="portal-menu">
+                    <li><a href="index.html"><i class="fa-solid fa-house"></i>Inicio</a></li>
+                    <li><a href="catalogo.html" class="active" aria-current="page"><i class="fa-solid fa-car"></i>Catálogo</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-calendar-days"></i>Mis reservaciones</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-clock"></i>Mis rentas</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-chart-column"></i>Reportes</a></li>
+                    <li><a href="#" data-pendiente title="Próximamente"><i class="fa-solid fa-circle-question"></i>Ayuda</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="portal-main">
+            <header class="portal-topbar">
+                <button type="button" class="btn-menu" id="btnMenu" aria-controls="portalSidebar" aria-expanded="false" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <form class="topbar-search" id="buscadorGlobal" role="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <label for="buscarVehiculos" class="sr-only">Buscar vehículos</label>
+                    <input type="search" id="buscarVehiculos" name="q" placeholder="Buscar vehículos...">
+                </form>
+                <div class="portal-session" id="portalSession"></div>
+            </header>
+
+            <main class="portal-content">
+                <div class="page-title">
+                    <h1>Catálogo de vehículos</h1>
+                    <p>Encuentra el auto ideal para tu próximo viaje.</p>
+                </div>
+
+                <section class="card">
+                    <form class="filtros" id="formFiltros" novalidate>
+                        <div class="pt-field">
+                            <label for="filtroCategoria">Categoría</label>
+                            <select id="filtroCategoria">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+                        <div class="pt-field">
+                            <label for="filtroPrecio">Precio por día</label>
+                            <select id="filtroPrecio"></select>
+                        </div>
+                        <button type="submit" class="pt-btn pt-btn-primary"><i class="fa-solid fa-magnifying-glass"></i>Buscar</button>
+                    </form>
+                </section>
+
+                <p class="conteo" id="conteo" aria-live="polite">Cargando…</p>
+                <div class="vehiculos-grid" id="catalogoGrid"></div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/client.js"></script>
+    <script src="js/portal.js?v=4"></script>
+    <script src="js/catalogo.js?v=4"></script>
+</body>
+</html>
