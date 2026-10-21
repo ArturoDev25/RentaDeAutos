@@ -53,15 +53,27 @@ El script `V1__init_schema.sql` (raíz del repositorio) define las 11 tablas nor
 
 ---
 
-## 🧪 Tests Automatizados
+## 🧪 Tests automatizados y CI
 
-Los tests corren desacoplados de MySQL usando **H2 en memoria**. No requieren ninguna BD activa:
+Las pruebas usan **H2 en memoria**, por lo que no requieren MySQL ni Docker.
+GitHub Actions las ejecuta automáticamente en cada `push` y `pull request`
+mediante [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+Para ejecutarlas manualmente desde la raíz del repositorio:
 
 ```bash
 cd backend
-./mvnw clean compile   # BUILD SUCCESS
-./mvnw test            # BUILD SUCCESS (H2, sin MySQL)
+./mvnw test
 ```
+
+En Windows PowerShell:
+
+```powershell
+.\backend\mvnw.cmd -f .\backend\pom.xml test
+```
+
+El resultado esperado es `BUILD SUCCESS`, con cero fallos y errores. Para más
+opciones, consulta [`backend/src/test/README.md`](backend/src/test/README.md).
 
 ---
 
@@ -70,44 +82,3 @@ cd backend
 Login con JWT y BCrypt. Requiere las variables `JWT_SECRET` y `JWT_EXPIRATION_MINUTES`.
 
 📖 **Guía completa:** [`docs/autenticacion.md`](docs/autenticacion.md)
-
-
-## Tarifas por categoría — Sprint 3
-
-El backend permite alta, consulta, edición y baja lógica de tarifas, con validación
-de vigencias sin traslape y conservación de la tarifa histórica de reservaciones.
-
-Contrato REST, permisos y guía de comprobación: [docs/tarifas-api.md](docs/tarifas-api.md).
-
-
-## Seed de tarifas — S3-07
-
-En desarrollo se cargan tarifas ficticias faltantes para las categorías activas,
-sin duplicar ni sustituir las tarifas vigentes existentes.
-
-Ejecución, precios y guion de demostración: [docs/seed-tarifas-sprint-3.md](docs/seed-tarifas-sprint-3.md).
-
-## Entrega de vehículo — Sprint 3
-
-`POST /api/v1/entregas` entrega el vehículo de una reservación confirmada: registra
-kilometraje, combustible y condición de salida, pasa la reservación a `EN_CURSO` y el
-vehículo a `RENTADO` en una sola transacción, y genera auditoría.
-
-Contrato REST, reglas y guía de comprobación: [docs/entregas-api.md](docs/entregas-api.md).
-
-## Rentas activas — S3-11
-
-`GET /api/v1/rentas/activas` consulta las reservaciones `EN_CURSO`, incluidas
-las vencidas, con cliente, vehículo y fecha prevista de devolución.
-Consulta permitida a Administrador, Agente, Supervisor y Auditor.
-
-Contrato REST, pruebas y guion de comprobación:
-[docs/rentas-activas-api.md](docs/rentas-activas-api.md).
-
-## Catálogo del cliente — S4-05
-
-`GET /api/v1/catalogo/vehiculos` consulta vehículos disponibles con categoría
-y tarifa vigente de hoy. Permite filtrar por categoría y rango de precio diario.
-
-Contrato, alcance de disponibilidad y guía de comprobación:
-[docs/catalogo-cliente-api.md](docs/catalogo-cliente-api.md).
