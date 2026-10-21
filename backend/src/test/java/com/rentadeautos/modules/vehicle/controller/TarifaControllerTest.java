@@ -7,6 +7,7 @@ import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.vehicle.dto.TarifaResponse;
 import com.rentadeautos.modules.vehicle.exception.TarifaNoEncontradaException;
 import com.rentadeautos.modules.vehicle.service.TarifaService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -37,6 +38,7 @@ class TarifaControllerTest {
     @MockBean private TarifaService tarifas;
     @MockBean private JwtService jwtService;
     @MockBean private UsuarioAppRepository usuarios;
+    @MockBean private ClienteRepository clientes;
 
     private TarifaResponse tarifa() {
         return new TarifaResponse(1L, 2L, "SUV", new BigDecimal("850.00"),

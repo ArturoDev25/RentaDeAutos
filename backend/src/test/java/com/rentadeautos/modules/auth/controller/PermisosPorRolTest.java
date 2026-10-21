@@ -4,6 +4,7 @@ import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -34,14 +35,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class PermisosPorRolTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private JwtService jwtService;
-
-    @MockBean
-    private UsuarioAppRepository usuarioRepository;
+    @Autowired private MockMvc mockMvc;
+    @MockBean private JwtService jwtService;
+    @MockBean private UsuarioAppRepository usuarioRepository;
+    @MockBean private ClienteRepository clienteRepository;
 
     private static final String[] METODOS = {
         "GET", "POST", "PUT", "PATCH", "DELETE"
@@ -76,6 +73,13 @@ class PermisosPorRolTest {
         agregar(casos, "AUDITOR", "vehiculos",  "SNNNN");
         agregar(casos, "AUDITOR", "categorias", "SNNNN");
         agregar(casos, "AUDITOR", "tarifas",    "SNNNN");
+
+        
+        agregar(casos, "CLIENTE", "clientes",   "NNNNN");
+        agregar(casos, "CLIENTE", "vehiculos",  "NNNNN");
+        agregar(casos, "CLIENTE", "categorias", "NNNNN");
+        agregar(casos, "CLIENTE", "tarifas",    "NNNNN");
+
 
         return casos.stream();
     }

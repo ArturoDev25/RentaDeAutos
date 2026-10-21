@@ -7,6 +7,7 @@ import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class})
 class AuditControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private AuditService auditService;
-
-    @MockBean
-    private JwtService jwtService;
-
-    @MockBean
-    private UsuarioAppRepository usuarioAppRepository;
+    @Autowired private MockMvc mockMvc;
+    @MockBean private AuditService auditService;
+    @MockBean private JwtService jwtService;
+    @MockBean private UsuarioAppRepository usuarioAppRepository;
+    @MockBean private ClienteRepository clientes;
 
     @Test
     @WithMockUser(roles = "AUDITOR")

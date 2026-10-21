@@ -13,6 +13,7 @@ import com.rentadeautos.modules.vehicle.dto.CategoriaResponse;
 import com.rentadeautos.modules.vehicle.exception.CategoriaDuplicadaException;
 import com.rentadeautos.modules.vehicle.exception.CategoriaNoEncontradaException;
 import com.rentadeautos.modules.vehicle.service.CategoriaService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,9 @@ class CategoriaControllerTest {
 
     @MockBean
     private UsuarioAppRepository usuarioRepository;
+
+    @MockBean
+    private ClienteRepository clientes;
 
     private CategoriaResponse suv(boolean activo) {
         return new CategoriaResponse(

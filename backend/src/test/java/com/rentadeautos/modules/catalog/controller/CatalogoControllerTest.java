@@ -6,6 +6,7 @@ import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.auth.security.SecurityConfig;
 import com.rentadeautos.modules.catalog.repository.CatalogoRepository;
 import com.rentadeautos.modules.catalog.dto.VehiculoCatalogoResponse;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -32,6 +33,7 @@ class CatalogoControllerTest {
     @MockBean CatalogoRepository catalogo;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
+    @MockBean ClienteRepository clientes;
     private static final String RUTA = "/api/v1/catalogo/vehiculos";
 
     @Test void consultaPublicaSoloExponeDatosDelCatalogo() throws Exception {

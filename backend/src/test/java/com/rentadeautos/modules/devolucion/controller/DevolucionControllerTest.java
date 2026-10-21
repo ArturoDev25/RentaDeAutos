@@ -8,6 +8,7 @@ import com.rentadeautos.modules.devolucion.dto.DevolucionResponse;
 import com.rentadeautos.modules.devolucion.exception.DevolucionException;
 import com.rentadeautos.modules.devolucion.exception.DevolucionExceptionHandler;
 import com.rentadeautos.modules.devolucion.service.DevolucionService;
+import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ class DevolucionControllerTest {
     @MockBean DevolucionService servicio;
     @MockBean JwtService        jwt;
     @MockBean UsuarioAppRepository usuarios;
+    @MockBean ClienteRepository clientes;
 
     /** Payload JSON mínimo válido para una devolución. */
     private static final String DATOS_VALIDOS = """
