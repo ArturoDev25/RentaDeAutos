@@ -38,7 +38,8 @@ GET /api/v1/catalogo/vehiculos?categoriaId=1&precioMin=500&precioMax=1000
       "color": "Blanco",
       "categoriaId": 1,
       "categoria": "SUV",
-      "tarifaDia": 850.00
+      "tarifaDia": 850.00,
+      "tieneImagen": true
     }
   ]
 }
@@ -46,6 +47,28 @@ GET /api/v1/catalogo/vehiculos?categoriaId=1&precioMin=500&precioMax=1000
 
 El color puede ser nulo. No se exponen placa, VIN, kilometraje, datos de clientes
 ni datos de usuarios del personal. Sin resultados: `{"success":true,"data":[]}`.
+
+`tieneImagen` indica si el vehículo tiene foto registrada desde el panel (columna
+`imagen`, migración V4). La foto no viaja en la lista porque cada una puede pesar
+hasta 2 MB; se pide por separado.
+
+## Foto del vehículo
+
+`GET /api/v1/catalogo/vehiculos/{id}/imagen`
+
+Consulta pública de solo lectura. Devuelve la foto como archivo binario con su
+`Content-Type` (`image/png`, `image/jpeg`, `image/webp` o `image/gif`) y
+`Cache-Control: max-age=600, public`, para usarla directamente en `<img src>`.
+
+| Situación | HTTP |
+|---|---|
+| Vehículo con foto válida y que no está en `BAJA` | 200 con la imagen |
+| Sin foto, vehículo inexistente o en `BAJA` | 404 sin cuerpo |
+| Contenido guardado que no es una data URL de imagen permitida (por ejemplo SVG o HTML) | 404 |
+| `id` menor o igual a cero | 404 sin consultar la base |
+| Escritura por esta ruta, incluso de Administrador | 403 |
+
+Cualquier otra ruta bajo `/api/v1/catalogo/` sigue bloqueada.
 
 | Situación | HTTP y comportamiento |
 |---|---|
@@ -82,9 +105,9 @@ Los valores del usuario se envían como parámetros JDBC, sin concatenarlos al S
 
 | Archivo | Responsabilidad |
 |---|---|
-| `VehiculoCatalogoResponse.java` | Contrato público de datos |
-| `CatalogoRepository.java` | Consulta JDBC, disponibilidad, tarifa y filtros |
-| `CatalogoController.java` | Ruta GET y validación de filtros |
+| `VehiculoCatalogoResponse.java` | Contrato público de datos, incluido `tieneImagen` |
+| `CatalogoRepository.java` | Consulta JDBC, disponibilidad, tarifa, filtros y foto |
+| `CatalogoController.java` | Rutas GET de la lista y de la foto, validación de filtros |
 | `CatalogoExceptionHandler.java` | Errores 400 del catálogo |
 | `SecurityConfig.java` | Lectura pública y bloqueo de escrituras |
 | `CatalogoRepositoryTest.java` | Consulta real en H2: estados, vigencias, filtros y compromisos |
@@ -125,11 +148,14 @@ Con backend y MySQL de desarrollo en ejecución:
    actual no se ofrecen; no se deben alterar datos reales para esta comprobación.
 8. Con token de cliente, intentar POST o PATCH contra la ruta: 403 y ningún cambio.
 9. Revisar que el JSON no contenga placa, VIN ni datos privados.
+10. Subir una foto a un vehículo desde el panel y abrir
+    `/api/v1/catalogo/vehiculos/{id}/imagen` sin sesión: se ve la imagen.
+11. Un vehículo sin foto responde 404 en esa ruta y `tieneImagen: false` en la lista.
 
 ```powershell
 Invoke-RestMethod "http://localhost:8080/api/v1/catalogo/vehiculos"
 Invoke-RestMethod "http://localhost:8080/api/v1/catalogo/vehiculos?categoriaId=1&precioMin=500&precioMax=1000"
 ```
 
-Pendiente hasta aportar evidencia: comprobación manual contra MySQL e integración
-con la pantalla del portal. Ajustar host y puerto a la configuración de desarrollo.
+La pantalla del portal (S4-08) usa estas rutas en `index.html`, `catalogo.html`
+y `vehiculo.html`. Pendiente hasta aportar evidencia: comprobación manual contra MySQL. Ajustar host y puerto a la configuración de desarrollo.
