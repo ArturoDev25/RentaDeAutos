@@ -4,6 +4,7 @@ import com.rentadeautos.modules.audit.service.AuditService;
 import com.rentadeautos.modules.audit.service.AuditoriaOperativa;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.reservation.dto.ReservacionRequest;
+import com.rentadeautos.modules.reservation.dto.ReservacionClienteRequest;
 import com.rentadeautos.modules.reservation.dto.ReservacionResponse;
 import com.rentadeautos.modules.reservation.exception.ReservacionException;
 import com.rentadeautos.modules.reservation.model.Reservacion;
@@ -61,6 +62,45 @@ public class ReservacionService {
 
     @Transactional
     public ReservacionResponse crear(ReservacionRequest datos) {
+        Reservacion r = prepararAlta(datos);
+
+        String correo = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long creador = usuarios.findByCorreo(correo)
+                .orElseThrow(() -> new ReservacionException(HttpStatus.UNAUTHORIZED,
+                        "La sesión ya no corresponde a un usuario válido"))
+                .getId();
+        r.setCreadoPorId(creador);
+        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+    }
+
+    /** Misma validación y bloqueo que mostrador; el actor sale de la sesión CLIENTE. */
+    @Transactional
+    public ReservacionResponse crearDesdePortal(
+            ReservacionClienteRequest datos) {
+        var autenticacion = SecurityContextHolder.getContext().getAuthentication();
+        if (autenticacion == null || !autenticacion.isAuthenticated()
+                || autenticacion.getAuthorities().stream()
+                    .noneMatch(a -> "ROLE_CLIENTE".equals(a.getAuthority()))
+                || !autenticacion.getName().matches("cliente:[1-9]\\d*")) {
+            throw new ReservacionException(HttpStatus.UNAUTHORIZED, "Identidad de cliente inválida");
+        }
+        Long clienteId;
+        try {
+            clienteId = Long.valueOf(autenticacion.getName().substring("cliente:".length()));
+        } catch (NumberFormatException error) {
+            throw new ReservacionException(HttpStatus.UNAUTHORIZED, "Identidad de cliente inválida");
+        }
+        if (datos.fechaInicio() == null || !datos.fechaInicio().isAfter(java.time.LocalDateTime.now())) {
+            throw new ReservacionException(HttpStatus.BAD_REQUEST, "El inicio debe estar en el futuro");
+        }
+        ReservacionRequest peticion = new ReservacionRequest(clienteId, datos.vehiculoId(),
+                datos.fechaInicio(), datos.fechaFin(), datos.observaciones());
+        Reservacion r = prepararAlta(peticion);
+        r.setCreadoPorClienteId(clienteId);
+        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+    }
+
+    private Reservacion prepararAlta(ReservacionRequest datos) {
         validarFechas(datos);
         validarCliente(datos.clienteId());
         Long categoriaId = bloquearYValidarVehiculo(datos.vehiculoId());
@@ -68,15 +108,9 @@ public class ReservacionService {
         BigDecimal tarifa = tarifaVigente(categoriaId, datos.fechaInicio().toLocalDate());
         validarTotal(datos, tarifa);
 
-        String correo = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long creador = usuarios.findByCorreo(correo)
-                .orElseThrow(() -> new ReservacionException(HttpStatus.UNAUTHORIZED,
-                        "La sesión ya no corresponde a un usuario válido"))
-                .getId();
         Reservacion r = new Reservacion();
-        r.setCreadoPorId(creador);
         aplicar(r, datos, tarifa);
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        return r;
     }
 
     @Transactional

@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReservacionClienteControllerTest {
     @Autowired MockMvc mvc;
     @MockBean ReservacionClienteRepository reservaciones;
+    @MockBean com.rentadeautos.modules.reservation.service.ReservacionService servicio;
     @MockBean JwtService jwt;
     @MockBean UsuarioAppRepository usuarios;
     @MockBean ClienteRepository clientes;
@@ -88,4 +89,58 @@ class ReservacionClienteControllerTest {
                 .andExpect(status().isForbidden());
         verifyNoInteractions(reservaciones);
     }
+    private String alta() {
+        var inicio = LocalDateTime.now().plusDays(10).withNano(0);
+        return "{\"vehiculoId\":3,\"fechaInicio\":\"" + inicio
+                + "\",\"fechaFin\":\"" + inicio.plusDays(1) + "\","
+                + "\"clienteId\":999,\"creadoPorId\":999,\"tarifaDia\":1,\"estado\":\"CONFIRMADA\"}";
+    }
+
+    @Test void postDevuelve201ConValoresDelServidor() throws Exception {
+        var fecha = LocalDateTime.now().plusDays(10);
+        var respuesta = new com.rentadeautos.modules.reservation.dto.ReservacionResponse(
+                5L, 7L, 3L, null, fecha, fecha.plusDays(1), "PENDIENTE",
+                new BigDecimal("850"), new BigDecimal("850"), null);
+        when(servicio.crearDesdePortal(org.mockito.ArgumentMatchers.any())).thenReturn(respuesta);
+        mvc.perform(post(RUTA).contentType("application/json").content(alta())
+                .with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.estado").value("PENDIENTE"))
+                .andExpect(jsonPath("$.data.tarifaDia").value(850))
+                .andExpect(jsonPath("$.data.creadoPorId").doesNotExist());
+        var captor = org.mockito.ArgumentCaptor.forClass(
+                com.rentadeautos.modules.reservation.dto.ReservacionClienteRequest.class);
+        verify(servicio).crearDesdePortal(captor.capture());
+        org.junit.jupiter.api.Assertions.assertEquals(3L, captor.getValue().vehiculoId());
+    }
+
+    @Test void postInvalidoDevuelve400SinInvocarServicio() throws Exception {
+        mvc.perform(post(RUTA).contentType("application/json").content("{\"vehiculoId\":-1}")
+                .with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isBadRequest());
+        verifyNoInteractions(servicio);
+    }
+
+    @Test void postSinSesionDevuelve401() throws Exception {
+        mvc.perform(post(RUTA).contentType("application/json").content(alta()))
+                .andExpect(status().isUnauthorized());
+        verifyNoInteractions(servicio);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR"})
+    void personalNoCreaPorElPortal(String rol) throws Exception {
+        mvc.perform(post(RUTA).contentType("application/json").content(alta())
+                .with(user("personal").roles(rol))).andExpect(status().isForbidden());
+        verifyNoInteractions(servicio);
+    }
+
+    @Test void postTraslapadoDevuelve409() throws Exception {
+        when(servicio.crearDesdePortal(org.mockito.ArgumentMatchers.any())).thenThrow(
+                new com.rentadeautos.modules.reservation.exception.ReservacionException(
+                        org.springframework.http.HttpStatus.CONFLICT, "El vehículo ya tiene una reservación para esas fechas"));
+        mvc.perform(post(RUTA).contentType("application/json").content(alta())
+                .with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.success").value(false));
+    }
+
 }

@@ -2,6 +2,10 @@ package com.rentadeautos.modules.reservation.controller;
 
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.reservation.dto.ReservacionClienteResponse;
+import com.rentadeautos.modules.reservation.dto.ReservacionClienteRequest;
+import com.rentadeautos.modules.reservation.service.ReservacionService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import com.rentadeautos.modules.reservation.exception.ReservacionException;
 import com.rentadeautos.modules.reservation.repository.ReservacionClienteRepository;
 import org.springframework.http.HttpStatus;
@@ -13,9 +17,23 @@ import java.util.List;
 @RequestMapping("/api/v1/cliente/reservaciones")
 public class ReservacionClienteController {
     private final ReservacionClienteRepository reservaciones;
+    private final ReservacionService servicio;
 
-    public ReservacionClienteController(ReservacionClienteRepository reservaciones) {
+    public ReservacionClienteController(ReservacionClienteRepository reservaciones,
+            ReservacionService servicio) {
         this.reservaciones = reservaciones;
+        this.servicio = servicio;
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<ReservacionClienteResponse>> crear(
+            @Valid @RequestBody
+            ReservacionClienteRequest datos) {
+        var r = servicio.crearDesdePortal(datos);
+        var respuesta = new ReservacionClienteResponse(r.id(), r.vehiculoId(), r.fechaInicio(),
+                r.fechaFin(), r.estado(), r.tarifaDia(), r.totalEstimado());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(respuesta));
     }
 
     @GetMapping
