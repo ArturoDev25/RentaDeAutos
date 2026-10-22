@@ -172,4 +172,47 @@ class ReservacionClienteControllerTest {
         verifyNoInteractions(servicio);
     }
 
+    @Test void historialUsaClienteAutenticadoIgnorandoIdEnviado() throws Exception {
+        when(reservaciones.historial(7L)).thenReturn(List.of());
+        mvc.perform(get(RUTA + "/historial").param("clienteId", "8")
+                .with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data").isEmpty());
+        verify(reservaciones).historial(7L);
+        verifyNoMoreInteractions(reservaciones);
+        verifyNoInteractions(servicio);
+    }
+
+    @Test void historialExponeDatosDeRentaSinPersonalNiObservacionesInternas() throws Exception {
+        var fecha = LocalDateTime.of(2026, 11, 1, 10, 0);
+        var renta = new com.rentadeautos.modules.reservation.dto.RentaClienteResponse(
+                5L, 3L, "Nissan", "Kicks", "EN_CURSO", fecha, fecha.plusDays(1),
+                null, new BigDecimal("850"), new BigDecimal("850"), null);
+        when(reservaciones.historial(7L)).thenReturn(List.of(renta));
+        mvc.perform(get(RUTA + "/historial").with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data[0].reservacionId").value(5))
+                .andExpect(jsonPath("$.data[0].estado").value("EN_CURSO"))
+                .andExpect(jsonPath("$.data[0].totalFinal").doesNotExist())
+                .andExpect(jsonPath("$.data[0].entregadoPorId").doesNotExist())
+                .andExpect(jsonPath("$.data[0].observaciones").doesNotExist());
+    }
+
+    @Test void historialSinSesionDevuelve401() throws Exception {
+        mvc.perform(get(RUTA + "/historial")).andExpect(status().isUnauthorized());
+        verifyNoInteractions(reservaciones);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR"})
+    void historialNoEsRutaDelPersonal(String rol) throws Exception {
+        mvc.perform(get(RUTA + "/historial").with(user("personal").roles(rol)))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(reservaciones);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"POST", "PUT", "PATCH", "DELETE"})
+    void historialNoPermiteEscritura(String metodo) throws Exception {
+        mvc.perform(request(org.springframework.http.HttpMethod.valueOf(metodo), RUTA + "/historial")
+                .with(user("cliente:7").roles("CLIENTE"))).andExpect(status().isForbidden());
+        verifyNoInteractions(servicio, reservaciones);
+    }
+
 }

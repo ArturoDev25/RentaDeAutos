@@ -3,6 +3,7 @@ package com.rentadeautos.modules.reservation.controller;
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.reservation.dto.ReservacionClienteResponse;
 import com.rentadeautos.modules.reservation.dto.ReservacionClienteRequest;
+import com.rentadeautos.modules.reservation.dto.RentaClienteResponse;
 import com.rentadeautos.modules.reservation.service.ReservacionService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,11 @@ public class ReservacionClienteController {
     @GetMapping
     public ApiResponse<List<ReservacionClienteResponse>> listar(Principal principal) {
         return ApiResponse.success(reservaciones.listar(clienteActual(principal)));
+    }
+
+    @GetMapping("/historial")
+    public ApiResponse<List<RentaClienteResponse>> historial(Principal principal) {
+        return ApiResponse.success(reservaciones.historial(clienteActual(principal)));
     }
 
     @GetMapping("/{id}")
