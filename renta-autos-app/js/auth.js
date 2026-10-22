@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerText = 'CARGANDO...';
 
             try {
-                const result = await fetchAPI('/auth/login', {
+                const result = await fetchAPI('/auth/cliente/login', {
                     method: 'POST',
                     body: JSON.stringify({
                         correo: email,
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerText = 'REGISTRANDO...';
 
             try {
-                const result = await fetchAPI('/auth/register', {
+                const result = await fetchAPI('/auth/cliente/register', {
                     method: 'POST',
                     body: JSON.stringify({
                         nombre: nombre,
@@ -130,4 +130,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- LÓGICA DE CIERRE DE SESIÓN ---
+    window.logout = () => {
+        localStorage.removeItem('usuarioSesion');
+        window.location.href = 'login.html';
+    };
+
+    // --- GUARDIA DE ACCESO ---
+    window.validarAcceso = (rolRequerido = null) => {
+        const sesion = localStorage.getItem('usuarioSesion');
+
+        if (!sesion) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const usuario = JSON.parse(sesion);
+        if (rolRequerido && usuario.rol !== rolRequerido) {
+            // Si requiere un rol específico (ej. ADMIN) y el usuario no lo tiene
+            window.location.href = 'index.html';
+            return;
+        }
+    };
 });
