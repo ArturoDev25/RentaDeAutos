@@ -21,4 +21,15 @@ jobs:
 
       - name: Ejecutar pruebas
         working-directory: backend
-        run: ./mvnw test
+        run: ./mvnw -B -ntp test
+
+      - name: Conservar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-pruebas-backend
+          path: |
+            backend/target/surefire-reports/*.xml
+            backend/target/surefire-reports/*.txt
+          if-no-files-found: warn
+          retention-days: 7
