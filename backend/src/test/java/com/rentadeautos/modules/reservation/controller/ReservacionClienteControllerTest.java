@@ -143,4 +143,33 @@ class ReservacionClienteControllerTest {
                 .andExpect(status().isConflict()).andExpect(jsonPath("$.success").value(false));
     }
 
+    @Test void patchCancelaPropiaYDevuelve200() throws Exception {
+        var fecha = LocalDateTime.now().plusDays(10);
+        when(servicio.cancelarDesdePortal(5L)).thenReturn(new ReservacionClienteResponse(
+                5L, 3L, fecha, fecha.plusDays(1), "CANCELADA", new BigDecimal("850"), new BigDecimal("850")));
+        mvc.perform(patch(RUTA + "/5/cancelar").with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.estado").value("CANCELADA"));
+        verify(servicio).cancelarDesdePortal(5L);
+    }
+
+    @Test void patchAjenoDevuelve404() throws Exception {
+        when(servicio.cancelarDesdePortal(5L)).thenThrow(
+                new com.rentadeautos.modules.reservation.exception.ReservacionException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Reservación no encontrada"));
+        mvc.perform(patch(RUTA + "/5/cancelar").with(user("cliente:7").roles("CLIENTE")))
+                .andExpect(status().isNotFound()).andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test void patchSinSesionDevuelve401() throws Exception {
+        mvc.perform(patch(RUTA + "/5/cancelar")).andExpect(status().isUnauthorized());
+        verifyNoInteractions(servicio);
+    }
+
+    @ParameterizedTest @ValueSource(strings = {"ADMINISTRADOR", "AGENTE", "SUPERVISOR", "AUDITOR"})
+    void personalNoCancelaEnRutaDelCliente(String rol) throws Exception {
+        mvc.perform(patch(RUTA + "/5/cancelar").with(user("personal").roles(rol)))
+                .andExpect(status().isForbidden());
+        verifyNoInteractions(servicio);
+    }
+
 }

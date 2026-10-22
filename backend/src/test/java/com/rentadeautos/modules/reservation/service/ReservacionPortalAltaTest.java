@@ -111,4 +111,73 @@ class ReservacionPortalAltaTest {
         SecurityContextHolder.clearContext();
         rechazaSinGuardar(401, datos());
     }
+    @Test void cancelaPendientePropiaSinEliminarla() {
+        var r = servicio.crearDesdePortal(datos());
+        var cancelada = servicio.cancelarDesdePortal(r.id());
+        assertEquals("CANCELADA", cancelada.estado());
+        assertEquals(r.totalEstimado(), cancelada.totalEstimado());
+        assertEquals("CANCELADA", jdbc.queryForObject("SELECT estado FROM reservaciones WHERE id = ?", String.class, r.id()));
+        assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM reservaciones", Integer.class));
+    }
+
+    @Test void cancelarConfirmadaLiberaVehiculoSinOtrosCompromisos() {
+        var r = servicio.crearDesdePortal(datos());
+        jdbc.update("UPDATE reservaciones SET estado = 'CONFIRMADA' WHERE id = ?", r.id());
+        jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' WHERE id = 1");
+        servicio.cancelarDesdePortal(r.id());
+        assertEquals("DISPONIBLE", jdbc.queryForObject("SELECT estado FROM vehiculos WHERE id = 1", String.class));
+    }
+
+    @Test void cancelarConfirmadaNoLiberaSiHayOtraConfirmada() {
+        var r = servicio.crearDesdePortal(datos());
+        jdbc.update("UPDATE reservaciones SET estado = 'CONFIRMADA' WHERE id = ?", r.id());
+        jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' WHERE id = 1");
+        jdbc.update("""
+                INSERT INTO reservaciones (cliente_id, vehiculo_id, creado_por_cliente_id,
+                    fecha_inicio, fecha_fin, estado, tarifa_dia, total_estimado)
+                VALUES (7, 1, 7, ?, ?, 'CONFIRMADA', 850, 850)
+                """, inicio.plusDays(3), inicio.plusDays(4));
+        servicio.cancelarDesdePortal(r.id());
+        assertEquals("RESERVADO", jdbc.queryForObject("SELECT estado FROM vehiculos WHERE id = 1", String.class));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"EN_CURSO", "FINALIZADA", "CANCELADA"})
+    void noCancelaEstadosNoPermitidos(String estado) {
+        var r = servicio.crearDesdePortal(datos());
+        jdbc.update("UPDATE reservaciones SET estado = ? WHERE id = ?", estado, r.id());
+        var error = assertThrows(ReservacionException.class, () -> servicio.cancelarDesdePortal(r.id()));
+        assertEquals(409, error.getStatus().value());
+        assertEquals(estado, jdbc.queryForObject("SELECT estado FROM reservaciones WHERE id = ?", String.class, r.id()));
+    }
+
+    @Test void clienteDistintoNoCancelaReservaAjena() {
+        var r = servicio.crearDesdePortal(datos());
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("cliente:8", null,
+                        List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"))));
+        var error = assertThrows(ReservacionException.class, () -> servicio.cancelarDesdePortal(r.id()));
+        assertEquals(404, error.getStatus().value());
+        assertEquals("PENDIENTE", jdbc.queryForObject("SELECT estado FROM reservaciones WHERE id = ?", String.class, r.id()));
+    }
+
+    @Test void cancelacionInexistenteDevuelve404() {
+        var error = assertThrows(ReservacionException.class, () -> servicio.cancelarDesdePortal(999L));
+        assertEquals(404, error.getStatus().value());
+    }
+
+    @Test void cancelarSinSesionDevuelve401() {
+        SecurityContextHolder.clearContext();
+        var error = assertThrows(ReservacionException.class, () -> servicio.cancelarDesdePortal(1L));
+        assertEquals(401, error.getStatus().value());
+    }
+
+    @Test void cancelacionNoSacaVehiculoDeMantenimiento() {
+        var r = servicio.crearDesdePortal(datos());
+        jdbc.update("UPDATE reservaciones SET estado = 'CONFIRMADA' WHERE id = ?", r.id());
+        jdbc.update("UPDATE vehiculos SET estado = 'MANTENIMIENTO' WHERE id = 1");
+        servicio.cancelarDesdePortal(r.id());
+        assertEquals("MANTENIMIENTO", jdbc.queryForObject("SELECT estado FROM vehiculos WHERE id = 1", String.class));
+    }
+
 }

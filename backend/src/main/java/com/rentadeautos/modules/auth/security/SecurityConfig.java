@@ -62,6 +62,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/cliente/registro").permitAll()
 
                 // S4-06: operaciones del portal, aisladas por cliente autenticado.
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/cliente/reservaciones/*/cancelar")
+                    .hasRole("CLIENTE")
                 .requestMatchers(HttpMethod.POST, "/api/v1/cliente/reservaciones").hasRole("CLIENTE")
                 .requestMatchers(HttpMethod.GET, "/api/v1/cliente/reservaciones",
                         "/api/v1/cliente/reservaciones/*").hasRole("CLIENTE")

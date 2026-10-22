@@ -36,6 +36,11 @@ public class ReservacionClienteController {
                 .body(ApiResponse.success(respuesta));
     }
 
+    @PatchMapping("/{id}/cancelar")
+    public ApiResponse<ReservacionClienteResponse> cancelar(@PathVariable Long id) {
+        return ApiResponse.success(servicio.cancelarDesdePortal(id));
+    }
+
     @GetMapping
     public ApiResponse<List<ReservacionClienteResponse>> listar(Principal principal) {
         return ApiResponse.success(reservaciones.listar(clienteActual(principal)));

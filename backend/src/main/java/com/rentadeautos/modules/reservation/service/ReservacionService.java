@@ -5,6 +5,7 @@ import com.rentadeautos.modules.audit.service.AuditoriaOperativa;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.reservation.dto.ReservacionRequest;
 import com.rentadeautos.modules.reservation.dto.ReservacionClienteRequest;
+import com.rentadeautos.modules.reservation.dto.ReservacionClienteResponse;
 import com.rentadeautos.modules.reservation.dto.ReservacionResponse;
 import com.rentadeautos.modules.reservation.exception.ReservacionException;
 import com.rentadeautos.modules.reservation.model.Reservacion;
@@ -77,6 +78,18 @@ public class ReservacionService {
     @Transactional
     public ReservacionResponse crearDesdePortal(
             ReservacionClienteRequest datos) {
+        Long clienteId = clienteActualPortal();
+        if (datos.fechaInicio() == null || !datos.fechaInicio().isAfter(java.time.LocalDateTime.now())) {
+            throw new ReservacionException(HttpStatus.BAD_REQUEST, "El inicio debe estar en el futuro");
+        }
+        ReservacionRequest peticion = new ReservacionRequest(clienteId, datos.vehiculoId(),
+                datos.fechaInicio(), datos.fechaFin(), datos.observaciones());
+        Reservacion r = prepararAlta(peticion);
+        r.setCreadoPorClienteId(clienteId);
+        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+    }
+
+    private Long clienteActualPortal() {
         var autenticacion = SecurityContextHolder.getContext().getAuthentication();
         if (autenticacion == null || !autenticacion.isAuthenticated()
                 || autenticacion.getAuthorities().stream()
@@ -90,14 +103,54 @@ public class ReservacionService {
         } catch (NumberFormatException error) {
             throw new ReservacionException(HttpStatus.UNAUTHORIZED, "Identidad de cliente inválida");
         }
-        if (datos.fechaInicio() == null || !datos.fechaInicio().isAfter(java.time.LocalDateTime.now())) {
-            throw new ReservacionException(HttpStatus.BAD_REQUEST, "El inicio debe estar en el futuro");
+        return clienteId;
+    }
+
+    /** Sigue el orden de entrega: vehículo primero, reservación después. */
+    @Transactional
+    public ReservacionClienteResponse cancelarDesdePortal(Long id) {
+        Long clienteId = clienteActualPortal();
+        var vehiculos = jdbc.query("SELECT vehiculo_id FROM reservaciones WHERE id = ? AND cliente_id = ?",
+                (rs, fila) -> rs.getLong(1), id, clienteId);
+        if (vehiculos.isEmpty()) {
+            throw new ReservacionException(HttpStatus.NOT_FOUND, "Reservación no encontrada");
         }
-        ReservacionRequest peticion = new ReservacionRequest(clienteId, datos.vehiculoId(),
-                datos.fechaInicio(), datos.fechaFin(), datos.observaciones());
-        Reservacion r = prepararAlta(peticion);
-        r.setCreadoPorClienteId(clienteId);
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        Long vehiculoId = vehiculos.get(0);
+        jdbc.query("SELECT id FROM vehiculos WHERE id = ? FOR UPDATE",
+                (rs, fila) -> rs.getLong(1), vehiculoId);
+        var filas = jdbc.query("""
+                SELECT id, vehiculo_id, fecha_inicio, fecha_fin, estado, tarifa_dia, total_estimado
+                FROM reservaciones WHERE id = ? AND cliente_id = ? FOR UPDATE
+                """, (rs, fila) -> new ReservacionClienteResponse(
+                        rs.getLong("id"), rs.getLong("vehiculo_id"),
+                        rs.getTimestamp("fecha_inicio").toLocalDateTime(),
+                        rs.getTimestamp("fecha_fin").toLocalDateTime(), rs.getString("estado"),
+                        rs.getBigDecimal("tarifa_dia"), rs.getBigDecimal("total_estimado")), id, clienteId);
+        if (filas.isEmpty()) {
+            throw new ReservacionException(HttpStatus.NOT_FOUND, "Reservación no encontrada");
+        }
+        var r = filas.get(0);
+        if (!vehiculoId.equals(r.vehiculoId())) {
+            throw new ReservacionException(HttpStatus.CONFLICT,
+                    "La reservación cambió de vehículo; vuelva a intentar");
+        }
+        if (!List.of("PENDIENTE", "CONFIRMADA").contains(r.estado())) {
+            throw new ReservacionException(HttpStatus.CONFLICT,
+                    "Solo se pueden cancelar reservaciones pendientes o confirmadas");
+        }
+        jdbc.update("UPDATE reservaciones SET estado = 'CANCELADA' WHERE id = ? AND cliente_id = ?", id, clienteId);
+        if ("CONFIRMADA".equals(r.estado())) {
+            // Lectura actual: no reutilizar una instantánea anterior a la espera del vehículo.
+            var otras = jdbc.query("SELECT id FROM reservaciones WHERE vehiculo_id = ? AND id <> ? "
+                            + "AND estado IN ('CONFIRMADA', 'EN_CURSO') FOR UPDATE",
+                    (rs, fila) -> rs.getLong(1), vehiculoId, id);
+            if (otras.isEmpty()) {
+                jdbc.update("UPDATE vehiculos SET estado = 'DISPONIBLE' WHERE id = ? AND estado = 'RESERVADO'",
+                        vehiculoId);
+            }
+        }
+        return new ReservacionClienteResponse(r.id(), r.vehiculoId(),
+                r.fechaInicio(), r.fechaFin(), "CANCELADA", r.tarifaDia(), r.totalEstimado());
     }
 
     private Reservacion prepararAlta(ReservacionRequest datos) {
