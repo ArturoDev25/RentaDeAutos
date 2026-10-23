@@ -1,0 +1,266 @@
+/* Flujo de reservación en cuatro pasos (S4-09). Usa las variables de portal.css */
+
+.portal-content > h1.page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--pt-text);
+    letter-spacing: -0.01em;
+    margin: 0.75rem 0 1.25rem;
+}
+
+/* ---------- Barra de pasos ---------- */
+
+.pasos {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.pasos li {
+    flex: 1 1 0;
+    min-width: 9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    background-color: var(--pt-input);
+    border: 1px solid var(--pt-border);
+    border-radius: 12px;
+    color: var(--pt-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.pasos .paso-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background-color: var(--pt-border);
+    color: var(--pt-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.pasos li.activo {
+    background-color: var(--pt-primary-soft);
+    border-color: #dbe4fb;
+    color: var(--pt-navy);
+}
+
+.pasos li.activo .paso-num {
+    background-color: var(--pt-primary);
+    color: #fff;
+}
+
+.pasos li.hecho {
+    color: var(--pt-text);
+}
+
+.pasos li.hecho .paso-num {
+    background-color: var(--pt-success);
+    color: #fff;
+}
+
+/* ---------- Tarjeta de cada paso ---------- */
+
+.paso {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    max-width: 46rem;
+}
+
+.paso .card-title {
+    margin-bottom: 0;
+}
+
+.paso h2:focus {
+    outline: none;
+}
+
+.resumen-vehiculo {
+    display: grid;
+    grid-template-columns: minmax(10rem, 16rem) 1fr;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.resumen-foto {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.resumen-foto .vehiculo-visual {
+    aspect-ratio: 16 / 9;
+}
+
+.resumen-vehiculo h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--pt-text);
+}
+
+.resumen-vehiculo .precio {
+    margin: 0.5rem 0;
+}
+
+.campos-fechas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.paso .pt-field textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background-color: var(--pt-input);
+    color: var(--pt-text);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.paso .pt-field textarea:focus {
+    border-color: var(--pt-primary);
+    background-color: var(--pt-surface);
+}
+
+/* ---------- Resumen y términos ---------- */
+
+.resumen-lista {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--pt-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.resumen-lista > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--pt-border);
+}
+
+.resumen-lista > div:last-child {
+    border-bottom: 0;
+}
+
+.resumen-lista dt {
+    color: var(--pt-muted);
+}
+
+.resumen-lista dd {
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.resumen-lista .total {
+    background-color: var(--pt-primary-soft);
+}
+
+.resumen-lista .total dt,
+.resumen-lista .total dd {
+    color: var(--pt-navy);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.terminos {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.terminos input {
+    flex-shrink: 0;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.2rem;
+    accent-color: var(--pt-primary);
+}
+
+/* ---------- Botones y resultado ---------- */
+
+.acciones-paso {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.acciones-paso .pt-btn:only-child {
+    margin-left: auto;
+}
+
+.resultado {
+    align-items: center;
+    text-align: center;
+}
+
+.resultado > i {
+    font-size: 3rem;
+}
+
+.resultado.ok > i {
+    color: var(--pt-success);
+}
+
+.resultado.error {
+    background-color: var(--pt-danger-bg);
+    border-color: #fecaca;
+}
+
+.resultado.error > i {
+    color: var(--pt-danger);
+}
+
+.resultado h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.resultado p {
+    color: var(--pt-muted);
+}
+
+.resultado .resumen-lista {
+    width: 100%;
+    text-align: left;
+    background-color: var(--pt-surface);
+}
+
+.resultado .acciones-paso {
+    justify-content: center;
+}
+
+@media (max-width: 640px) {
+    .resumen-vehiculo,
+    .campos-fechas {
+        grid-template-columns: 1fr;
+    }
+
+    .pasos li {
+        flex: 1 1 calc(50% - 0.75rem);
+    }
+
+    .acciones-paso .pt-btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        text-align: center;
+    }
+}
