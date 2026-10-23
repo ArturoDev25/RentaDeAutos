@@ -138,6 +138,10 @@ public class ReservacionService {
             throw new ReservacionException(HttpStatus.CONFLICT,
                     "Solo se pueden cancelar reservaciones pendientes o confirmadas");
         }
+        if (!r.fechaInicio().isAfter(java.time.LocalDateTime.now())) {
+            throw new ReservacionException(HttpStatus.CONFLICT,
+                    "No se puede cancelar una reservación cuya fecha de inicio ya pasó");
+        }
         jdbc.update("UPDATE reservaciones SET estado = 'CANCELADA' WHERE id = ? AND cliente_id = ?", id, clienteId);
         if ("CONFIRMADA".equals(r.estado())) {
             // Lectura actual: no reutilizar una instantánea anterior a la espera del vehículo.

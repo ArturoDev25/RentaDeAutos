@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de ayuda - RentaDeAutos</title>
+    <link rel="stylesheet" href="css/portal.css?v=4">
+    <link rel="stylesheet" href="css/portal-cuenta.css?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <aside class="portal-sidebar" id="portalSidebar">
+            <a href="index.html" class="portal-brand"><svg viewBox="0 0 64 48" aria-hidden="true"><path fill="currentColor" d="M15.2 8h24.6a8 8 0 0 1 6.4 3.2L52.5 20H56a6 6 0 0 1 6 6v8a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-8a6 6 0 0 1 6-6h.6l3.3-9.2A4 4 0 0 1 15.2 8z"/><path fill="#fff" opacity=".7" d="M16.5 13H27v7H13.9zM31 13h8.3a3 3 0 0 1 2.4 1.2L46.3 20H31z"/><circle cx="17" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/><circle cx="47" cy="38" r="7.5" fill="currentColor" stroke="#fff" stroke-width="3"/></svg>RentaDeAutos</a>
+            <nav aria-label="Principal">
+                <ul class="portal-menu">
+                    <li><a href="index.html"><i class="fa-solid fa-house"></i>Inicio</a></li>
+                    <li><a href="catalogo.html"><i class="fa-solid fa-car"></i>Catálogo</a></li>
+                    <li><a href="mis-reservaciones.html"><i class="fa-solid fa-calendar-days"></i>Mis reservaciones</a></li>
+                    <li><a href="mis-rentas.html"><i class="fa-solid fa-clock"></i>Mis rentas</a></li>
+                    <li><a href="reportes-cliente.html"><i class="fa-solid fa-chart-column"></i>Reportes</a></li>
+                    <li><a href="ayuda.html" class="active" aria-current="page"><i class="fa-solid fa-circle-question"></i>Ayuda</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div class="portal-main">
+            <header class="portal-topbar">
+                <button type="button" class="btn-menu" id="btnMenu" aria-controls="portalSidebar" aria-expanded="false" aria-label="Abrir menú">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <form class="topbar-search" id="buscadorGlobal" role="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <label for="buscarVehiculos" class="sr-only">Buscar vehículos</label>
+                    <input type="search" id="buscarVehiculos" name="q" placeholder="Buscar vehículos...">
+                </form>
+                <div class="portal-session" id="portalSession"></div>
+            </header>
+
+            <main class="portal-content">
+                <div class="page-title">
+                    <h1>Centro de ayuda</h1>
+                    <p>Encuentra respuestas rápidas a las dudas más frecuentes sobre el portal y tus rentas.</p>
+                </div>
+
+                <section class="card">
+                    <h2 class="card-title"><i class="fa-solid fa-circle-question"></i>Preguntas frecuentes</h2>
+                    <div class="faq-lista">
+                        <details class="faq-item" open>
+                            <summary>
+                                <span>¿Cómo puedo hacer una reservación?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                Ingresa a la sección <strong>Catálogo</strong>, filtra por categoría, precio o fechas de viaje, elige el vehículo de tu preferencia y haz clic en <strong>Ver detalles</strong>. Selecciona tus fechas de inicio y fin y confirma tu reservación con tu cuenta de cliente.
+                            </div>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>
+                                <span>¿Qué documentos necesito para recoger el vehículo?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                Al acudir a la <strong>Sucursal Saltillo</strong> deberás presentar tu identificación oficial vigente, la licencia de conducir vigente registrada en tu perfil y el número de folio de tu reservación confirmada.
+                            </div>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>
+                                <span>¿Puedo cancelar o modificar mi reservación?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                Desde la sección <strong>Mis reservaciones</strong> puedes cancelar sin costo cualquier reservación propia que se encuentre en estado <strong>Pendiente</strong> o <strong>Confirmada</strong> siempre que la fecha y hora de inicio aún no hayan comenzado. Si requieres cambiar fechas o unidad, cancela la reservación actual y registra una nueva o comunícate con sucursal.
+                            </div>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>
+                                <span>¿Qué métodos de pago aceptan?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                El portal calcula un <strong>importe estimado</strong> con base en la tarifa diaria vigente de la categoría del vehículo. El pago y el depósito de garantía se realizan directamente en el mostrador de la sucursal al momento de la entrega y liquidación final al devolver la unidad.
+                            </div>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>
+                                <span>¿Qué incluye el precio de la renta?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                La tarifa por día incluye el uso de la unidad durante los días reservados y la revisión estándar de salida. Al devolver el vehículo en sucursal se verifica el kilometraje, nivel de combustible y estado físico para determinar el total final de la renta.
+                            </div>
+                        </details>
+
+                        <details class="faq-item">
+                            <summary>
+                                <span>¿Qué hago en caso de accidente o falla mecánica?</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </summary>
+                            <div class="faq-respuesta">
+                                Mantén la calma, asegúrate de estar en un lugar seguro y comunícate de inmediato con nuestra línea de atención en Sucursal Saltillo al <strong>(844) 410-2030</strong> para recibir asistencia vial e instrucciones sobre el seguro de la unidad.
+                            </div>
+                        </details>
+                    </div>
+                </section>
+
+                <section class="card soporte-box">
+                    <i class="fa-solid fa-headset icono-principal" aria-hidden="true"></i>
+                    <h2>¿Necesitas más ayuda?</h2>
+                    <p>Nuestro equipo de atención en Sucursal Saltillo está listo para orientarte.</p>
+                    <button type="button" class="pt-btn pt-btn-primary" id="btnContactarSoporte">
+                        <i class="fa-solid fa-envelope"></i>Contactar soporte
+                    </button>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div class="pt-modal-backdrop" id="modalSoporte" hidden role="dialog" aria-modal="true" aria-labelledby="modalSoporteTitulo">
+        <div class="pt-modal">
+            <div class="pt-modal-header">
+                <h3 id="modalSoporteTitulo">Contacto de soporte</h3>
+                <button type="button" class="pt-modal-close" id="btnCerrarSoporte" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="pt-modal-body">
+                <p>Comunícate con nuestro equipo de atención al cliente en cualquiera de nuestros canales oficiales:</p>
+                <div class="pt-modal-dl">
+                    <div><small>Sucursal</small><strong>Sucursal Saltillo Centro</strong></div>
+                    <div><small>Teléfono directo</small><strong>(844) 410-2030</strong></div>
+                    <div><small>Correo electrónico</small><strong>soporte@rentadeautos.local</strong></div>
+                    <div><small>Horario de atención</small><strong>Lun a Dom · 8:00 a 20:00 h</strong></div>
+                </div>
+            </div>
+            <div class="pt-modal-footer">
+                <a href="mailto:soporte@rentadeautos.local?subject=Soporte%20Portal%20RentaDeAutos" class="pt-btn pt-btn-outline pt-btn-sm">
+                    <i class="fa-regular fa-paper-plane"></i>Enviar correo
+                </a>
+                <button type="button" class="pt-btn pt-btn-primary pt-btn-sm" id="btnAceptarSoporte">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/client.js"></script>
+    <script src="js/portal.js?v=4"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('modalSoporte');
+            const btnAbrir = document.getElementById('btnContactarSoporte');
+            const btnCerrar = document.getElementById('btnCerrarSoporte');
+            const btnAceptar = document.getElementById('btnAceptarSoporte');
+            const cerrar = () => { modal.hidden = true; };
+            btnAbrir.addEventListener('click', () => { modal.hidden = false; });
+            btnCerrar.addEventListener('click', cerrar);
+            btnAceptar.addEventListener('click', cerrar);
+            modal.addEventListener('click', (e) => { if (e.target === modal) cerrar(); });
+        });
+    </script>
+</body>
+</html>
