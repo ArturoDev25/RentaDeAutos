@@ -23,17 +23,37 @@
         <form id="registerForm">
             <div class="form-group">
                 <label for="nombre">Nombre Completo</label>
-                <input type="text" id="nombre" placeholder="Tu nombre completo" required>
+                <input type="text" id="nombre" placeholder="Tu nombre" maxlength="100" autocomplete="given-name" required>
+            </div>
+            <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <input type="text" id="apellidos" placeholder="Tus apellidos" maxlength="150" autocomplete="family-name" required>
             </div>
             <div class="form-group">
                 <label for="reg-email">Correo Electrónico</label>
-                <input type="email" id="reg-email" placeholder="ejemplo@correo.com" required>
+                <input type="email" id="reg-email" placeholder="ejemplo@correo.com" maxlength="150" autocomplete="email" required>
             </div>
             <div class="form-group">
                 <label for="reg-password">Contraseña</label>
-                <input type="password" id="reg-password" placeholder="••••••••" required>
+                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" minlength="6" maxlength="72" autocomplete="new-password" required>
             </div>
-            <div id="authError" class="error-msg" style="display: none; margin-bottom: 1rem; color: #ff6b6b; font-size: 0.85rem; text-align: center;"></div>
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" placeholder="8441234567" maxlength="20" autocomplete="tel" required>
+            </div>
+            <div class="form-group">
+                <label for="numeroLicencia">Número de licencia</label>
+                <input type="text" id="numeroLicencia" placeholder="LIC-PORTAL-01" maxlength="50" required>
+            </div>
+            <div class="form-group">
+                <label for="licenciaVencimiento">Vencimiento de licencia</label>
+                <input type="date" id="licenciaVencimiento" required>
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección (opcional)</label>
+                <input type="text" id="direccion" placeholder="Tu domicilio" maxlength="255" autocomplete="street-address">
+            </div>
+            <div id="authError" class="error-msg" role="alert" aria-live="polite" style="display: none; margin-bottom: 1rem; color: #ff6b6b; font-size: 0.85rem; text-align: center;"></div>
             <button type="submit" class="login-btn">REGISTRARSE</button>
         </form>
 
