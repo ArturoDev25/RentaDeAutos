@@ -26,6 +26,8 @@ class EsquemaReservacionesV6Test {
                     CREATE TABLE reservaciones (id BIGINT PRIMARY KEY,
                         cliente_id BIGINT UNSIGNED NOT NULL,
                         creado_por_id BIGINT UNSIGNED NOT NULL,
+                        CONSTRAINT fk_reservaciones_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+                            ON UPDATE CASCADE ON DELETE RESTRICT,
                         CONSTRAINT fk_reservaciones_usuario FOREIGN KEY (creado_por_id) REFERENCES usuarios_app(id))
                     """);
             sql.execute("INSERT INTO reservaciones VALUES (1, 1, 10)");
@@ -65,5 +67,22 @@ class EsquemaReservacionesV6Test {
 
     @Test void rechazaClienteCreadorInexistente() {
         assertThrows(SQLException.class, () -> insertar("NULL", "999", "999"));
+    }
+
+    // MySQL 8 rechaza un CHECK sobre columnas con llaves foráneas en cascada (error 3823).
+    // H2 no lo valida, por eso se comprueba aquí que ninguna llave del cliente use CASCADE.
+    @Test void llavesDelClienteNoUsanAccionesEnCascada() throws Exception {
+        try (Connection c = ds.getConnection(); var sql = c.createStatement();
+             var r = sql.executeQuery("SELECT CONSTRAINT_NAME, UPDATE_RULE, DELETE_RULE "
+                     + "FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS "
+                     + "WHERE CONSTRAINT_NAME IN ('FK_RESERVACIONES_CLIENTE', 'FK_RESERVACIONES_CREADOR_CLIENTE')")) {
+            int encontradas = 0;
+            while (r.next()) {
+                encontradas++;
+                assertEquals("RESTRICT", r.getString("UPDATE_RULE"), r.getString("CONSTRAINT_NAME"));
+                assertEquals("RESTRICT", r.getString("DELETE_RULE"), r.getString("CONSTRAINT_NAME"));
+            }
+            assertEquals(2, encontradas);
+        }
     }
 }
