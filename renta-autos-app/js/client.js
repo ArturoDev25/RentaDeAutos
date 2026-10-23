@@ -10,18 +10,15 @@ const API_BASE_URL = window.API_BASE_URL ||
         : `${window.location.origin}/api`);
 
 async function fetchAPI(endpoint, options = {}) {
-
-    // Obtener la sesión del usuario
     const sesion = localStorage.getItem('usuarioSesion');
-
-    let token = null;
+    let usuario = null;
 
     if (sesion) {
         try {
-            const usuario = JSON.parse(sesion);
-            token = usuario.token;
+            usuario = JSON.parse(sesion);
         } catch (error) {
             console.error('Error al leer la sesión:', error);
+            localStorage.removeItem('usuarioSesion');
         }
     }
 
@@ -30,9 +27,8 @@ async function fetchAPI(endpoint, options = {}) {
         ...options.headers
     };
 
-    // Agregar el token JWT
-    if (token) {
-        defaultHeaders.Authorization = `Bearer ${token}`;
+    if (usuario?.token) {
+        defaultHeaders.Authorization = `${usuario.tokenType || 'Bearer'} ${usuario.token}`;
     }
 
     const config = {
@@ -41,39 +37,26 @@ async function fetchAPI(endpoint, options = {}) {
     };
 
     let response;
-
     try {
         response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     } catch (error) {
-        console.error(
-            `No se pudo conectar con el backend en ${endpoint}:`,
-            error
-        );
-
-        throw new Error(
-            'No se pudo conectar con el servidor. Verifica tu conexión.'
-        );
+        console.error(`No se pudo conectar con el backend en ${endpoint}:`, error);
+        throw new Error('No se pudo conectar con el servidor. Verifica tu conexión.');
     }
 
-    if (response.status === 204) {
-        return null;
-    }
+    if (response.status === 204) return null;
 
     let body = null;
-
     try {
         body = await response.json();
     } catch (_) {
-        // Respuesta sin cuerpo JSON válido
+        // Algunas respuestas no contienen JSON.
     }
 
     if (!response.ok) {
-        const mensaje =
-            body && body.message
-                ? body.message
-                : `Error HTTP: ${response.status}`;
-
-        const error = new Error(mensaje);
+        const error = new Error(
+            body?.message || `Error HTTP: ${response.status}`
+        );
         error.status = response.status;
         throw error;
     }
