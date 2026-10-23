@@ -113,5 +113,14 @@ Validación en el equipo del desarrollador — 22 de octubre de 2026:
 809 pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.
 BUILD SUCCESS. Tiempo de ejecución: 1 minuto y 29 segundos.
 
-Pendiente: verificar la ejecución remota de CI después de publicar
-esta rama y confirmar que se genera el artefacto de reportes.
+S4-06 quedó integrada mediante el PR #140. Se incorporaron los cambios
+de origin/main a esta rama sin conflictos.
+
+Validación posterior a la integración — 22 de octubre de 2026:
+809 pruebas, 0 fallos, 0 errores y 0 omitidas.
+BUILD SUCCESS. Duración: 1 minuto y 17 segundos.
+
+CI aprobó el commit 8fe79f4 y generó reportes-pruebas-backend:
+https://github.com/ArturoDev25/RentaDeAutos/actions/runs/39797165116
+
+El siguiente push ejecutará nuevamente CI sobre la rama actualizada.
