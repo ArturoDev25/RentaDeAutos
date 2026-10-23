@@ -114,4 +114,31 @@ class ReservacionClienteRepositoryTest {
                 .map(r -> r.reservacionId()).toList());
     }
 
+    @Test void listarEnriqueceDatosDelVehiculoYCalculaPuedeCancelar() {
+        vehiculoHistorial();
+        var futuro = java.time.LocalDateTime.now().plusDays(5).withNano(0);
+        var pasado = java.time.LocalDateTime.now().minusDays(2).withNano(0);
+        jdbc.update("""
+                INSERT INTO reservaciones (id, cliente_id, vehiculo_id, creado_por_id,
+                fecha_inicio, fecha_fin, estado, tarifa_dia, total_estimado)
+                VALUES (10, 7, 1, 1, ?, ?, 'PENDIENTE', 850, 1700),
+                       (11, 7, 1, 1, ?, ?, 'CONFIRMADA', 850, 1700),
+                       (12, 7, 1, 1, ?, ?, 'CANCELADA', 850, 1700)
+                """, futuro, futuro.plusDays(2), pasado, pasado.plusDays(1), futuro, futuro.plusDays(1));
+        var lista = reservaciones.listar(7L);
+        assertEquals(3, lista.size());
+        var rFuturo = reservaciones.obtener(7L, 10L).orElseThrow();
+        assertEquals("Nissan", rFuturo.marca());
+        assertEquals("Kicks", rFuturo.modelo());
+        assertEquals(2024, rFuturo.anio());
+        assertEquals("SUV", rFuturo.categoria());
+        assertTrue(rFuturo.puedeCancelar());
+
+        var rPasado = reservaciones.obtener(7L, 11L).orElseThrow();
+        assertFalse(rPasado.puedeCancelar());
+
+        var rCancelada = reservaciones.obtener(7L, 12L).orElseThrow();
+        assertFalse(rCancelada.puedeCancelar());
+    }
+
 }

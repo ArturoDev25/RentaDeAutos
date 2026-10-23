@@ -63,19 +63,26 @@ Un traslape se rechaza con 409, sin guardar una segunda reservación.
     "fechaFin": "2027-01-13T10:00:00",
     "estado": "PENDIENTE",
     "tarifaDia": 850.00,
-    "totalEstimado": 2550.00
+    "totalEstimado": 2550.00,
+    "marca": "Nissan",
+    "modelo": "Kicks",
+    "anio": 2024,
+    "categoria": "SUV",
+    "puedeCancelar": true
   }
 }
 ```
 
 No se exponen identificadores del personal ni observaciones internas. Las fechas
 usan LocalDateTime sin zona horaria, según la convención actual del backend.
+En las consultas (`GET /api/v1/cliente/reservaciones` y `GET /api/v1/cliente/reservaciones/{id}`),
+se incluyen también `marca`, `modelo`, `anio`, `categoria` y `puedeCancelar` (S4-10).
 
 ## Cancelación
 
-Solo el dueño puede cancelar estados `PENDIENTE` o `CONFIRMADA`, según el flujo
+Solo el dueño puede cancelar estados `PENDIENTE` o `CONFIRMADA` cuya `fechaInicio` sea futura, según el flujo
 existente documentado. No se añade plazo de anticipación ni penalización nueva.
-`EN_CURSO`, `FINALIZADA` y `CANCELADA` se rechazan con 409; repetir la cancelación
+`EN_CURSO`, `FINALIZADA`, `CANCELADA` o reservaciones cuya fecha de inicio ya pasó se rechazan con 409; repetir la cancelación
 no es una operación exitosa idempotente en este contrato.
 
 La cancelación conserva el registro y los importes. Bloquea primero el vehículo

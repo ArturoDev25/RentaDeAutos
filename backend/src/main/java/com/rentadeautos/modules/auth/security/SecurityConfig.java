@@ -61,14 +61,14 @@ public class SecurityConfig {
                 // S4-02: alta pública de clientes; no permite crear personal.
                 .requestMatchers(HttpMethod.POST, "/api/auth/cliente/registro").permitAll()
 
-                // S4-06: operaciones del portal, aisladas por cliente autenticado.
+                // S4-06 / S4-10: operaciones del portal, aisladas por cliente autenticado.
                 .requestMatchers(HttpMethod.PATCH, "/api/v1/cliente/reservaciones/*/cancelar")
                     .hasRole("CLIENTE")
                 .requestMatchers(HttpMethod.POST, "/api/v1/cliente/reservaciones").hasRole("CLIENTE")
                 .requestMatchers(HttpMethod.GET, "/api/v1/cliente/reservaciones",
                         "/api/v1/cliente/reservaciones/*").hasRole("CLIENTE")
-                .requestMatchers("/api/v1/cliente/reservaciones",
-                        "/api/v1/cliente/reservaciones/**").denyAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/cliente/reportes/resumen").hasRole("CLIENTE")
+                .requestMatchers("/api/v1/cliente", "/api/v1/cliente/**").denyAll()
 
                 // Administración de usuarios.
                 .requestMatchers("/api/admin/**")

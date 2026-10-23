@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.reservation.exception;
 
 import com.rentadeautos.common.dto.ApiResponse;
+import com.rentadeautos.modules.reservation.controller.ReporteClienteController;
 import com.rentadeautos.modules.reservation.controller.ReservacionController;
 import com.rentadeautos.modules.reservation.controller.ReservacionClienteController;
 import org.springframework.core.Ordered;
@@ -11,7 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {ReservacionController.class, ReservacionClienteController.class})
+@RestControllerAdvice(assignableTypes = {
+        ReservacionController.class,
+        ReservacionClienteController.class,
+        ReporteClienteController.class
+})
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ReservacionExceptionHandler {
     @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)

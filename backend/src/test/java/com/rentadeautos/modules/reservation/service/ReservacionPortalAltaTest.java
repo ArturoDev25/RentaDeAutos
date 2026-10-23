@@ -180,4 +180,13 @@ class ReservacionPortalAltaTest {
         assertEquals("MANTENIMIENTO", jdbc.queryForObject("SELECT estado FROM vehiculos WHERE id = 1", String.class));
     }
 
+    @Test void noCancelaReservacionCuyaFechaDeInicioYaPaso() {
+        var r = servicio.crearDesdePortal(datos());
+        jdbc.update("UPDATE reservaciones SET fecha_inicio = ?, fecha_fin = ? WHERE id = ?",
+                LocalDateTime.now().minusHours(2), LocalDateTime.now().plusDays(1), r.id());
+        var error = assertThrows(ReservacionException.class, () -> servicio.cancelarDesdePortal(r.id()));
+        assertEquals(409, error.getStatus().value());
+        assertEquals("PENDIENTE", jdbc.queryForObject("SELECT estado FROM reservaciones WHERE id = ?", String.class, r.id()));
+    }
+
 }
