@@ -28,7 +28,8 @@ class EsquemaReservacionesV6Test {
                         creado_por_id BIGINT UNSIGNED NOT NULL,
                         CONSTRAINT fk_reservaciones_cliente FOREIGN KEY (cliente_id) REFERENCES clientes(id)
                             ON UPDATE CASCADE ON DELETE RESTRICT,
-                        CONSTRAINT fk_reservaciones_usuario FOREIGN KEY (creado_por_id) REFERENCES usuarios_app(id))
+                        CONSTRAINT fk_reservaciones_usuario FOREIGN KEY (creado_por_id) REFERENCES usuarios_app(id)
+                            ON UPDATE CASCADE ON DELETE RESTRICT)
                     """);
             sql.execute("INSERT INTO reservaciones VALUES (1, 1, 10)");
         }
@@ -75,14 +76,14 @@ class EsquemaReservacionesV6Test {
         try (Connection c = ds.getConnection(); var sql = c.createStatement();
              var r = sql.executeQuery("SELECT CONSTRAINT_NAME, UPDATE_RULE, DELETE_RULE "
                      + "FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS "
-                     + "WHERE CONSTRAINT_NAME IN ('FK_RESERVACIONES_CLIENTE', 'FK_RESERVACIONES_CREADOR_CLIENTE')")) {
+                     + "WHERE CONSTRAINT_NAME IN ('FK_RESERVACIONES_CLIENTE', 'FK_RESERVACIONES_USUARIO', 'FK_RESERVACIONES_CREADOR_CLIENTE')")) {
             int encontradas = 0;
             while (r.next()) {
                 encontradas++;
                 assertEquals("RESTRICT", r.getString("UPDATE_RULE"), r.getString("CONSTRAINT_NAME"));
                 assertEquals("RESTRICT", r.getString("DELETE_RULE"), r.getString("CONSTRAINT_NAME"));
             }
-            assertEquals(2, encontradas);
+            assertEquals(3, encontradas);
         }
     }
 }
