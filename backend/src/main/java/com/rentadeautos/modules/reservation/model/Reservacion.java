@@ -19,8 +19,10 @@ public class Reservacion {
     private Long clienteId;
     @Column(name = "vehiculo_id", nullable = false)
     private Long vehiculoId;
-    @Column(name = "creado_por_id", nullable = false)
+    @Column(name = "creado_por_id")
     private Long creadoPorId;
+    @Column(name = "creado_por_cliente_id")
+    private Long creadoPorClienteId;
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDateTime fechaInicio;
     @Column(name = "fecha_fin", nullable = false)
@@ -39,6 +41,8 @@ public class Reservacion {
     public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
     public Long getVehiculoId() { return vehiculoId; }
     public void setVehiculoId(Long vehiculoId) { this.vehiculoId = vehiculoId; }
+    public Long getCreadoPorClienteId() { return creadoPorClienteId; }
+    public void setCreadoPorClienteId(Long id) { this.creadoPorClienteId = id; }
     public Long getCreadoPorId() { return creadoPorId; }
     public void setCreadoPorId(Long creadoPorId) { this.creadoPorId = creadoPorId; }
     public LocalDateTime getFechaInicio() { return fechaInicio; }

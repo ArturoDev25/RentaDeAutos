@@ -82,3 +82,11 @@ opciones, consulta [`backend/src/test/README.md`](backend/src/test/README.md).
 Login con JWT y BCrypt. Requiere las variables `JWT_SECRET` y `JWT_EXPIRATION_MINUTES`.
 
 📖 **Guía completa:** [`docs/autenticacion.md`](docs/autenticacion.md)
+
+## Reservaciones del cliente — S4-06
+
+El cliente autenticado puede crear y consultar sus reservaciones, cancelar las
+permitidas y consultar su historial de rentas de solo lectura.
+
+Contrato, permisos, migración V6 y guía de comprobación:
+[docs/reservaciones-cliente-api.md](docs/reservaciones-cliente-api.md).
