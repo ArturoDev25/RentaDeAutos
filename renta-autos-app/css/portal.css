@@ -852,3 +852,549 @@ body.portal-body {
         margin-left: 0;
     }
 }
+
+
+/* =====================================================
+   LOGIN - REDISEÑO PORTAL RENTA DE AUTOS
+   ===================================================== */
+
+/* ---------- Estructura general ---------- */
+
+body.login-page {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    background: #eaf0f8;
+    color: #10264a;
+    overflow-x: hidden;
+}
+
+.login-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* ---------- Panel izquierdo ---------- */
+
+.login-visual {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(2rem, 5.5vw, 5.5rem);
+    background: #071d3c;
+}
+
+.login-car-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+}
+
+/* Capa azul sobre la fotografía */
+
+.login-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(4, 23, 50, 0.94) 0%,
+            rgba(4, 23, 50, 0.78) 48%,
+            rgba(4, 23, 50, 0.20) 100%
+        );
+    z-index: 1;
+}
+
+.login-visual-overlay {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 590px;
+    color: #ffffff;
+    transform: translateY(-200px);
+}
+
+/* ---------- Logotipo ---------- */
+
+.login-visual-overlay::before {
+    content: "";
+    display: block;
+    width: 260px;
+    height: 75px;
+    margin-bottom: 3.5rem;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+}
+
+/* ---------- Texto principal ---------- */
+
+.login-visual-overlay h1 {
+    font-size: clamp(2.2rem, 4vw, 3.7rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -1.5px;
+    max-width: 650px;
+    margin-bottom: 1.2rem;
+}
+
+.login-visual-overlay p {
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    line-height: 1.5;
+    color: #d5e5fa;
+    max-width: 480px;
+    margin-bottom: 2.3rem;
+}
+
+/* ---------- Beneficios ---------- */
+
+.login-benefits {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.login-benefit {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.login-benefit i {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(0, 105, 220, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: #ffffff;
+}
+
+/* ---------- Panel derecho ---------- */
+
+.login-form-panel {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem;
+    background: linear-gradient(
+        135deg,
+        #edf3fa 0%,
+        #f8fafc 100%
+    );
+}
+
+/* ---------- Tarjeta del formulario ---------- */
+
+.login-card {
+    width: 100%;
+    max-width: 590px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 2.5rem 3.5rem;
+    box-shadow: 0 15px 45px rgba(15, 40, 75, 0.10);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* ---------- Botón volver ---------- */
+
+.login-card .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #0878f9;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 1.8rem;
+}
+
+.login-card .back-btn:hover {
+    color: #064ba7;
+}
+
+.login-card .back-btn i {
+    font-size: 1.3rem;
+}
+
+/* ---------- Logo del formulario ---------- */
+
+.login-card .logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.login-card .logo img {
+    width: 230px;
+    max-width: 80%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ---------- Títulos ---------- */
+
+.login-card h2 {
+    text-align: center;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 800;
+    color: #10264a;
+    margin-bottom: 0.5rem;
+}
+
+.login-card .subtitle {
+    text-align: center;
+    color: #8493a9;
+    font-size: 1.05rem;
+    margin-bottom: 2.3rem;
+}
+
+/* ---------- Formulario ---------- */
+
+.login-card .form-group {
+    margin-bottom: 1.7rem;
+}
+
+.login-card .form-group label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 650;
+    color: #10264a;
+    margin-bottom: 0.65rem;
+}
+
+.login-card .form-group input {
+    width: 100%;
+    height: 60px;
+    padding: 0 1.2rem;
+    border: 1.5px solid #d5e0ef;
+    border-radius: 13px;
+    background: #f7f9fc;
+    color: #10264a;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-card .form-group input::placeholder {
+    color: #94a3b8;
+}
+
+.login-card .form-group input:focus {
+    border-color: #2479d8;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+/* ---------- Mensajes de error ---------- */
+
+.login-card .error-msg {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+/* ---------- Botón ingresar ---------- */
+
+.login-card .login-btn {
+    width: 100%;
+    min-height: 68px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(
+        110deg,
+        #164c87 0%,
+        #062448 100%
+    );
+    color: #ffffff;
+    font-size: 1.2rem;
+    font-weight: 750;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.login-card .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(10, 54, 105, 0.25);
+}
+
+.login-card .login-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login-card .login-btn.btn-loading {
+    cursor: wait;
+}
+
+/* ---------- Pie de formulario ---------- */
+
+.login-card .login-footer {
+    text-align: center;
+    margin-top: 2.5rem;
+}
+
+.login-card .login-footer p {
+    color: #10264a;
+    font-size: 0.98rem;
+}
+
+.login-card .login-footer a {
+    color: #0878f9;
+    font-weight: 700;
+    text-decoration: underline;
+    margin-left: 0.4rem;
+}
+
+.login-card .login-footer a:hover {
+    color: #064ba7;
+}
+
+/* ---------- Accesibilidad ---------- */
+
+.login-card a:focus-visible,
+.login-card button:focus-visible,
+.login-card input:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.4);
+    outline-offset: 3px;
+}
+
+/* ---------- Tablets ---------- */
+
+@media (max-width: 1000px) {
+    .login-layout {
+        grid-template-columns: 0.9fr 1.1fr;
+    }
+
+    .login-visual {
+        padding: 2.5rem;
+    }
+
+    .login-card {
+        padding: 2rem;
+    }
+
+    .login-visual-overlay::before {
+        width: 210px;
+        margin-bottom: 2rem;
+    }
+
+    .login-benefits {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ---------- Celulares ---------- */
+
+@media (max-width: 700px) {
+    body.login-page {
+        overflow-y: auto;
+    }
+
+    .login-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .login-visual {
+        min-height: 340px;
+        padding: 2rem 1.5rem;
+    }
+
+    .login-visual-overlay {
+    transform: translateY(-15px);
+    }
+
+    .login-visual-overlay::before {
+        width: 180px;
+        height: 55px;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-visual-overlay h1 {
+        font-size: 2rem;
+    }
+
+    .login-visual-overlay p {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .login-benefits {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .login-benefit {
+        font-size: 0.82rem;
+        gap: 0.5rem;
+    }
+
+    .login-benefit i {
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+
+    .login-form-panel {
+        min-height: auto;
+        padding: 1.5rem 1rem;
+    }
+
+    .login-card {
+        max-width: 500px;
+        padding: 1.7rem 1.3rem;
+        border-radius: 16px;
+    }
+
+    .login-card .logo img {
+        width: 180px;
+    }
+
+    .login-card h2 {
+        font-size: 1.8rem;
+    }
+
+    .login-card .form-group input {
+        height: 54px;
+    }
+
+    .login-card .login-btn {
+        min-height: 58px;
+    }
+}
+
+/* ---------- Celulares pequeños ---------- */
+
+@media (max-width: 380px) {
+    .login-visual {
+        min-height: 310px;
+        padding: 1.5rem 1rem;
+    }
+
+    .login-visual-overlay h1 {
+        font-size: 1.7rem;
+    }
+
+    .login-benefit {
+        font-size: 0.75rem;
+    }
+
+    .login-card {
+        padding: 1.4rem 1rem;
+    }
+}
+
+
+.login-visual .login-benefits {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0 !important;
+    width: 100%;
+    max-width: 550px;
+    margin-top: 2rem;
+}
+
+.login-visual .login-benefit {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.35;
+}
+
+.login-visual .login-benefit:first-child {
+    border-right: 1px solid rgba(255,255,255,.4);
+    padding-right: 15px;
+}
+
+.login-visual .login-benefit:last-child {
+    padding-left: 25px;
+}
+
+.login-visual .login-benefit i {
+    width: 68px;
+    height: 68px;
+    min-width: 68px;
+    border-radius: 50%;
+    background: #0862b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+    color: white;
+}
+
+/* ---------- Mostrar / ocultar contraseña ---------- */
+
+.login-card .password-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+}
+
+.login-card .password-wrapper input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 50px !important;
+}
+
+.login-card .password-wrapper .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+    color: #64748b;
+
+    cursor: pointer;
+    font-size: 1.1rem;
+    z-index: 5;
+}
+
+.login-card .password-wrapper .toggle-password:hover {
+    color: #0878f9;
+}

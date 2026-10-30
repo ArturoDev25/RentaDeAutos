@@ -80,6 +80,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    
+    // Mostrar y ocultar contraseña en el login
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+
+    if (passwordInput && togglePassword) {
+        togglePassword.addEventListener('click', () => {
+            const mostrar = passwordInput.type === 'password';
+
+            passwordInput.type = mostrar ? 'text' : 'password';
+
+            togglePassword.innerHTML = mostrar
+                ? '<i class="fa-solid fa-eye-slash"></i>'
+                : '<i class="fa-solid fa-eye"></i>';
+
+            togglePassword.setAttribute(
+                'aria-label',
+                mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'
+            );
+        });
+    }
+
 
     const registerForm = document.getElementById('registerForm');
     if (registerForm) {
