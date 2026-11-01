@@ -1,69 +1,404 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Renta de Autos</title>
+
+    <title>Crear cuenta | RentaDeAutos</title>
+
+    <!-- Estilos generales -->
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Estilos exclusivos del registro -->
+    <link rel="stylesheet" href="css/registro.css">
+
+    <!-- Iconos -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="login-page">
 
-    <div class="login-card">
-        <a href="index.html" class="back-btn">
-            <i class="fa-solid fa-arrow-left"></i> Volver
-        </a>
-        <div class="logo">
-            <img src="assets/Imagenes/LogoCar.png" alt="Logo Renta de Autos">
-        </div>
-        
-        <h2>Crear Cuenta</h2>
-        <p class="subtitle">Ingresa tus datos para registrarte</p>
+<body class="registro-page">
 
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="nombre">Nombre Completo</label>
-                <input type="text" id="nombre" placeholder="Tu nombre" maxlength="100" autocomplete="given-name" required>
-            </div>
-            <div class="form-group">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" id="apellidos" placeholder="Tus apellidos" maxlength="150" autocomplete="family-name" required>
-            </div>
-            <div class="form-group">
-                <label for="reg-email">Correo Electrónico</label>
-                <input type="email" id="reg-email" placeholder="ejemplo@correo.com" maxlength="150" autocomplete="email" required>
-            </div>
-            <div class="form-group">
-                <label for="reg-password">Contraseña</label>
-                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" minlength="6" maxlength="72" autocomplete="new-password" required>
-            </div>
-            <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" placeholder="8441234567" maxlength="20" autocomplete="tel" required>
-            </div>
-            <div class="form-group">
-                <label for="numeroLicencia">Número de licencia</label>
-                <input type="text" id="numeroLicencia" placeholder="LIC-PORTAL-01" maxlength="50" required>
-            </div>
-            <div class="form-group">
-                <label for="licenciaVencimiento">Vencimiento de licencia</label>
-                <input type="date" id="licenciaVencimiento" required>
-            </div>
-            <div class="form-group">
-                <label for="direccion">Dirección (opcional)</label>
-                <input type="text" id="direccion" placeholder="Tu domicilio" maxlength="255" autocomplete="street-address">
-            </div>
-            <div id="authError" class="error-msg" role="alert" aria-live="polite" style="display: none; margin-bottom: 1rem; color: #ff6b6b; font-size: 0.85rem; text-align: center;"></div>
-            <button type="submit" class="login-btn">REGISTRARSE</button>
-        </form>
+    <main class="registro-layout">
 
-        <div class="login-footer">
-            <p>¿Ya tienes una cuenta? <a href="login.html">Inicia sesión aquí</a></p>
-        </div>
-    </div>
+        <!-- =================================
+             PANEL IZQUIERDO
+        ================================== -->
 
-    <!-- SCRIPT DE AUTENTICACIÓN / REGISTRO -->
+        <section class="registro-visual">
+
+            <div class="registro-visual-content">
+
+                <!-- PRESENTACIÓN -->
+                <div class="registro-presentacion">
+
+                    <h1>
+                        Únete y comienza
+                        <span>tu próxima aventura</span>
+                    </h1>
+
+                    <p>
+                        Regístrate y accede a una gran variedad
+                        de vehículos para cada ocasión.
+                    </p>
+
+                </div>
+
+                <!-- BENEFICIOS -->
+                <div class="registro-beneficios">
+
+                    <div class="registro-beneficio">
+
+                        <div class="beneficio-icono">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+
+                        <span>
+                            Amplia selección<br>
+                            de vehículos
+                        </span>
+
+                    </div>
+
+                    <div class="beneficio-separador"></div>
+
+                    <div class="registro-beneficio">
+
+                        <div class="beneficio-icono">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+
+                        <span>
+                            Proceso seguro<br>
+                            y confiable
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================
+             PANEL DERECHO
+        ================================== -->
+
+        <section class="registro-formulario-panel">
+
+            <div class="registro-card">
+
+                <!-- VOLVER -->
+                <a href="index.html" class="registro-volver">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Volver
+                </a>
+
+
+                <!-- LOGOTIPO DEL FORMULARIO -->
+                <div class="registro-card-logo">
+                    <img
+                        src="assets/Imagenes/LogoCar2.png"
+                        alt="Renta de Autos">
+                </div>
+
+
+                <!-- ENCABEZADO -->
+                <div class="registro-encabezado">
+
+                    <h2>Crear Cuenta</h2>
+
+                    <p>
+                        Ingresa tus datos para registrarte
+                    </p>
+
+                </div>
+
+
+                <!-- FORMULARIO -->
+                <form id="registerForm" novalidate>
+
+                    <div class="registro-grid">
+
+
+                        <!-- NOMBRE -->
+                        <div class="registro-campo">
+
+                            <label for="nombre">
+                                <i class="fa-regular fa-user"></i>
+                                Nombre Completo
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="nombre"
+                                placeholder="Tu nombre"
+                                maxlength="100"
+                                autocomplete="given-name"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="nombre"></small>
+
+                        </div>
+
+
+                        <!-- APELLIDOS -->
+                        <div class="registro-campo">
+
+                            <label for="apellidos">
+                                <i class="fa-solid fa-users"></i>
+                                Apellidos
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="apellidos"
+                                placeholder="Tus apellidos"
+                                maxlength="150"
+                                autocomplete="family-name"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="apellidos"></small>
+
+                        </div>
+
+
+                        <!-- CORREO -->
+                        <div class="registro-campo">
+
+                            <label for="reg-email">
+                                <i class="fa-regular fa-envelope"></i>
+                                Correo Electrónico
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="email"
+                                id="reg-email"
+                                placeholder="ejemplo@correo.com"
+                                maxlength="150"
+                                autocomplete="email"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="reg-email"></small>
+
+                        </div>
+
+
+                        <!-- CONTRASEÑA -->
+                        <div class="registro-campo">
+
+                            <label for="reg-password">
+                                <i class="fa-solid fa-lock"></i>
+                                Contraseña
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <div class="registro-password">
+
+                                <input
+                                    type="password"
+                                    id="reg-password"
+                                    placeholder="Mínimo 6 caracteres"
+                                    minlength="6"
+                                    maxlength="72"
+                                    autocomplete="new-password"
+                                    required>
+
+                                <button
+                                    type="button"
+                                    id="toggleRegisterPassword"
+                                    class="registro-toggle-password"
+                                    aria-label="Mostrar contraseña">
+
+                                    <i class="fa-regular fa-eye-slash"></i>
+
+                                </button>
+
+                            </div>
+
+                            <small class="campo-error"
+                                   data-error-for="reg-password"></small>
+
+                        </div>
+
+
+                        <!-- TELEFONO -->
+                        <div class="registro-campo">
+
+                            <label for="telefono">
+                                <i class="fa-solid fa-phone"></i>
+                                Teléfono
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="telefono"
+                                placeholder="8441234567"
+                                maxlength="20"
+                                autocomplete="tel"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="telefono"></small>
+
+                        </div>
+
+
+                        <!-- LICENCIA -->
+                        <div class="registro-campo">
+
+                            <label for="numeroLicencia">
+                                <i class="fa-regular fa-id-card"></i>
+                                Número de licencia
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="numeroLicencia"
+                                placeholder="LIC-PORTAL-01"
+                                maxlength="50"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="numeroLicencia"></small>
+
+                        </div>
+
+
+                        <!-- VENCIMIENTO -->
+                        <div class="registro-campo">
+
+                            <label for="licenciaVencimiento">
+                                <i class="fa-regular fa-calendar"></i>
+                                Vencimiento de licencia
+                                <span class="obligatorio">*</span>
+                            </label>
+
+                            <input
+                                type="date"
+                                id="licenciaVencimiento"
+                                required>
+
+                            <small class="campo-error"
+                                   data-error-for="licenciaVencimiento"></small>
+
+                        </div>
+
+
+                        <!-- DIRECCION -->
+                        <div class="registro-campo">
+
+                            <label for="direccion">
+                                <i class="fa-solid fa-house"></i>
+                                Dirección
+                                <span class="campo-opcional">(opcional)</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                id="direccion"
+                                placeholder="Tu domicilio"
+                                maxlength="255"
+                                autocomplete="street-address">
+
+                            <small class="campo-error"
+                                   data-error-for="direccion"></small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ERROR GENERAL -->
+                    <div
+                        id="authError"
+                        class="registro-error-general"
+                        role="alert"
+                        aria-live="polite"
+                        style="display:none;">
+                    </div>
+
+
+                    <!-- BOTON REGISTRARSE -->
+                    <button
+                        type="submit"
+                        class="registro-boton">
+
+                        REGISTRARSE
+
+                        <i class="fa-solid fa-chevron-right"></i>
+
+                    </button>
+
+                </form>
+
+
+                <!-- CONFIRMACION -->
+                <div
+                    id="registerSuccess"
+                    class="registro-exito"
+                    role="status"
+                    aria-live="polite"
+                    style="display:none;">
+
+                    <div class="registro-exito-icono">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <h2>¡Registro exitoso!</h2>
+
+                    <p>
+                        Tu cuenta quedó pendiente de aprobación.
+                    </p>
+
+                    <span>
+                        Tu solicitud fue recibida. Una vez que el
+                        administrador revise tu registro, podrás
+                        acceder al portal.
+                    </span>
+
+                    <a href="login.html">
+                        IR A INICIAR SESIÓN
+                    </a>
+
+                </div>
+
+
+                <!-- FOOTER -->
+                <div class="registro-footer">
+
+                    <p>
+                        ¿Ya tienes una cuenta?
+
+                        <a href="login.html">
+                            Inicia sesión aquí
+                        </a>
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- SCRIPTS EXISTENTES -->
     <script src="js/client.js"></script>
     <script src="js/auth.js"></script>
+
+
 </body>
 </html>

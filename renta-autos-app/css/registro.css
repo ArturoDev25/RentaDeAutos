@@ -1,0 +1,1020 @@
+
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body.registro-page {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body.registro-page {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #10264a;
+    overflow-x: hidden;
+
+    background-image:
+        url("../assets/Imagenes/Carros/fondo.png");
+
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+/* =========================================================
+   2. DISTRIBUCIÓN PRINCIPAL
+========================================================= */
+
+.registro-layout {
+    width: 100%;
+    min-height: 100vh;
+
+    display: grid;
+
+    /* Distribución similar a la imagen de referencia */
+    grid-template-columns: 57.2% 42.8%;
+
+    align-items: stretch;
+}
+
+
+/* =========================================================
+   3. PANEL IZQUIERDO
+========================================================= */
+
+.registro-visual {
+    position: relative;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+
+    padding: 55px 7%;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        110deg,
+        rgba(4, 25, 57, 0.78) 0%,
+        rgba(5, 34, 73, 0.65) 45%,
+        rgba(5, 38, 78, 0.38) 78%,
+        rgba(5, 38, 78, 0.18) 100%
+    );
+}
+
+.registro-visual-content {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 650px;
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   4. LOGOTIPO IZQUIERDO
+========================================================= */
+
+.registro-logo {
+    margin-bottom: 55px;
+}
+
+.registro-logo img {
+    display: block;
+
+    width: 330px;
+    max-width: 90%;
+    height: auto;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   5. PRESENTACIÓN
+========================================================= */
+
+.registro-presentacion {
+    max-width: 650px;
+}
+
+.registro-presentacion h1 {
+    margin: 0 0 20px;
+
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 800;
+
+    line-height: 1.12;
+    letter-spacing: -1.5px;
+
+    color: #ffffff;
+}
+
+.registro-presentacion h1 span {
+    display: block;
+    color: #36a3ff;
+}
+
+.registro-presentacion p {
+    max-width: 540px;
+
+    margin: 0;
+
+    color: #d5e3f6;
+
+    font-size: clamp(17px, 1.5vw, 24px);
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   6. BENEFICIOS
+========================================================= */
+
+.registro-beneficios {
+    display: flex;
+    align-items: center;
+
+    gap: 30px;
+
+    margin-top: 38px;
+}
+
+.registro-beneficio {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.beneficio-icono {
+    width: 68px;
+    height: 68px;
+
+    min-width: 68px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #0757b4;
+
+    color: #ffffff;
+
+    font-size: 27px;
+}
+
+.beneficio-separador {
+    width: 1px;
+    height: 65px;
+
+    background: rgba(255, 255, 255, 0.45);
+}
+
+
+/* =========================================================
+   7. PANEL DERECHO
+========================================================= */
+
+.registro-formulario-panel {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 35px 45px;
+
+    background: transparent;
+}
+
+
+/* =========================================================
+   8. TARJETA BLANCA
+========================================================= */
+
+.registro-card {
+    width: 100%;
+    max-width: 620px;
+
+    padding: 28px 30px;
+
+    background: #ffffff;
+
+    border-radius: 19px;
+
+    box-shadow:
+        0 15px 50px rgba(4, 25, 57, 0.18);
+
+    border: 1px solid rgba(230, 236, 245, 0.9);
+}
+
+
+/* =========================================================
+   9. BOTÓN VOLVER
+========================================================= */
+
+.registro-volver {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 8px;
+
+    color: #0878f9;
+
+    text-decoration: none;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+.registro-volver:hover {
+    color: #064ba7;
+}
+
+.registro-volver i {
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   10. LOGOTIPO DEL FORMULARIO
+========================================================= */
+
+.registro-card-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
+}
+
+.registro-card-logo img {
+    display: block;
+
+    width: 290px;
+    max-width: 85%;
+    height: 65px;
+
+    object-fit: contain;
+}
+
+
+/* =========================================================
+   11. ENCABEZADO
+========================================================= */
+
+.registro-encabezado {
+    text-align: center;
+    margin-bottom: 27px;
+}
+
+.registro-encabezado h2 {
+    margin: 0 0 7px;
+
+    color: #10264a;
+
+    font-size: 36px;
+    font-weight: 800;
+}
+
+.registro-encabezado p {
+    margin: 0;
+
+    color: #8493a9;
+
+    font-size: 18px;
+}
+
+
+/* =========================================================
+   12. FORMULARIO
+========================================================= */
+
+.registro-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    column-gap: 27px;
+    row-gap: 20px;
+}
+
+.registro-campo {
+    width: 100%;
+    min-width: 0;
+}
+
+.registro-campo label {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 9px;
+
+    color: #10264a;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.registro-campo label i {
+    width: 18px;
+
+    color: #10264a;
+
+    font-size: 19px;
+    text-align: center;
+}
+
+.registro-campo .obligatorio {
+    color: #e34b58;
+    margin-left: -7px;
+}
+
+.registro-campo .campo-opcional {
+    margin-left: -6px;
+
+    color: #8995a7;
+
+    font-size: 13px;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   13. INPUTS
+========================================================= */
+
+.registro-campo > input,
+.registro-password {
+    width: 100%;
+    height: 53px;
+
+    border: 1.5px solid #d5e0ef;
+
+    border-radius: 13px;
+
+    background: #f7f9fc;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.registro-campo > input {
+    display: block;
+
+    padding: 0 16px;
+
+    outline: none;
+
+    color: #10264a;
+
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.registro-campo input::placeholder {
+    color: #94a3b8;
+}
+
+.registro-campo > input:focus,
+.registro-password:focus-within {
+    border-color: #2479d8;
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+
+    outline: none;
+}
+
+
+/* =========================================================
+   14. CONTRASEÑA
+========================================================= */
+
+.registro-password {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+}
+
+.registro-password input {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 48px 0 16px;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    color: #10264a;
+
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.registro-toggle-password {
+    position: absolute;
+
+    right: 10px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: transparent;
+
+    color: #10264a;
+
+    font-size: 17px;
+
+    cursor: pointer;
+}
+
+.registro-toggle-password:hover {
+    color: #0878f9;
+}
+
+
+/* =========================================================
+   15. ERRORES POR CAMPO
+========================================================= */
+
+.campo-error {
+    display: block;
+
+    min-height: 0;
+
+    margin-top: 5px;
+
+    color: #dc2626;
+
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.campo-error:empty {
+    display: none;
+}
+
+.registro-campo input.input-invalid {
+    border-color: #dc2626;
+    background: #fff7f7;
+}
+
+.registro-campo input.input-valid {
+    border-color: #16a36a;
+}
+
+
+/* =========================================================
+   16. ERROR GENERAL
+========================================================= */
+
+.registro-error-general {
+    margin-top: 16px;
+
+    padding: 12px 15px;
+
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   17. BOTÓN REGISTRARSE
+========================================================= */
+
+.registro-boton {
+    width: 100%;
+    min-height: 67px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    margin-top: 25px;
+
+    border: none;
+    border-radius: 40px;
+
+    background: linear-gradient(
+        110deg,
+        #164c87 0%,
+        #062448 100%
+    );
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 21px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 22px rgba(10, 54, 105, 0.17);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.registro-boton:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 26px rgba(10, 54, 105, 0.25);
+}
+
+.registro-boton:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.registro-boton i {
+    font-size: 23px;
+}
+
+
+/* =========================================================
+   18. FOOTER
+========================================================= */
+
+.registro-footer {
+    margin-top: 27px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid #e4eaf2;
+
+    text-align: center;
+}
+
+.registro-footer p {
+    margin: 0;
+
+    color: #10264a;
+
+    font-size: 16px;
+}
+
+.registro-footer a {
+    margin-left: 5px;
+
+    color: #0878f9;
+
+    font-weight: 700;
+
+    text-decoration: underline;
+}
+
+.registro-footer a:hover {
+    color: #064ba7;
+}
+
+
+/* =========================================================
+   19. CONFIRMACIÓN DE REGISTRO
+========================================================= */
+
+.registro-exito {
+    padding: 35px 12px;
+
+    text-align: center;
+}
+
+.registro-exito-icono {
+    margin-bottom: 18px;
+
+    color: #16a36a;
+
+    font-size: 65px;
+}
+
+.registro-exito h2 {
+    margin-bottom: 15px;
+
+    color: #10264a;
+
+    font-size: 29px;
+}
+
+.registro-exito p {
+    margin-bottom: 12px;
+
+    color: #21865f;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.registro-exito span {
+    display: block;
+
+    color: #718096;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.registro-exito a {
+    display: inline-block;
+
+    margin-top: 25px;
+    padding: 15px 28px;
+
+    border-radius: 30px;
+
+    background: #092e65;
+
+    color: white;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   20. TABLETS
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .registro-layout {
+        grid-template-columns: 52% 48%;
+    }
+
+    .registro-formulario-panel {
+        padding: 25px;
+    }
+
+    .registro-card {
+        padding: 25px 22px;
+    }
+
+    .registro-visual {
+        padding: 40px;
+    }
+
+    .registro-presentacion h1 {
+        font-size: 43px;
+    }
+
+    .registro-beneficios {
+        gap: 15px;
+    }
+
+    .registro-beneficio {
+        gap: 10px;
+        font-size: 14px;
+    }
+
+    .beneficio-icono {
+        width: 55px;
+        height: 55px;
+        min-width: 55px;
+        font-size: 22px;
+    }
+}
+
+
+/* =========================================================
+   21. TABLETS PEQUEÑAS
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .registro-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .registro-visual {
+        min-height: 420px;
+        padding: 45px;
+    }
+
+    .registro-visual-content {
+        max-width: 650px;
+    }
+
+    .registro-logo {
+        margin-bottom: 30px;
+    }
+
+    .registro-logo img {
+        width: 250px;
+    }
+
+    .registro-presentacion h1 {
+        font-size: 40px;
+    }
+
+    .registro-formulario-panel {
+        min-height: auto;
+        padding: 35px 20px;
+    }
+
+    .registro-card {
+        max-width: 650px;
+    }
+}
+
+
+/* =========================================================
+   22. CELULARES
+========================================================= */
+
+@media (max-width: 600px) {
+
+    body.registro-page {
+        background-attachment: scroll;
+    }
+
+    .registro-visual {
+        min-height: 370px;
+        padding: 30px 25px;
+    }
+
+    .registro-logo img {
+        width: 210px;
+    }
+
+    .registro-presentacion h1 {
+        font-size: 33px;
+        letter-spacing: -0.7px;
+    }
+
+    .registro-presentacion p {
+        font-size: 16px;
+    }
+
+    .registro-beneficios {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .registro-beneficio {
+        font-size: 13px;
+    }
+
+    .beneficio-icono {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        font-size: 18px;
+    }
+
+    .beneficio-separador {
+        display: none;
+    }
+
+    .registro-formulario-panel {
+        padding: 20px 12px;
+    }
+
+    .registro-card {
+        padding: 25px 18px;
+        border-radius: 16px;
+    }
+
+    .registro-card-logo img {
+        width: 210px;
+    }
+
+    .registro-encabezado h2 {
+        font-size: 29px;
+    }
+
+    .registro-encabezado p {
+        font-size: 15px;
+    }
+
+    .registro-grid {
+        grid-template-columns: 1fr;
+        row-gap: 17px;
+    }
+
+    .registro-campo > input,
+    .registro-password {
+        height: 53px;
+    }
+
+    .registro-boton {
+        min-height: 59px;
+        font-size: 17px;
+    }
+
+    .registro-footer p {
+        font-size: 13px;
+    }
+}
+
+
+/* =========================================================
+   23. CELULARES PEQUEÑOS
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .registro-visual {
+        min-height: 340px;
+        padding: 25px 18px;
+    }
+
+    .registro-presentacion h1 {
+        font-size: 28px;
+    }
+
+    .registro-presentacion p {
+        font-size: 14px;
+    }
+
+    .registro-card {
+        padding: 22px 14px;
+    }
+
+    .registro-encabezado h2 {
+        font-size: 25px;
+    }
+
+    .registro-campo label {
+        font-size: 13px;
+    }
+}
+
+
+/* ==========================================
+   AJUSTE DE PROPORCIONES
+========================================== */
+
+.registro-layout {
+    grid-template-columns: 47% 53%;
+}
+
+/* Panel derecho más amplio */
+
+.registro-formulario-panel {
+    padding: 30px 35px 30px 15px;
+}
+
+.registro-card {
+    width: 100%;
+    max-width: 700px;
+    padding: 32px 38px;
+}
+
+/* ==========================================
+   DISTRIBUCIÓN DEL CONTENIDO IZQUIERDO
+========================================== */
+
+.registro-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px 7%;
+}
+
+.registro-visual-content {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+/* Logotipo */
+
+.registro-logo {
+    margin-bottom: 65px;
+}
+
+.registro-logo img {
+    width: 320px;
+    max-width: 85%;
+    display: block;
+}
+
+/* Título */
+
+.registro-presentacion {
+    margin-bottom: 0;
+}
+
+.registro-presentacion h1 {
+    max-width: 620px;
+    font-size: clamp(38px, 3.6vw, 55px);
+    line-height: 1.13;
+    letter-spacing: -1.2px;
+    margin-bottom: 20px;
+}
+
+.registro-presentacion h1 span {
+    display: block;
+    color: #39a4ff;
+}
+
+/* Descripción */
+
+.registro-presentacion p {
+    max-width: 550px;
+    font-size: 20px;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Beneficios */
+
+.registro-beneficios {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.registro-beneficio {
+    gap: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.beneficio-icono {
+    width: 65px;
+    height: 65px;
+    min-width: 65px;
+    font-size: 25px;
+}
+
+/* Tarjeta derecha */
+
+.registro-encabezado {
+    margin-bottom: 30px;
+}
+
+.registro-encabezado h2 {
+    font-size: 37px;
+}
+
+.registro-grid {
+    column-gap: 25px;
+    row-gap: 22px;
+}
+
+.registro-campo > input,
+.registro-password {
+    height: 55px;
+}
+
+.registro-boton {
+    margin-top: 28px;
+    min-height: 67px;
+}
