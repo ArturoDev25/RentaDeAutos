@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ADMINISTRADOR: [],
         AGENTE:        ['categorias.html', 'auditoria.html', 'usuarios.html'],
         SUPERVISOR:    ['categorias.html', 'usuarios.html'],
-        AUDITOR:       ['categorias.html', 'usuarios.html']
+        // S5-09: el Auditor no aprueba ni rechaza cuentas de clientes.
+        AUDITOR:       ['categorias.html', 'usuarios.html', 'clientes-pendientes.html']
     };
     const ocultar = paginasSinAcceso[sesion?.rol] || [];
     if (ocultar.length) {

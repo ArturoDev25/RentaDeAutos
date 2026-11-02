@@ -15,6 +15,8 @@ No necesitas instalar ninguna dependencia. Para ver la aplicación:
 - `catalogo.html`: Catálogo con filtros por categoría y precio diario.
 - `vehiculo.html`: Detalle del vehículo (`?id=`) y botón para iniciar la reservación.
 - `login.html`: Interfaz de inicio de sesión.
+- `registro.html`: Registro del cliente; la cuenta queda pendiente de aprobación (S5-09).
+- `clientes-pendientes.html` / `js/clientes-pendientes.js`: Panel del personal para aprobar o rechazar cuentas del portal (S5-09).
 - `css/style.css`: Contiene todos los estilos globales, colores y diseño responsivo.
 - `css/portal.css`: Estilos del portal del cliente.
 - `js/portal.js`: Funciones compartidas del portal (consulta del catálogo, tarjetas, estados de carga, vacío y error, sesión).
@@ -31,3 +33,10 @@ No necesitas instalar ninguna dependencia. Para ver la aplicación:
 Los vehículos del portal ya no se escriben en el HTML. Inicio, catálogo y detalle los obtienen de `GET /api/v1/catalogo/vehiculos` (ver `docs/catalogo-cliente-api.md`). Para que aparezca un auto en el portal debe estar `DISPONIBLE`, con categoría activa y una tarifa vigente.
 
 Para probar el portal, levanta el backend en `http://localhost:8080` y abre `index.html`. Si el backend está apagado se muestra el mensaje de error de conexión con la opción de reintentar.
+
+## Pruebas del frontend
+Desde la carpeta `renta-autos-app` (requiere Node.js 18 o superior):
+
+```bash
+node --test
+```

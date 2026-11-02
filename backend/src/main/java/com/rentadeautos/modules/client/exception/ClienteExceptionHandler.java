@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.client.exception;
 
 import com.rentadeautos.common.dto.ApiResponse;
+import com.rentadeautos.modules.client.controller.ClienteAprobacionController;
 import com.rentadeautos.modules.client.controller.ClienteController;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-@RestControllerAdvice(assignableTypes = ClienteController.class)
+@RestControllerAdvice(assignableTypes = {ClienteController.class, ClienteAprobacionController.class})
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ClienteExceptionHandler {
 
@@ -22,6 +23,11 @@ public class ClienteExceptionHandler {
 
     @ExceptionHandler(ClienteDuplicadoException.class)
     public ResponseEntity<ApiResponse<Void>> handleDuplicado(ClienteDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(ClienteEstadoAprobacionException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEstadoAprobacion(ClienteEstadoAprobacionException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(ex.getMessage()));
     }
 

@@ -4,6 +4,7 @@ import com.rentadeautos.modules.auth.dto.ClienteRegistroRequest;
 import com.rentadeautos.modules.auth.dto.ClienteRegistroResponse;
 import com.rentadeautos.modules.auth.exception.ClienteRegistroDuplicadoException;
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import jakarta.validation.Valid;
 import org.hibernate.exception.ConstraintViolationException;
@@ -41,7 +42,10 @@ public class ClienteRegistroService {
         cliente.setNumeroLicencia(datos.numeroLicencia());
         cliente.setLicenciaVencimiento(datos.licenciaVencimiento());
         cliente.setDireccion(datos.direccion());
-        cliente.setActivo(true);
+        // S5-09: la cuenta del portal queda inactiva y pendiente de aprobación
+        // hasta que un usuario autorizado del personal la apruebe o la rechace.
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.PENDIENTE);
         cliente.setPasswordHash(passwordEncoder.encode(datos.password()));
 
         try {
@@ -55,7 +59,8 @@ public class ClienteRegistroService {
             throw error;
         }
         return new ClienteRegistroResponse(cliente.getId(), cliente.getNombre(),
-                cliente.getApellidos(), cliente.getCorreo(), Boolean.TRUE.equals(cliente.getActivo()));
+                cliente.getApellidos(), cliente.getCorreo(), Boolean.TRUE.equals(cliente.getActivo()),
+                cliente.getEstadoAprobacion());
     }
 
     private boolean esDuplicado(Throwable error) {

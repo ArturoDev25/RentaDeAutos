@@ -2,6 +2,7 @@ package com.rentadeautos.modules.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,8 @@ class ClienteRegistroIntegrationTest {
         return datos;
     }
 
-    @Test void registraPersisteBCryptEIniciaSesionComoCliente() throws Exception {
+    // S5-09: el registro queda pendiente y no puede iniciar sesión hasta ser aprobado.
+    @Test void registraPersisteBCryptYQuedaPendienteSinPoderIniciarSesion() throws Exception {
         long antes = clientes.count();
         var datos = datos();
         // No puede elegir rol ni desactivar la cuenta desde el cuerpo.
@@ -62,20 +64,23 @@ class ClienteRegistroIntegrationTest {
         datos.put("passwordHash", "hash-controlado-por-solicitante");
         mvc.perform(post(RUTA).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(datos)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.activo").value(true))
+                .andExpect(jsonPath("$.data.activo").value(false))
+                .andExpect(jsonPath("$.data.estadoAprobacion").value("PENDIENTE"))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.passwordHash").doesNotExist());
         em.clear();
         Cliente guardado = clientes.findByCorreoIgnoreCase("nuevo-s402@example.test").orElseThrow();
         assertEquals(antes + 1, clientes.count());
-        assertTrue(guardado.getActivo());
+        assertFalse(guardado.getActivo());
+        assertEquals(EstadoAprobacionCliente.PENDIENTE, guardado.getEstadoAprobacion());
         assertTrue(encoder.matches("Clave123!", guardado.getPasswordHash()));
         assertNotEquals("Clave123!", guardado.getPasswordHash());
         mvc.perform(post("/api/auth/cliente/login").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"correo\":\"nuevo-s402@example.test\",\"password\":\"Clave123!\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.user.rol").value("CLIENTE"))
-                .andExpect(jsonPath("$.data.accessToken", not(emptyOrNullString())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message", containsString("pendiente de aprobación")))
+                .andExpect(jsonPath("$.data").doesNotExist())
                 .andExpect(content().string(not(containsString(guardado.getPasswordHash()))));
     }
 

@@ -7,3 +7,29 @@
 .cliente-estado.activo { background: #ddf3e6; color: #18734d; }
 .cliente-estado.inactivo { background: #eceff3; color: #5b6576; }
 @media (max-width: 650px) { .clientes-tabla { min-width: 860px; } }
+/* ---------- S5-09: estados de aprobación y vista de clientes pendientes ---------- */
+.cliente-estado.pendiente { background: #fff1d6; color: #8a5a00; }
+.cliente-estado.aprobado  { background: #ddf3e6; color: #18734d; }
+.cliente-estado.rechazado { background: #ffe3e5; color: #b0262f; }
+.veh-tabla.pendientes-tabla { min-width: 900px; }
+.pendientes-tabla th, .pendientes-tabla td { padding-left: 12px; padding-right: 12px; }
+.pendientes-tabla td { white-space: normal; }
+.pendientes-tabla th:first-child, .pendientes-tabla td:first-child { min-width: 170px; }
+.pendientes-tabla td:nth-child(4) { max-width: 150px; overflow-wrap: anywhere; }
+.pendientes-tabla td:last-child { width: 1%; }
+.pendientes-dato span, .pendientes-dato small { display: block; }
+.pendientes-dato small { margin-top: 3px; color: #637087; font-size: 12px; }
+.pendientes-dato .pendientes-alerta { color: #b0262f; font-weight: 600; }
+.pendientes-acciones { display: flex; flex-direction: column; gap: 6px; min-width: 116px; }
+.pendientes-accion { height: 36px; padding: 0 12px; justify-content: center; display: inline-flex; align-items: center; gap: 8px; border-radius: 9px; border: 1px solid transparent; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s ease; }
+.pendientes-accion.aprobar { background: #145b49; color: #ffffff; }
+.pendientes-accion.aprobar:hover { background: #0f4638; }
+.pendientes-accion.rechazar { background: #fff6f6; color: #b0262f; border-color: #f3c9cc; }
+.pendientes-accion.rechazar:hover { background: #ffe7e8; }
+.pendientes-accion:focus-visible { outline: 3px solid rgba(39, 133, 109, 0.35); outline-offset: 2px; }
+.pendientes-revisado td { background: #fafbfb; }
+.pendientes-revisado-texto { color: #637087; font-size: 12px; }
+.pendientes-btn-rechazar { border: none; background: #b0262f; color: #ffffff; }
+.pendientes-btn-rechazar:hover:not(:disabled) { background: #8f1d25; }
+.veh-campo textarea { width: 100%; box-sizing: border-box; border: 1px solid #d6dfdb; border-radius: 10px; padding: 12px 14px; font: inherit; color: #172033; resize: vertical; }
+.veh-campo textarea:focus { outline: none; border-color: #27856d; box-shadow: 0 0 0 3px rgba(39, 133, 109, 0.15); }

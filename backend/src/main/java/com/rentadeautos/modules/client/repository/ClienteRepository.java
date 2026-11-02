@@ -1,11 +1,15 @@
 package com.rentadeautos.modules.client.repository;
 
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
@@ -30,4 +34,12 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
                         ORDER BY c.apellidos ASC, c.nombre ASC
                         """)
         List<Cliente> buscar(@Param("patron") String patron, @Param("activo") Boolean activo);
+
+    /** S5-09: cuentas del portal en un estado de revisión, de la más antigua a la más reciente. */
+    List<Cliente> findByEstadoAprobacionOrderByIdAsc(EstadoAprobacionCliente estadoAprobacion);
+
+    /** S5-09: bloquea la fila mientras se aprueba o rechaza la cuenta. */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM Cliente c WHERE c.id = :id")
+    Optional<Cliente> findByIdParaRevision(@Param("id") Long id);
 }
