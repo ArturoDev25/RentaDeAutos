@@ -97,7 +97,7 @@ async function cargarDashboard() {
 
         // Actualizar gráfica de vehículos
         actualizarEstadoVehiculos(inventario);
-        actualizarReservaciones(reservaciones);
+        actualizarReservaciones();
         actualizarRentasActivas(rentasActivas);
 
         // Actualizar fecha
@@ -367,7 +367,7 @@ function mostrarErrorDashboard(mensaje) {
 // RESERVACIONES DEL DASHBOARD
 // =========================================================
 
-function actualizarReservaciones(reservaciones) {
+async function actualizarReservaciones() {
 
     const tbody =
         document.getElementById(
@@ -380,60 +380,89 @@ function actualizarReservaciones(reservaciones) {
 
     tbody.innerHTML = '';
 
-    const data = obtenerData(reservaciones);
+    try {
 
-    if (!data) {
-        return;
-    }
+        // Reservaciones individuales + nombres de cliente y vehículo.
+        const [listaResp, opcionesResp] = await Promise.all([
+            fetchAPI('/reservaciones'),
+            fetchAPI('/reservaciones/opciones')
+        ]);
 
-    // El reporte actualmente contiene el total y
-    // las cantidades agrupadas por estado.
-    const total =
-        Number(data.totalReservaciones || 0);
+        const lista = obtenerData(listaResp);
+        const opciones = obtenerData(opcionesResp) || {};
 
-    // Si no existen reservaciones, mostrar mensaje
-    if (total === 0) {
+        if (!Array.isArray(lista)) {
+            return;
+        }
 
-        const fila =
-            document.createElement('tr');
+        const nombreCliente = new Map(
+            (opciones.clientes || []).map(c => [c.id, c.nombre])
+        );
+        const nombreVehiculo = new Map(
+            (opciones.vehiculos || []).map(v => [v.id, v.nombre])
+        );
+
+        // Próximas: pendientes o confirmadas que inician de hoy en adelante.
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        const proximas = lista
+            .filter(r => r.estado === 'PENDIENTE' || r.estado === 'CONFIRMADA')
+            .filter(r => new Date(r.fechaInicio) >= hoy)
+            .sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio))
+            .slice(0, 8);
+
+        if (proximas.length === 0) {
+
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td colspan="5" style="text-align: center;">
+                    No hay reservaciones próximas.
+                </td>
+            `;
+
+            tbody.appendChild(fila);
+
+            return;
+        }
+
+        proximas.forEach(r => {
+
+            const clase =
+                r.estado === 'CONFIRMADA' ? 'confirmed' : 'pending';
+
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${nombreCliente.get(r.clienteId) || ('Cliente ' + r.clienteId)}</td>
+                <td>${nombreVehiculo.get(r.vehiculoId) || ('Vehículo ' + r.vehiculoId)}</td>
+                <td>${formatearFechaHora(r.fechaInicio)}</td>
+                <td>${formatearFechaHora(r.fechaFin)}</td>
+                <td>
+                    <span class="reservation-status ${clase}">
+                        ${r.estado}
+                    </span>
+                </td>
+            `;
+
+            tbody.appendChild(fila);
+        });
+
+    } catch (error) {
+
+        console.error('Error al cargar reservaciones próximas:', error);
+
+        const fila = document.createElement('tr');
 
         fila.innerHTML = `
             <td colspan="5" style="text-align: center;">
-                No hay reservaciones próximas.
+                No se pudieron cargar las reservaciones.
             </td>
         `;
 
         tbody.appendChild(fila);
-
-        return;
     }
-
-    // Por ahora el endpoint de reportes solamente
-    // proporciona el resumen por estado.
-    const porEstado =
-        Array.isArray(data.porEstado)
-            ? data.porEstado
-            : [];
-
-    porEstado.forEach(item => {
-
-        const fila =
-            document.createElement('tr');
-
-        fila.innerHTML = `
-            <td colspan="4">
-                Reservaciones
-            </td>
-
-            <td>
-                <span class="reservation-status confirmed">
-                    ${item.etiqueta}: ${item.cantidad}
-                </span>
-            </td>
-        `;
-
-        tbody.appendChild(fila);
-    });
 }
 
 // =========================================================
