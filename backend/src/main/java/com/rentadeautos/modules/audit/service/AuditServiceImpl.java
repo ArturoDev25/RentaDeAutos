@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -68,12 +69,14 @@ public class AuditServiceImpl implements AuditService {
     private final AuditRepository auditRepository;
     private final UsuarioAppRepository usuarioRepository;
     private final PlatformTransactionManager transactionManager;
+    private final JdbcTemplate jdbc;
 
     public AuditServiceImpl(AuditRepository auditRepository, UsuarioAppRepository usuarioRepository,
-                            PlatformTransactionManager transactionManager) {
+                            PlatformTransactionManager transactionManager, JdbcTemplate jdbc) {
         this.auditRepository = auditRepository;
         this.usuarioRepository = usuarioRepository;
         this.transactionManager = transactionManager;
+        this.jdbc = jdbc;
     }
 
     @Override
@@ -232,7 +235,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     private AuditResponseDTO mapToResponseDTO(Auditoria a) {
-        String usuarioNombre = a.getUsuario() != null ? a.getUsuario().getNombre() : "Sistema";
+        String usuarioNombre = resolverNombreActor(a);
         String resultadoDisplay = "FALLIDO".equalsIgnoreCase(a.getResultado()) ? "Fallida" : "Exitosa";
         String idFormateado = "AUD-" + String.format("%04d", a.getId());
         String descripcion = String.format("%s en %s", a.getAccion(), a.getEntidad());
@@ -244,7 +247,7 @@ public class AuditServiceImpl implements AuditService {
     }
 
     private AuditDetailDTO mapToDetailDTO(Auditoria a) {
-        String usuarioNombre = a.getUsuario() != null ? a.getUsuario().getNombre() : "Sistema";
+        String usuarioNombre = resolverNombreActor(a);
         String resultadoDisplay = "FALLIDO".equalsIgnoreCase(a.getResultado()) ? "Fallida" : "Exitosa";
         String idFormateado = "AUD-" + String.format("%04d", a.getId());
         String descripcion = String.format("%s en %s", a.getAccion(), a.getEntidad());
@@ -254,5 +257,46 @@ public class AuditServiceImpl implements AuditService {
             a.getEntidad(), a.getAccion(), descripcion, a.getDireccionIp(), resultadoDisplay,
             a.getValoresAnteriores(), a.getValoresNuevos()
         );
+    }
+
+    /** Nombre a mostrar del actor: el usuario de personal; o el cliente del portal
+     *  (resuelto desde el clienteId del snapshot) cuando la acción no la hizo personal. */
+    private String resolverNombreActor(Auditoria a) {
+        if (a.getUsuario() != null) {
+            return a.getUsuario().getNombre();
+        }
+        Long clienteId = extraerClienteId(a.getValoresNuevos());
+        if (clienteId == null) {
+            clienteId = extraerClienteId(a.getValoresAnteriores());
+        }
+        if (clienteId != null) {
+            String nombre = nombreCliente(clienteId);
+            if (nombre != null) {
+                return nombre + " (cliente)";
+            }
+        }
+        return "Sistema";
+    }
+
+    private Long extraerClienteId(String snapshotJson) {
+        if (snapshotJson == null || snapshotJson.isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode cliente = JSON.readTree(snapshotJson).get("clienteId");
+            return (cliente != null && cliente.canConvertToLong()) ? cliente.asLong() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private String nombreCliente(Long clienteId) {
+        try {
+            var filas = jdbc.query("SELECT nombre, apellidos FROM clientes WHERE id = ?",
+                    (rs, n) -> rs.getString("nombre") + " " + rs.getString("apellidos"), clienteId);
+            return filas.isEmpty() ? null : filas.get(0);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

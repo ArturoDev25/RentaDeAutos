@@ -106,6 +106,36 @@ public class TarifaService {
         return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
     }
 
+    /** Reactiva una tarifa dada de baja, si no choca con otra tarifa vigente de la categoría. */
+    @Transactional
+    public TarifaResponse reactivar(Long id) {
+        Long categoriaId = tarifas.consultarCategoriaId(id)
+                .orElseThrow(TarifaNoEncontradaException::new);
+        var categoria = categorias.bloquearPorId(categoriaId)
+                .orElseThrow(() -> new TarifaException(HttpStatus.CONFLICT,
+                        "La categoría de la tarifa ya no existe"));
+        Tarifa tarifa = tarifas.bloquearPorId(id).orElseThrow(TarifaNoEncontradaException::new);
+        if (!tarifa.getCategoria().getId().equals(categoriaId)) {
+            throw new TarifaException(HttpStatus.CONFLICT,
+                    "La categoría de la tarifa cambió durante la operación; vuelve a intentarlo");
+        }
+        // Reactivar una tarifa que ya está activa devuelve el mismo estado sin cambios.
+        if (Boolean.TRUE.equals(tarifa.getActivo())) {
+            return TarifaResponse.desde(tarifa);
+        }
+        if (!Boolean.TRUE.equals(categoria.getActivo())) {
+            throw new TarifaException(HttpStatus.BAD_REQUEST, "La categoría está inactiva");
+        }
+        // Mantiene la invariante: una sola tarifa activa por categoría y periodo.
+        if (!tarifas.buscarTraslapesExcluyendo(categoriaId, tarifa.getFechaInicio(),
+                tarifa.getFechaFin(), id).isEmpty()) {
+            throw new TarifaException(HttpStatus.CONFLICT,
+                    "Ya existe una tarifa activa para la categoría en ese periodo");
+        }
+        tarifa.setActivo(true);
+        return TarifaResponse.desde(tarifas.saveAndFlush(tarifa));
+    }
+
     private void validarFechas(TarifaRequest datos) {
         if (datos.fechaFin() != null && datos.fechaFin().isBefore(datos.fechaInicio())) {
             throw new TarifaException(HttpStatus.BAD_REQUEST,

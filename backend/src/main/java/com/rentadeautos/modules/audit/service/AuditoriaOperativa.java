@@ -18,6 +18,9 @@ public final class AuditoriaOperativa {
     public static final String FALLIDO = "FALLIDO";
 
     // ── Acciones ──
+    public static final String CREAR_RESERVACION     = "CREAR_RESERVACION";
+    public static final String EDITAR_RESERVACION    = "EDITAR_RESERVACION";
+    public static final String CANCELAR_RESERVACION  = "CANCELAR_RESERVACION";
     public static final String CONFIRMAR_RESERVACION = "CONFIRMAR_RESERVACION";
     public static final String ENTREGAR_VEHICULO     = "ENTREGAR_VEHICULO";
     public static final String DEVOLVER_VEHICULO     = "DEVOLVER_VEHICULO";

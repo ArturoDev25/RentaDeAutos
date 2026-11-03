@@ -206,11 +206,12 @@
         botonAccion(celda, 'Editar', () => comenzarEdicion(r), 'secondary');
         botonAccion(celda, 'Cancelar', () => cambiarEstado(r, 'cancelar'), 'secondary');
       }
-      // S3-14: la entrega solo se inicia desde una reservación CONFIRMADA.
-      if (r.estado === 'CONFIRMADA') {
+      // S3-14: la entrega solo se inicia desde una reservación CONFIRMADA (el Auditor solo consulta).
+      if (puedeOperar && r.estado === 'CONFIRMADA') {
         const entregar = document.createElement('a'); entregar.textContent = 'Entregar'; entregar.className = 'accion-entregar';
         entregar.href = `entrega.html?reservacion=${r.id}`; celda.append(entregar);
       }
+      // Consulta de la entrega: disponible para el personal y para el Auditor (solo lectura).
       if (['EN_CURSO', 'FINALIZADA'].includes(r.estado)) {
         const ver = document.createElement('a'); ver.textContent = 'Ver entrega'; ver.className = 'accion-entregar secondary';
         ver.href = `entrega.html?reservacion=${r.id}`; celda.append(ver);
