@@ -131,7 +131,7 @@ function actualizarIndicadores(
         obtenerData(inventario)?.totalVehiculos ?? 0;
 
     const totalClientesActivos =
-        obtenerData(clientes)?.Activos ?? 0;
+        obtenerData(clientes)?.activos ?? 0;
 
     const totalReservaciones =
         obtenerData(reservaciones)?.totalReservaciones ?? 0;
@@ -410,7 +410,7 @@ async function actualizarReservaciones() {
             .filter(r => r.estado === 'PENDIENTE' || r.estado === 'CONFIRMADA')
             .filter(r => new Date(r.fechaInicio) >= hoy)
             .sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio))
-            .slice(0, 8);
+            .slice(0, 5);
 
         if (proximas.length === 0) {
 

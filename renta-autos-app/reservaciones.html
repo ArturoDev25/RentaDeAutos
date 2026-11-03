@@ -63,13 +63,30 @@
         </form>
       </section>
       <section class="dashboard-panel reservation-panel" aria-labelledby="lista-titulo">
-        <div class="panel-header"><h2 id="lista-titulo"><i class="fa-solid fa-list"></i>Reservaciones registradas</h2><button type="button" id="recargar">Actualizar</button></div>
+        <div class="panel-header"><h2 id="lista-titulo"><i class="fa-solid fa-list"></i>Reservaciones registradas</h2></div>
+        <div class="reservation-filtros" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;margin:0 0 1rem;">
+          <div style="position:relative;flex:1;min-width:240px;">
+            <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);color:#9ca3af;"></i>
+            <input type="search" id="buscarReserva" placeholder="Buscar por cliente, vehículo o ID..." aria-label="Buscar reservaciones"
+                   style="width:100%;padding:0.6rem 0.9rem 0.6rem 2.5rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;">
+          </div>
+          <select id="filtroEstado" aria-label="Filtrar por estado"
+                  style="padding:0.6rem 0.9rem;border:1px solid #d1d5db;border-radius:8px;font:inherit;background:#fff;">
+            <option value="">Todos los estados</option>
+            <option value="PENDIENTE">Pendiente</option>
+            <option value="CONFIRMADA">Confirmada</option>
+            <option value="EN_CURSO">En curso</option>
+            <option value="FINALIZADA">Finalizada</option>
+            <option value="CANCELADA">Cancelada</option>
+          </select>
+          <button type="button" id="recargar" style="padding:0.6rem 1rem;white-space:nowrap;">Actualizar</button>
+        </div>
         <div class="reservation-table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Vehículo</th><th>Inicio</th><th>Devolución</th><th>Estado</th><th>Tarifa diaria</th><th>Total estimado</th><th>Acciones</th></tr></thead><tbody id="filas"></tbody></table></div>
       </section>
     </main>
   </div>
   <script src="js/client.js"></script>
-  <script src="js/reservaciones.js"></script>
-  <script src="js/panel.js?v=s3"></script>
+  <script src="js/reservaciones.js?v=s8"></script>
+  <script src="js/panel.js?v=s7"></script>
 </body>
 </html>

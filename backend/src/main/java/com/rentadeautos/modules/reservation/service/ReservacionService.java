@@ -352,6 +352,12 @@ public class ReservacionService {
 
     private void aplicar(Reservacion r, ReservacionRequest datos, BigDecimal tarifa) {
         r.setClienteId(datos.clienteId());
+        // Mantiene la invariante chk_reservaciones_un_creador: si la reserva la creó un
+        // cliente del portal, su creador debe seguir apuntando al cliente de la reserva,
+        // aunque el personal la edite o la reasigne a otro cliente.
+        if (r.getCreadoPorClienteId() != null) {
+            r.setCreadoPorClienteId(datos.clienteId());
+        }
         r.setVehiculoId(datos.vehiculoId());
         r.setFechaInicio(datos.fechaInicio());
         r.setFechaFin(datos.fechaFin());
