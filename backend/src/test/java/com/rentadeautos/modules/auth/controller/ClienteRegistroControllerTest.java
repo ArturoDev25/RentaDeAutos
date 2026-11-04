@@ -2,6 +2,7 @@ package com.rentadeautos.modules.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentadeautos.modules.auth.dto.ClienteRegistroResponse;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.auth.exception.ClienteRegistroDuplicadoException;
 import com.rentadeautos.modules.auth.repository.UsuarioAppRepository;
 import com.rentadeautos.modules.auth.security.JwtAuthenticationFilter;
@@ -52,12 +53,14 @@ class ClienteRegistroControllerTest {
 
     @Test void registroEsPublicoYDevuelve201SinCredenciales() throws Exception {
         when(servicio.registrar(any())).thenReturn(
-                new ClienteRegistroResponse(7L, "Ana", "Prueba", "ana@example.test", true));
+                new ClienteRegistroResponse(7L, "Ana", "Prueba", "ana@example.test", false,
+                        EstadoAprobacionCliente.PENDIENTE));
         mvc.perform(post(RUTA).contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsString(datos())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").value(7))
-                .andExpect(jsonPath("$.data.activo").value(true))
+                .andExpect(jsonPath("$.data.activo").value(false))
+                .andExpect(jsonPath("$.data.estadoAprobacion").value("PENDIENTE"))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.passwordHash").doesNotExist())
                 .andExpect(jsonPath("$.data.accessToken").doesNotExist())

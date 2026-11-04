@@ -57,9 +57,22 @@ function determinarDestinoLogin(rol, searchParams = (typeof window !== 'undefine
     return destinoSeguro ? redirect : 'index.html';
 }
 
+/** S5-09: mensaje que ve el cliente al terminar su registro en el portal. */
+const MENSAJE_REGISTRO_PENDIENTE = 'Tu cuenta quedó pendiente de aprobación';
+
+/**
+ * S5-09: botón de envío del formulario de registro. El rediseño S5-02 usa
+ * .registro-boton; se acepta también .login-btn por compatibilidad.
+ */
+function botonRegistro(formulario) {
+    return formulario?.querySelector('.registro-boton, .login-btn, button[type="submit"]') || null;
+}
+
 function mensajeDeError(error, mensajePredeterminado) {
     if (error?.status === 400) return error.message || 'Revisa los datos ingresados.';
     if (error?.status === 401) return 'Correo o contraseña incorrectos';
+    // S5-09: cuenta del portal pendiente de aprobación o rechazada (el backend explica el motivo).
+    if (error?.status === 403 && error.message) return error.message;
     if (error?.status === 409) {
         return 'El correo electrónico o número de licencia ya están registrados.';
     }
@@ -171,7 +184,7 @@ if (typeof document !== 'undefined') {
                 ];
                 const campos = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
                 const errorDiv = document.getElementById('authError');
-                const submitBtn = registerForm.querySelector('.login-btn');
+                const submitBtn = botonRegistro(registerForm);
                 if (Object.values(campos).some(campo => !campo) || !submitBtn) return;
 
                 const nombre = campos.nombre.value.trim();
@@ -192,8 +205,9 @@ if (typeof document !== 'undefined') {
                 if (errorDiv) errorDiv.style.display = 'none';
                 submitBtn.disabled = true;
                 submitBtn.classList.add('btn-loading');
-                const originalBtnText = submitBtn.innerText;
-                submitBtn.innerText = 'REGISTRANDO...';
+                // innerHTML conserva el ícono del botón rediseñado (S5-02).
+                const contenidoOriginal = submitBtn.innerHTML;
+                submitBtn.textContent = 'REGISTRANDO...';
 
                 try {
                     const result = await fetchAPI('/auth/cliente/registro', {
@@ -211,7 +225,9 @@ if (typeof document !== 'undefined') {
                     });
 
                     if (result?.success) {
-                        window.location.href = 'login.html';
+                        // S5-09: la cuenta queda pendiente; no se redirige al login
+                        // porque todavía no puede iniciar sesión.
+                        mostrarRegistroPendiente(registerForm);
                     } else {
                         mostrarError(errorDiv, result?.message || 'Hubo un problema al registrarse.');
                     }
@@ -224,9 +240,47 @@ if (typeof document !== 'undefined') {
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('btn-loading');
-                    submitBtn.innerText = originalBtnText;
+                    submitBtn.innerHTML = contenidoOriginal;
                 }
             });
+
+            // Mostrar y ocultar contraseña en el registro (S5-02)
+            const regPassword = document.getElementById('reg-password');
+            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+            if (regPassword && toggleRegisterPassword) {
+                toggleRegisterPassword.addEventListener('click', () => {
+                    const mostrar = regPassword.type === 'password';
+                    regPassword.type = mostrar ? 'text' : 'password';
+                    toggleRegisterPassword.innerHTML = mostrar
+                        ? '<i class="fa-regular fa-eye"></i>'
+                        : '<i class="fa-regular fa-eye-slash"></i>';
+                    toggleRegisterPassword.setAttribute(
+                        'aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+                });
+            }
+        }
+
+        /** S5-09: oculta el formulario y muestra la confirmación de cuenta pendiente. */
+        function mostrarRegistroPendiente(formulario) {
+            const confirmacion = document.getElementById('registerSuccess');
+            if (!confirmacion) {
+                window.location.href = 'login.html?registro=pendiente';
+                return;
+            }
+            formulario.reset();
+            formulario.hidden = true;
+            formulario.style.display = 'none';
+            confirmacion.style.display = 'block';
+            const mensaje = confirmacion.querySelector('p');
+            if (mensaje) mensaje.textContent = `${MENSAJE_REGISTRO_PENDIENTE}.`;
+            confirmacion.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+            confirmacion.querySelector('a')?.focus();
+        }
+
+        // S5-09: si se llega al login tras registrarse, recordar que la cuenta está pendiente.
+        if (loginForm && new URLSearchParams(window.location.search).get('registro') === 'pendiente') {
+            mostrarError(document.getElementById('authError'),
+                `${MENSAJE_REGISTRO_PENDIENTE}. Podrás iniciar sesión cuando el personal la apruebe.`);
         }
 
         window.logout = () => {
@@ -260,6 +314,8 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         autenticarEnCascada,
         determinarDestinoLogin,
-        mensajeDeError
+        mensajeDeError,
+        botonRegistro,
+        MENSAJE_REGISTRO_PENDIENTE
     };
 }

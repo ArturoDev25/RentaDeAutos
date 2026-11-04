@@ -3,6 +3,7 @@ package com.rentadeautos.modules.auth.service;
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
 import com.rentadeautos.modules.auth.dto.UsuarioResponse;
+import com.rentadeautos.modules.auth.exception.CuentaClienteNoAprobadaException;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.client.model.Cliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
@@ -22,6 +23,11 @@ import java.util.UUID;
  * vacío ante CUALQUIER fallo (correo inexistente, contraseña incorrecta, cuenta
  * inactiva o cliente sin cuenta de portal) para que el controlador responda
  * siempre lo mismo y no revele si un correo está registrado.
+ *
+ * S5-09: si la contraseña es correcta pero la cuenta del portal está PENDIENTE
+ * o RECHAZADA, lanza {@link CuentaClienteNoAprobadaException} para que el cliente
+ * sepa por qué no puede entrar. Solo ocurre con la contraseña correcta, así que
+ * no expone a terceros qué correos existen.
  */
 @Service
 public class ClienteLoginService {
@@ -64,6 +70,14 @@ public class ClienteLoginService {
         boolean coincide = passwordEncoder.matches(
                 peticion.password(), hash != null ? hash : hashSenuelo);
 
+        // S5-09: cuenta del portal sin aprobar (pendiente o rechazada).
+        if (cliente != null && hash != null && coincide && cliente.bloqueadoPorAprobacion()) {
+            log.warn("Intento de acceso de cliente {} con cuenta {}", cliente.getId(),
+                    cliente.getEstadoAprobacion());
+            throw new CuentaClienteNoAprobadaException(cliente.getEstadoAprobacion());
+        }
+
+        // Se conserva la validación existente: una cuenta inactiva nunca entra.
         boolean puedeEntrar = cliente != null
                 && hash != null
                 && Boolean.TRUE.equals(cliente.getActivo())

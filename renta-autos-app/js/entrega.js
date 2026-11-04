@@ -27,11 +27,14 @@
 
   // ---------- Sesión (mismo criterio que reservaciones.js) ----------
   try { sesion = JSON.parse(localStorage.getItem('usuarioSesion')); } catch (_) { /* sesión inválida */ }
-  // La entrega la opera el personal autorizado (Admin, Agente, Supervisor); el Auditor no.
-  if (!sesion?.token || !['ADMINISTRADOR', 'AGENTE', 'SUPERVISOR'].includes(sesion.rol)) {
+  // La entrega la REGISTRA el personal autorizado (Admin, Agente, Supervisor). El
+  // Auditor puede CONSULTAR una entrega ya registrada, en modo solo lectura.
+  const ROLES_OPERACION = ['ADMINISTRADOR', 'AGENTE', 'SUPERVISOR'];
+  if (!sesion?.token || ![...ROLES_OPERACION, 'AUDITOR'].includes(sesion.rol)) {
     window.location.replace('login.html');
     return;
   }
+  const soloLectura = !ROLES_OPERACION.includes(sesion.rol);
   $('operador').textContent = sesion.nombre;
   $('salir').addEventListener('click', () => {
     localStorage.removeItem('usuarioSesion');
@@ -132,6 +135,12 @@
       return;
     }
 
+    // El Auditor solo consulta: si aún no hay entrega registrada, no se le abre el formulario.
+    if (soloLectura) {
+      bloquear('Esta reservación aún no tiene una entrega registrada.');
+      return;
+    }
+
     const motivo = motivoBloqueo(reservacion, vehiculo, cliente);
     if (motivo) { bloquear(motivo); return; }
 
@@ -225,6 +234,7 @@
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
+    if (soloLectura) return;   // el Auditor no registra entregas
     limpiarAviso();
     const invalidos = Object.keys(reglas).filter(nombre => !validarCampo(nombre));
     if (invalidos.length) {
@@ -283,6 +293,9 @@
   const id = new URLSearchParams(window.location.search).get('reservacion');
   if (id && /^\d+$/.test(id)) {
     cargarReservacion(Number(id));
+  } else if (soloLectura) {
+    // El Auditor no inicia entregas; solo llega aquí vía "Ver entrega" con un id válido.
+    aviso('Abre una entrega desde la lista de Reservaciones, con el botón "Ver entrega".');
   } else {
     if (id) aviso('El identificador de reservación no es válido.');
     mostrarSeleccion();

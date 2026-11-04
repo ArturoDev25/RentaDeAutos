@@ -90,3 +90,9 @@ permitidas y consultar su historial de rentas de solo lectura.
 
 Contrato, permisos, migración V6 y guía de comprobación:
 [docs/reservaciones-cliente-api.md](docs/reservaciones-cliente-api.md).
+
+## Aprobación de clientes del portal — S5-09
+
+Las cuentas creadas desde el portal quedan pendientes hasta que el personal
+las aprueba o rechaza en **Clientes pendientes**. Estados, endpoints, permisos
+y auditoría: [docs/s5-09-aprobacion-clientes.md](docs/s5-09-aprobacion-clientes.md).

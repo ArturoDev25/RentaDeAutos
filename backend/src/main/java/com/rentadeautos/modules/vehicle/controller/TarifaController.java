@@ -41,6 +41,11 @@ public class TarifaController {
         return ApiResponse.success(tarifas.desactivar(id));
     }
 
+    @PatchMapping("/{id}/reactivar")
+    public ApiResponse<TarifaResponse> reactivar(@PathVariable Long id) {
+        return ApiResponse.success(tarifas.reactivar(id));
+    }
+
     @GetMapping
     public ApiResponse<List<TarifaResponse>> listar() {
         return ApiResponse.success(tarifas.listar());

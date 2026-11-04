@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes pendientes - RentaDeAutos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/vehiculos.css">
+    <link rel="stylesheet" href="css/clientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="css/panel.css">
+</head>
+<body class="dashboard-body">
+    <aside class="dashboard-sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html" aria-label="RentaDeAutos: inicio"><img src="assets/Imagenes/LogoCar.png" alt="RentaDeAutos"></a>
+    </div>
+    <nav class="sidebar-menu" aria-label="Menú principal">
+      <a href="dashboard.html" class="sidebar-link"><i class="fa-solid fa-house" aria-hidden="true"></i><span>Dashboard</span></a>
+      <a href="vehiculos.html" class="sidebar-link"><i class="fa-solid fa-car" aria-hidden="true"></i><span>Vehículos</span></a>
+      <a href="categorias.html" class="sidebar-link"><i class="fa-solid fa-tags" aria-hidden="true"></i><span>Categorías</span></a>
+
+      <a href="tarifas.html" class="sidebar-link"><i class="fa-solid fa-circle-dollar-to-slot" aria-hidden="true"></i><span>Tarifas</span></a>
+      <a href="clientes.html" class="sidebar-link"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Clientes</span></a>
+      <a href="clientes-pendientes.html" class="sidebar-link active" aria-current="page"><i class="fa-solid fa-user-clock" aria-hidden="true"></i><span>Clientes pendientes</span></a>
+      <a href="reservaciones.html" class="sidebar-link"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Reservaciones</span></a>
+      <a href="reportes.html" class="sidebar-link"><i class="fa-solid fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+      <a href="auditoria.html" class="sidebar-link"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i><span>Auditoría</span></a>
+      <a href="usuarios.html" class="sidebar-link"><i class="fa-solid fa-user-gear" aria-hidden="true"></i><span>Usuarios</span></a>
+    </nav>
+    <div class="sidebar-footer-message"><p>Conduce<br>tus mejores<br>experiencias</p><span></span></div>
+  </aside>
+
+    <div class="dashboard-main">
+        <header class="dashboard-topbar">
+            <div class="panel-ubicacion"><i class="fa-solid fa-user-clock" aria-hidden="true"></i><span>Administración / Clientes pendientes</span></div>
+            <div class="dashboard-user-area">
+                <div class="dashboard-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user" aria-hidden="true"></i></div>
+                    <div class="user-info">
+                        <strong id="nombre-usuario">Usuario</strong>
+                        <small id="rol-usuario" data-panel-rol>Sesión</small>
+                    </div>
+                </div>
+                <button id="cerrar-sesion" class="dashboard-logout" type="button" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i><span>Cerrar sesión</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- S5-09: revisión de las cuentas que los clientes crean desde el portal -->
+        <main class="dashboard-content">
+            <section class="dashboard-title">
+                <div>
+                    <h1>Clientes pendientes</h1>
+                    <p>Revisa las cuentas registradas desde el portal y apruébalas o recházalas</p>
+                </div>
+                <button id="actualizar-lista" class="veh-btn veh-btn-claro" type="button"><i class="fa-solid fa-rotate" aria-hidden="true"></i>Actualizar lista</button>
+            </section>
+
+            <section class="dashboard-statistics veh-resumen" aria-label="Resumen de la revisión">
+                <article class="stat-card veh-tarjeta-amarilla"><div class="stat-icon veh-icono-gris"><i class="fa-solid fa-user-clock" aria-hidden="true"></i></div><div class="stat-information"><strong id="total-pendientes">-</strong><p>Pendientes de revisión</p></div></article>
+                <article class="stat-card veh-tarjeta-verde"><div class="stat-icon stat-light-green"><i class="fa-solid fa-user-check" aria-hidden="true"></i></div><div class="stat-information"><strong id="total-aprobados">0</strong><p>Aprobados en esta sesión</p></div></article>
+                <article class="stat-card veh-tarjeta-roja"><div class="stat-icon stat-red"><i class="fa-solid fa-user-xmark" aria-hidden="true"></i></div><div class="stat-information"><strong id="total-rechazados">0</strong><p>Rechazados en esta sesión</p></div></article>
+            </section>
+
+            <p id="mensaje" class="veh-mensaje" role="status" aria-live="polite" hidden></p>
+
+            <section class="veh-tabla-contenedor" aria-label="Solicitudes de cuenta pendientes">
+                <table class="veh-tabla clientes-tabla pendientes-tabla">
+                    <thead>
+                        <tr><th>Cliente</th><th>Contacto</th><th>Licencia</th><th>Dirección</th><th>Solicitud</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody id="tabla-pendientes"><tr><td colspan="7" class="veh-celda-aviso">Cargando solicitudes...</td></tr></tbody>
+                </table>
+            </section>
+
+            <footer class="dashboard-footer"><span>RentaDeAutos © 2026. Todos los derechos reservados.</span><div><a href="#">Términos</a> | <a href="#">Privacidad</a> | <a href="#">Soporte</a></div></footer>
+        </main>
+    </div>
+
+    <!-- Confirmar aprobación -->
+    <dialog id="dialogo-aprobar" class="veh-dialogo" aria-labelledby="titulo-aprobar">
+        <form id="formulario-aprobar" method="dialog">
+            <header class="veh-dialogo-cabecera"><h2 id="titulo-aprobar">Aprobar cuenta</h2><button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
+            <p class="veh-ayuda" id="texto-aprobar"></p>
+            <footer class="veh-dialogo-acciones">
+                <button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cancelar</button>
+                <button id="confirmar-aprobar" type="submit" class="veh-btn veh-btn-primario"><i class="fa-solid fa-user-check" aria-hidden="true"></i>Aprobar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <!-- Confirmar rechazo (motivo opcional, se guarda en auditoría) -->
+    <dialog id="dialogo-rechazar" class="veh-dialogo" aria-labelledby="titulo-rechazar">
+        <form id="formulario-rechazar" method="dialog" novalidate>
+            <header class="veh-dialogo-cabecera"><h2 id="titulo-rechazar">Rechazar cuenta</h2><button type="button" class="veh-cerrar" data-cerrar aria-label="Cerrar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>
+            <p class="veh-ayuda" id="texto-rechazar"></p>
+            <div class="veh-campos">
+                <label class="veh-campo veh-campo-completo"><span>Motivo (opcional)</span><textarea id="motivo-rechazo" name="motivo" maxlength="255" rows="3" placeholder="Ej. La licencia está vencida o los datos no coinciden"></textarea></label>
+            </div>
+            <footer class="veh-dialogo-acciones">
+                <button type="button" class="veh-btn veh-btn-claro" data-cerrar>Cancelar</button>
+                <button id="confirmar-rechazar" type="submit" class="veh-btn pendientes-btn-rechazar"><i class="fa-solid fa-user-xmark" aria-hidden="true"></i>Rechazar</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <script src="js/client.js"></script>
+    <script src="js/clientes-pendientes.js"></script>
+    <script src="js/panel.js?v=s7"></script>
+</body>
+</html>

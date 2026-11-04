@@ -71,7 +71,11 @@ public class ReservacionService {
                         "La sesión ya no corresponde a un usuario válido"))
                 .getId();
         r.setCreadoPorId(creador);
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        Reservacion guardada = reservaciones.saveAndFlush(r);
+        auditoria.registrarEvento(creador, AuditoriaOperativa.CREAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, guardada.getId(), AuditoriaOperativa.EXITOSO,
+                null, snapshotReservacion(guardada), null);
+        return ReservacionResponse.desde(guardada);
     }
 
     /** Misma validación y bloqueo que mostrador; el actor sale de la sesión CLIENTE. */
@@ -86,7 +90,13 @@ public class ReservacionService {
                 datos.fechaInicio(), datos.fechaFin(), datos.observaciones());
         Reservacion r = prepararAlta(peticion);
         r.setCreadoPorClienteId(clienteId);
-        return ReservacionResponse.desde(reservaciones.saveAndFlush(r));
+        Reservacion guardada = reservaciones.saveAndFlush(r);
+        // Lo crea un cliente del portal (no es usuario de personal): el actor queda como
+        // "Sistema" y el cliente concreto se conserva en el snapshot (clienteId).
+        auditoria.registrarEvento(null, AuditoriaOperativa.CREAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, guardada.getId(), AuditoriaOperativa.EXITOSO,
+                null, snapshotReservacion(guardada), null);
+        return ReservacionResponse.desde(guardada);
     }
 
     private Long clienteActualPortal() {
@@ -153,6 +163,21 @@ public class ReservacionService {
                         vehiculoId);
             }
         }
+        Map<String, Object> antesPortal = new LinkedHashMap<>();
+        antesPortal.put("reservacionId", id);
+        antesPortal.put("estado", r.estado());
+        antesPortal.put("clienteId", clienteId);
+        antesPortal.put("vehiculoId", vehiculoId);
+        antesPortal.put("fechaInicio", r.fechaInicio());
+        antesPortal.put("fechaFin", r.fechaFin());
+        antesPortal.put("tarifaDia", r.tarifaDia());
+        antesPortal.put("totalEstimado", r.totalEstimado());
+        Map<String, Object> despuesPortal = new LinkedHashMap<>(antesPortal);
+        despuesPortal.put("estado", "CANCELADA");
+        // Cancelación hecha por el cliente desde el portal: actor "Sistema", cliente en snapshot.
+        auditoria.registrarEvento(null, AuditoriaOperativa.CANCELAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, id, AuditoriaOperativa.EXITOSO,
+                antesPortal, despuesPortal, null);
         return new ReservacionClienteResponse(r.id(), r.vehiculoId(),
                 r.fechaInicio(), r.fechaFin(), "CANCELADA", r.tarifaDia(), r.totalEstimado());
     }
@@ -186,6 +211,7 @@ public class ReservacionService {
                 ? r.getTarifaDia()
                 : tarifaVigente(categoriaId, datos.fechaInicio().toLocalDate());
         validarTotal(datos, tarifa);
+        Map<String, Object> antesEdicion = snapshotReservacion(r);
         aplicar(r, datos, tarifa);
         Reservacion guardada = reservaciones.saveAndFlush(r);
         // Si estaba CONFIRMADA y cambió de vehículo, sincronizar estados:
@@ -195,6 +221,9 @@ public class ReservacionService {
             jdbc.update("UPDATE vehiculos SET estado = 'RESERVADO' "
                     + "WHERE id = ? AND estado = 'DISPONIBLE'", datos.vehiculoId());
         }
+        auditoria.registrarEvento(usuarioActualId(), AuditoriaOperativa.EDITAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, id, AuditoriaOperativa.EXITOSO,
+                antesEdicion, snapshotReservacion(guardada), null);
         return ReservacionResponse.desde(guardada);
     }
 
@@ -203,12 +232,16 @@ public class ReservacionService {
         Reservacion r = buscar(id);
         validarEditable(r);
         boolean estabaConfirmada = "CONFIRMADA".equals(r.getEstado());
+        Map<String, Object> antesCancelar = snapshotReservacion(r);
         r.setEstado("CANCELADA");
         Reservacion guardada = reservaciones.saveAndFlush(r);
         // Si estaba CONFIRMADA, el vehículo quedó RESERVADO: liberarlo si nadie más lo retiene.
         if (estabaConfirmada) {
             liberarVehiculoSiNadieLoRetiene(r.getVehiculoId(), id);
         }
+        auditoria.registrarEvento(usuarioActualId(), AuditoriaOperativa.CANCELAR_RESERVACION,
+                AuditoriaOperativa.RESERVACION, id, AuditoriaOperativa.EXITOSO,
+                antesCancelar, snapshotReservacion(guardada), null);
         return ReservacionResponse.desde(guardada);
     }
 
@@ -264,6 +297,21 @@ public class ReservacionService {
         m.put("fechaFin", r.getFechaFin());
         m.put("tarifaDia", r.getTarifaDia());
         m.put("totalEstimado", r.getTotalEstimado());
+        return m;
+    }
+
+    /** Estado general de una reservación para la bitácora (crear, editar y cancelar). */
+    private static Map<String, Object> snapshotReservacion(Reservacion r) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("reservacionId", r.getId());
+        m.put("estado", r.getEstado());
+        m.put("clienteId", r.getClienteId());
+        m.put("vehiculoId", r.getVehiculoId());
+        m.put("fechaInicio", r.getFechaInicio());
+        m.put("fechaFin", r.getFechaFin());
+        m.put("tarifaDia", r.getTarifaDia());
+        m.put("totalEstimado", r.getTotalEstimado());
+        m.put("observaciones", r.getObservaciones());
         return m;
     }
 
@@ -352,6 +400,12 @@ public class ReservacionService {
 
     private void aplicar(Reservacion r, ReservacionRequest datos, BigDecimal tarifa) {
         r.setClienteId(datos.clienteId());
+        // Mantiene la invariante chk_reservaciones_un_creador: si la reserva la creó un
+        // cliente del portal, su creador debe seguir apuntando al cliente de la reserva,
+        // aunque el personal la edite o la reasigne a otro cliente.
+        if (r.getCreadoPorClienteId() != null) {
+            r.setCreadoPorClienteId(datos.clienteId());
+        }
         r.setVehiculoId(datos.vehiculoId());
         r.setFechaInicio(datos.fechaInicio());
         r.setFechaFin(datos.fechaFin());

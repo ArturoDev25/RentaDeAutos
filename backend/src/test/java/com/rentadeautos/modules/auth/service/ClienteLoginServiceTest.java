@@ -2,8 +2,10 @@ package com.rentadeautos.modules.auth.service;
 
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
+import com.rentadeautos.modules.auth.exception.CuentaClienteNoAprobadaException;
 import com.rentadeautos.modules.auth.security.JwtService;
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,6 +105,63 @@ class ClienteLoginServiceTest {
     @DisplayName("Cliente de mostrador sin cuenta de portal (password_hash nulo): se rechaza")
     void clienteSinCuentaDePortalSeRechaza() {
         cliente.setPasswordHash(null);
+        when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
+
+        assertTrue(servicio.login(new LoginRequest("ana@demo.local", PASSWORD)).isEmpty());
+    }
+
+    // ── S5-09: aprobación de cuentas del portal ──
+
+    @Test
+    @DisplayName("S5-09: cuenta pendiente con contraseña correcta → excepción con mensaje de pendiente")
+    void cuentaPendienteNoPuedeEntrarYSeExplicaElMotivo() {
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.PENDIENTE);
+        when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
+
+        CuentaClienteNoAprobadaException error = assertThrows(CuentaClienteNoAprobadaException.class,
+                () -> servicio.login(new LoginRequest("ana@demo.local", PASSWORD)));
+        assertEquals(EstadoAprobacionCliente.PENDIENTE, error.getEstado());
+        assertEquals(CuentaClienteNoAprobadaException.MENSAJE_PENDIENTE, error.getMessage());
+    }
+
+    @Test
+    @DisplayName("S5-09: cuenta rechazada con contraseña correcta → excepción con mensaje de rechazo")
+    void cuentaRechazadaNoPuedeEntrar() {
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.RECHAZADO);
+        when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
+
+        CuentaClienteNoAprobadaException error = assertThrows(CuentaClienteNoAprobadaException.class,
+                () -> servicio.login(new LoginRequest("ana@demo.local", PASSWORD)));
+        assertEquals(CuentaClienteNoAprobadaException.MENSAJE_RECHAZADA, error.getMessage());
+    }
+
+    @Test
+    @DisplayName("S5-09: cuenta pendiente con contraseña incorrecta → respuesta genérica (no revela el estado)")
+    void cuentaPendienteConPasswordIncorrectaNoRevelaEstado() {
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.PENDIENTE);
+        when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
+
+        assertTrue(servicio.login(new LoginRequest("ana@demo.local", "otra-clave")).isEmpty());
+    }
+
+    @Test
+    @DisplayName("S5-09: cuenta aprobada y activa → inicia sesión")
+    void cuentaAprobadaPuedeEntrar() {
+        cliente.setActivo(true);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.APROBADO);
+        when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
+
+        assertTrue(servicio.login(new LoginRequest("ana@demo.local", PASSWORD)).isPresent());
+    }
+
+    @Test
+    @DisplayName("S5-09: cuenta aprobada pero desactivada después → se conserva el bloqueo por inactiva")
+    void cuentaAprobadaPeroInactivaNoPuedeEntrar() {
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(EstadoAprobacionCliente.APROBADO);
         when(clientes.findByCorreoIgnoreCase("ana@demo.local")).thenReturn(Optional.of(cliente));
 
         assertTrue(servicio.login(new LoginRequest("ana@demo.local", PASSWORD)).isEmpty());
