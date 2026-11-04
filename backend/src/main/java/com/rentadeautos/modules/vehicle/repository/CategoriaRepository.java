@@ -14,6 +14,8 @@ import org.springframework.data.repository.query.Param;
  * Acceso a datos de las categorías de vehículos.
  */
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
+    java.util.Optional<Categoria> findByNombreIgnoreCase(String nombre);
+
 
     /** Serializa los cambios de tarifas incluso cuando aún no hay ninguna. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)

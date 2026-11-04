@@ -1,4 +1,4 @@
-# S5-04 — Seed de demostración (avance 1)
+# S5-04 — Seed de demostración (avances 1 y 2)
 
 ## Alcance actual
 
@@ -12,9 +12,24 @@ Las coincidencias parciales de correo/licencia provocan error antes de insertar.
 La carga es transaccional. No requiere migración nueva.
 
 Este avance NO completa S5-04: faltan los clientes pendientes de aprobación,
-vehículos con fotos, categorías/tarifas y reservaciones/rentas del guion final.
+y reservaciones/rentas del guion final.
 S5-09 aún no está integrado en el main d9c93a5 usado como base. No se simula una
 aprobación usando `activo`: aprobación y activación son conceptos diferentes.
+
+## Catálogo demo
+
+Carga cinco vehículos disponibles: Tsuru, Audi Q7, Tesla Model 3, BMW Serie 3 y
+Ferrari F8. Los identifica con placas `S504-DEMO-01` a `S504-DEMO-05` y VIN
+ficticios. Conserva los vehículos ya registrados y rechaza colisiones parciales.
+
+Crea las categorías Demo Económico, Demo SUV y Demo Lujo, con tarifas diarias
+iniciales de $500, $850 y $1,800. Si existe una tarifa vigente, la conserva.
+Si hay una tarifa futura, la vigencia creada termina el día anterior.
+
+Maven empaqueta las cinco fotos existentes del frontend como recursos del backend,
+sin duplicarlas en el repositorio. Compilar desde el repositorio completo, con
+`renta-autos-app` junto a `backend`. El seed guarda las fotos en el formato
+que consume el catálogo actual.
 
 ## Activación opcional
 
@@ -42,11 +57,12 @@ mantienen sin cambios en este avance y no se activan con demo por sí solo.
 Desde `backend`, Java 21:
 
 ```powershell
-.\mvnw.cmd "-Dtest=ClienteDemoInitializerTest,ClienteDemoActivacionTest" test
+.\mvnw.cmd "-Dtest=ClienteDemoInitializerTest,ClienteDemoActivacionTest,CatalogoDemoInitializerTest" test
 .\mvnw.cmd test
 ```
 
-Hay 14 casos nuevos: nueve de carga con H2 y cinco de activación del contexto.
+Hay 18 casos: nueve de carga de clientes con H2, cinco de activación del
+contexto y cuatro del catálogo demo.
 No requieren conexión al servidor. Pendiente ejecutar contra MySQL de demostración
 cuando el SM confirme el acceso y la base destino. No eliminar el perfil ni los datos
 para volver a cargar: ejecutar otra vez conserva los registros ya creados.
