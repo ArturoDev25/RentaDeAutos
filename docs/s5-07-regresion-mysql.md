@@ -25,3 +25,22 @@ y las que usan Flyway no pueden compartir la misma base:
 ## Recomendación para S5-05 y S5-06 (Docker y despliegue)
 Ejecutar el backend con `TZ=UTC` (variable de entorno en el contenedor y/o `-Duser.timezone=UTC`).
 La causa exacta de la conversión no se investigó a fondo; queda como mejora fijar la zona de forma explícita en la configuración.
+
+## Prueba manual contra MySQL (2026-11-04)
+Entorno: backend con `TZ=UTC` sobre MySQL 8.0 (Docker), base `rentadeautos_test` recién creada
+(Flyway aplicó V1..V7), frontend servido en `http://localhost:5500`.
+
+| # | Flujo | Resultado |
+|---|-------|-----------|
+| 1 | Login de personal (admin) redirige al dashboard (S5-03) | OK |
+| 2 | Registro de cliente muestra "cuenta pendiente de aprobación" | OK |
+| 3 | Registro duplicado muestra error claro (409) | OK |
+| 4 | Cliente pendiente no puede iniciar sesión | OK |
+| 5 | Aprobación y rechazo desde "Clientes pendientes" | OK |
+| 6 | Login de cliente aprobado entra al portal; el rechazado no | OK |
+| 7 | Alta de categoría, tarifa y vehículo desde el panel | OK |
+| 8 | Reserva, reserva contigua aceptada y reserva empalmada rechazada | OK |
+| 9 | Mis reservaciones y Mis rentas | OK |
+| 10 | Reportes de cliente y de administrador | OK |
+
+Nota: el seed de demo (S5-04) no estaba en `main` en ese momento, por lo que los vehículos se dieron de alta a mano.
