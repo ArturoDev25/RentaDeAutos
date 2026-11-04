@@ -40,10 +40,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * No usa @MockBean ni usuarios simulados con @WithMockUser.
  */
 @SpringBootTest(properties = {
-        "spring.datasource.url=jdbc:h2:mem:portal_s411_db;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.datasource.username=sa",
-        "spring.datasource.password=",
+        "spring.datasource.url=${TEST_DB_URL_PREFIX:jdbc:h2:mem:}portal_s411_db${TEST_DB_URL_SUFFIX:;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}",
+        "spring.datasource.driver-class-name=${TEST_DB_DRIVER:org.h2.Driver}",
+        "spring.datasource.username=${TEST_DB_USER:sa}",
+        "spring.datasource.password=${TEST_DB_PASSWORD:}",
         "spring.flyway.enabled=true",
         "spring.flyway.locations=classpath:db/migration",
         "spring.jpa.hibernate.ddl-auto=validate",
