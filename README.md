@@ -12,11 +12,17 @@ El backend se conecta a **MySQL 8.0** a través de un pool HikariCP configurado 
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `DB_URL` | URL de conexión JDBC | `jdbc:mysql://localhost:3306/rentadeautos?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC` |
 | `DB_USER` | Usuario de MySQL | `root` |
 | `DB_PASSWORD` | Contraseña de MySQL | `root` |
-| `DB_PORT` | Puerto del contenedor | `3306` |
 | `DB_NAME` | Nombre de la base de datos | `rentadeautos` |
+| `DB_PORT` | Puerto de MySQL publicado en el host | `3306` |
+| `BACKEND_PORT` | Puerto del backend publicado en el host | `8080` |
+| `FRONTEND_PORT` | Puerto del frontend publicado en el host | `80` |
+| `JWT_SECRET` | Secreto para firmar tokens JWT | `genera-una-clave-segura` |
+| `JWT_EXPIRATION_MINUTES` | Duración de los tokens JWT | `30` |
+
+Dentro de Docker, Compose construye automáticamente `DB_URL` con el host
+interno `mysql`; no debe configurarse con `localhost`.
 
 Copia la plantilla y ajusta los valores:
 
@@ -27,23 +33,30 @@ cp .env.example .env
 ### Quick Start — Docker Compose
 
 ```bash
-# 1. Levantar MySQL 8.0 (auto-inicializa el esquema en primer arranque)
+# 1. Crear la configuración local (el archivo .env no se sube al repositorio)
+cp .env.example .env
+
+# 2. Reemplazar JWT_SECRET y DB_PASSWORD en .env
+
+# 3. Levantar MySQL, backend y frontend
 docker compose up -d
 
-# 2. Verificar que el contenedor esté healthy
+# 4. Verificar los tres servicios
 docker compose ps
 
-# 3. Iniciar el backend
-cd backend && ./mvnw spring-boot:run
-
-# 4. Verificar la conexión
-curl http://localhost:8080/api/v1/health
+# 5. Verificar el backend a través del frontend/Nginx
+curl http://localhost/api/v1/health
 ```
 
 Respuesta esperada:
 ```json
 { "success": true, "data": { "status": "UP", "database": "UP", "timestamp": "..." } }
 ```
+
+El backend se construye dentro de su imagen con Maven y se ejecuta con el perfil
+`prod`. Su conexión usa el nombre de servicio `mysql`, mientras que el frontend
+usa Nginx para servir los archivos estáticos y reenviar `/api` al backend.
+Flyway ejecuta las migraciones al iniciar el backend.
 
 ### Esquema DDL
 
