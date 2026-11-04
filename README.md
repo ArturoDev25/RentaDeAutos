@@ -1,19 +1,27 @@
-# RentaDeAutos 
+# RentaDeAutos
 
-Aplicación web para administrar la operación básica de una empresa de renta de autos. El sistema centralizará clientes, vehículos, disponibilidad, reservaciones, entregas, devoluciones, incidencias y trazabilidad de las acciones realizadas por el personal.
+Aplicación web para administrar la operación básica de una empresa de renta de
+autos. El sistema centraliza clientes, vehículos, disponibilidad,
+reservaciones, entregas, devoluciones, incidencias y trazabilidad de las
+acciones realizadas por el personal.
 
 ---
 
 ## 🗄️ Infraestructura de Base de Datos
 
-El backend se conecta a **MySQL 8.0** a través de un pool HikariCP configurado en `backend/src/main/resources/application.yml`.
+El backend se conecta a **MySQL 8.0** mediante un pool HikariCP configurado en
+[`backend/src/main/resources/application.yml`](backend/src/main/resources/application.yml).
+La aplicación completa se ejecuta mediante Docker Compose, que levanta MySQL,
+el backend Spring Boot y el frontend Nginx.
 
-### Variables de entorno requeridas
+### Variables de entorno
+
+Las variables se configuran en `.env`, creado a partir de
+[`.env.example`](.env.example):
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
 | `DB_USER` | Usuario de MySQL | `root` |
-| `DB_PASSWORD` | Contraseña de MySQL | `root` |
 | `DB_NAME` | Nombre de la base de datos | `rentadeautos` |
 | `DB_PORT` | Puerto de MySQL publicado en el host | `3306` |
 | `BACKEND_PORT` | Puerto del backend publicado en el host | `8080` |
@@ -21,65 +29,95 @@ El backend se conecta a **MySQL 8.0** a través de un pool HikariCP configurado 
 | `JWT_SECRET` | Secreto para firmar tokens JWT | `genera-una-clave-segura` |
 | `JWT_EXPIRATION_MINUTES` | Duración de los tokens JWT | `30` |
 
-Dentro de Docker, Compose construye automáticamente `DB_URL` con el host
-interno `mysql`; no debe configurarse con `localhost`.
+`DB_URL` no necesita configurarse manualmente. Docker Compose la construye
+usando el host interno `mysql`; por ese motivo no debe utilizarse `localhost`
+para la conexión del backend dentro de Docker.
 
-Copia la plantilla y ajusta los valores:
+El archivo `.env` está excluido del repositorio y no debe contenerse en
+commits. Para crear la configuración local:
 
-```bash
+```powershell
 cp .env.example .env
 ```
+
+Después, reemplaza al menos `DB_PASSWORD` y `JWT_SECRET` por valores seguros.
 
 ### Quick Start — Docker Compose
 
-```bash
-# 1. Crear la configuración local (el archivo .env no se sube al repositorio)
-cp .env.example .env
+Desde la raíz del repositorio:
 
-# 2. Reemplazar JWT_SECRET y DB_PASSWORD en .env
-
-# 3. Levantar MySQL, backend y frontend
+```powershell
+# Levantar MySQL, backend y frontend
 docker compose up -d
 
-# 4. Verificar los tres servicios
+# Verificar el estado de los servicios
 docker compose ps
 
-# 5. Verificar el backend a través del frontend/Nginx
-curl http://localhost/api/v1/health
+# Consultar los logs
+docker compose logs -f
 ```
 
-Respuesta esperada:
+El backend se compila dentro de su imagen con Maven, se ejecuta con el perfil
+`prod` y utiliza el archivo `.jar` generado. MySQL cuenta con un healthcheck y
+el backend espera a que la base de datos esté disponible antes de iniciar.
+Flyway ejecuta automáticamente las migraciones al arrancar.
+
+URLs por defecto:
+
+- Frontend: <http://localhost>
+- Backend: <http://localhost:8080>
+- Health check: <http://localhost/api/v1/health>
+
+Respuesta esperada del health check:
+
 ```json
-{ "success": true, "data": { "status": "UP", "database": "UP", "timestamp": "..." } }
+{
+  "success": true,
+  "data": {
+    "status": "UP",
+    "database": "UP"
+  }
+}
 ```
 
-El backend se construye dentro de su imagen con Maven y se ejecuta con el perfil
-`prod`. Su conexión usa el nombre de servicio `mysql`, mientras que el frontend
-usa Nginx para servir los archivos estáticos y reenviar `/api` al backend.
-Flyway ejecuta las migraciones al iniciar el backend.
+El frontend utiliza Nginx para servir los archivos estáticos y reenviar las
+solicitudes `/api` al backend mediante la red interna de Docker.
 
-### Esquema DDL
+Para detener los contenedores sin eliminar los datos:
 
-El script `V1__init_schema.sql` (raíz del repositorio) define las 11 tablas normalizadas del sistema: `roles`, `usuarios_app`, `clientes`, `categorias`, `tarifas`, `vehiculos`, `reservaciones`, `entregas`, `devoluciones`, `incidencias` y `auditoria`.
+```powershell
+docker compose down
+```
 
-📖 **Guía completa de setup:** [`docs/database-setup.md`](docs/database-setup.md)
+Para detenerlos y eliminar también el volumen de MySQL:
+
+```powershell
+docker compose down -v
+```
+
+### Esquema DDL y migraciones
+
+Las migraciones versionadas de Flyway se encuentran en
+[`backend/src/main/resources/db/migration`](backend/src/main/resources/db/migration).
+La migración inicial define las tablas principales del sistema, incluyendo
+`roles`, `usuarios_app`, `clientes`, `categorias`, `tarifas`, `vehiculos`,
+`reservaciones`, `entregas`, `devoluciones`, `incidencias` y `auditoria`.
+
+📖 **Guías relacionadas:**
+
+- [`docs/database-setup.md`](docs/database-setup.md)
+- [`docs/modelo-datos.md`](docs/modelo-datos.md)
 
 ---
 
 ## 🧪 Tests automatizados y CI
 
-Las pruebas usan **H2 en memoria**, por lo que no requieren MySQL ni Docker.
-GitHub Actions las ejecuta automáticamente en cada `push` y `pull request`
-mediante [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+Las pruebas del backend usan H2 en memoria, por lo que no requieren iniciar
+MySQL ni Docker. GitHub Actions las ejecuta automáticamente en cada `push` y
+`pull request` mediante
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-Para ejecutarlas manualmente desde la raíz del repositorio:
-
-```bash
-cd backend
-./mvnw test
-```
-
-En Windows PowerShell:
+Para ejecutarlas manualmente desde la raíz en Windows PowerShell:
 
 ```powershell
 .\backend\mvnw.cmd -f .\backend\pom.xml test
@@ -88,11 +126,20 @@ En Windows PowerShell:
 El resultado esperado es `BUILD SUCCESS`, con cero fallos y errores. Para más
 opciones, consulta [`backend/src/test/README.md`](backend/src/test/README.md).
 
+El frontend cuenta con pruebas Node.js. Desde la carpeta
+[`renta-autos-app`](renta-autos-app):
+
+```powershell
+node --test
+```
+
 ---
 
 ## 🔐 Autenticación
 
-Login con JWT y BCrypt. Requiere las variables `JWT_SECRET` y `JWT_EXPIRATION_MINUTES`.
+El sistema utiliza JWT para autenticación y BCrypt para el manejo de
+contraseñas. Requiere las variables `JWT_SECRET` y
+`JWT_EXPIRATION_MINUTES`, configuradas en `.env`.
 
 📖 **Guía completa:** [`docs/autenticacion.md`](docs/autenticacion.md)
 
@@ -102,10 +149,17 @@ El cliente autenticado puede crear y consultar sus reservaciones, cancelar las
 permitidas y consultar su historial de rentas de solo lectura.
 
 Contrato, permisos, migración V6 y guía de comprobación:
-[docs/reservaciones-cliente-api.md](docs/reservaciones-cliente-api.md).
+[`docs/reservaciones-cliente-api.md`](docs/reservaciones-cliente-api.md).
 
 ## Aprobación de clientes del portal — S5-09
 
-Las cuentas creadas desde el portal quedan pendientes hasta que el personal
-las aprueba o rechaza en **Clientes pendientes**. Estados, endpoints, permisos
-y auditoría: [docs/s5-09-aprobacion-clientes.md](docs/s5-09-aprobacion-clientes.md).
+Las cuentas creadas desde el portal quedan pendientes hasta que el personal las
+aprueba o rechaza en **Clientes pendientes**. Estados, endpoints, permisos y
+auditoría:
+[`docs/s5-09-aprobacion-clientes.md`](docs/s5-09-aprobacion-clientes.md).
+
+## Otras funcionalidades documentadas
+
+- [Catálogo del cliente](docs/catalogo-cliente-api.md)
+- [Vehículos](docs/vehiculos-api.md)
+- [Tarifas](docs/tarifas-api.md)
