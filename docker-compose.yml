@@ -1,9 +1,9 @@
 # =====================================================================
 # docker-compose.yml — Sistema de Renta de Autos
-# Levanta MySQL 8.0 con auto-inicialización del esquema oficial.
+# Levanta MySQL, backend Spring Boot y frontend Nginx.
 #
 # Uso rápido:
-#   docker compose up -d
+#   docker compose up
 #   docker compose down          # detener (preserva datos)
 #   docker compose down -v       # detener + borrar volumen
 # =====================================================================
@@ -29,6 +29,34 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  backend:
+    build:
+      context: ./backend
+    container_name: rentadeautos-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-rentadeautos}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET debe definirse en .env}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-30}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+
+  frontend:
+    build:
+      context: ./renta-autos-app
+    container_name: rentadeautos-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
 
 volumes:
   mysql_data:
