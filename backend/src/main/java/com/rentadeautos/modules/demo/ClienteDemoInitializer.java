@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.demo;
 
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** S5-04, primer avance: ocho clientes ficticios; no modifica clientes existentes. */
+/** S5-04, primer avance: diez clientes ficticios con aprobación conforme a S5-09. */
 @Component
 @Order(30)
 @Profile("demo & !prod & !production")
@@ -31,7 +33,8 @@ public class ClienteDemoInitializer implements CommandLineRunner {
             new Datos("Ana", "Torres Demo"), new Datos("Luis", "Mendoza Demo"),
             new Datos("Sofía", "Ramírez Demo"), new Datos("Diego", "Herrera Demo"),
             new Datos("Valeria", "Castro Demo"), new Datos("Carlos", "Navarro Demo"),
-            new Datos("Elena", "Ríos Demo"), new Datos("Mateo", "Vargas Demo"));
+            new Datos("Elena", "Ríos Demo"), new Datos("Mateo", "Vargas Demo"),
+            new Datos("Lucía", "Ortega Demo"), new Datos("Andrés", "Salas Demo"));
 
     public ClienteDemoInitializer(ClienteRepository clientes, PasswordEncoder encoder,
             @Value("${app.demo.seed.password:}") String password) {
@@ -64,7 +67,20 @@ public class ClienteDemoInitializer implements CommandLineRunner {
                 faltantes.add(numero);
             }
         }
+        // Adaptación del seed anterior a S5-09: solo cuentas demo activas sin estado.
+        // No reactiva ni revierte revisiones del personal y no cambia contraseñas.
+        for (int numero = 1; numero <= 8; numero++) {
+            clientes.findByCorreoIgnoreCase(correo(numero)).ifPresent(cliente -> {
+                if (cliente.getEstadoAprobacion() == null && Boolean.TRUE.equals(cliente.getActivo())
+                        && cliente.tieneCuentaPortal()) {
+                    cliente.setEstadoAprobacion(EstadoAprobacionCliente.APROBADO);
+                    cliente.setFechaRevision(LocalDateTime.now());
+                    clientes.save(cliente);
+                }
+            });
+        }
         if (faltantes.isEmpty()) {
+            clientes.flush();
             return;
         }
         String hash = encoder.encode(password);
@@ -76,11 +92,15 @@ public class ClienteDemoInitializer implements CommandLineRunner {
             cliente.setApellidos(datos.apellidos());
             cliente.setCorreo(correo(numero));
             cliente.setNumeroLicencia(licencia(numero));
-            cliente.setTelefono("000000000" + numero);
+            cliente.setTelefono("00000000%02d".formatted(numero));
             cliente.setDireccion("Dirección ficticia S5-04, sin domicilio real");
             cliente.setLicenciaVencimiento(vencimiento);
             cliente.setPasswordHash(hash);
-            cliente.setActivo(true);
+            boolean aprobado = numero <= 8;
+            cliente.setActivo(aprobado);
+            cliente.setEstadoAprobacion(aprobado ? EstadoAprobacionCliente.APROBADO
+                    : EstadoAprobacionCliente.PENDIENTE);
+            cliente.setFechaRevision(aprobado ? LocalDateTime.now() : null);
             clientes.save(cliente);
         }
         clientes.flush();

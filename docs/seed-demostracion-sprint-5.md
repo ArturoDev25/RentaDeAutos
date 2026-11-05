@@ -1,20 +1,27 @@
-# S5-04 — Seed de demostración (avances 1 a 3)
+# S5-04 — Seed de demostración (avances 1 a 4)
 
 ## Alcance actual
 
-Crea ocho clientes ficticios activos, con correo `demo01@s504.example` hasta
-`demo08@s504.example`, licencias `S504-DEMO-01` a `S504-DEMO-08`, contraseña
-BCrypt y vencimiento de licencia tres años después de la carga inicial.
-Los nombres, teléfonos y domicilios son datos sintéticos.
+Crea diez clientes ficticios: `demo01@s504.example` a `demo08@s504.example`
+quedan APROBADO y activos; `demo09@s504.example` y `demo10@s504.example`
+quedan PENDIENTE e inactivos, visibles en el panel de aprobación de S5-09.
+Las licencias son S504-DEMO-01 a S504-DEMO-10, con vencimiento a tres años.
+La contraseña del entorno se guarda con BCrypt; nombres y contactos son sintéticos.
 
-No actualiza registros existentes, no restablece contraseñas ni elimina datos.
-Las coincidencias parciales de correo/licencia provocan error antes de insertar.
-La carga es transaccional. No requiere migración nueva.
+No restablece contraseñas ni elimina datos. Las coincidencias parciales de
+correo/licencia provocan error antes de insertar. Para compatibilidad con el
+primer avance, asigna APROBADO a las ocho cuentas demo anteriores únicamente
+si aún no tienen estado, están activas y tienen credenciales de portal.
+No reactiva cuentas desactivadas ni cambia aprobaciones o rechazos del personal.
+Los nuevos aprobados tienen fecha de revisión ficticia del momento de carga;
+los pendientes no tienen fecha de revisión.
 
-Este avance aún NO completa S5-04: faltan los clientes pendientes de aprobación
-y la validación del guion en el servidor de demostración.
-S5-09 aún no está integrado en el main d9c93a5 usado como base. No se simula una
-aprobación usando `activo`: aprobación y activación son conceptos diferentes.
+Se requiere S5-09 y la migración V7, ya incorporadas desde main 3b3f06a.
+Aprobación y activación son conceptos distintos. No se agrega una migración propia.
+La carga sigue siendo transaccional y opcional.
+
+Pendiente validar la carga en MySQL y las pantallas de la app. Puede hacerse
+localmente; no requiere un servidor remoto.
 
 ## Catálogo demo
 
@@ -101,8 +108,9 @@ Desde `backend`, Java 21:
 .\mvnw.cmd test
 ```
 
-Hay 25 casos específicos: nueve de clientes con H2, cinco de activación del
-contexto, cuatro del catálogo y siete de reservaciones/rentas.
+Hay 29 casos específicos: trece de clientes con H2, cinco de activación del
+contexto, cuatro del catálogo y siete de reservaciones/rentas. Se comprueba
+la visibilidad de pendientes y que no puedan iniciar sesión con contraseña correcta.
 No requieren conexión al servidor. Pendiente ejecutar contra MySQL de demostración
 cuando el SM confirme el acceso y la base destino. No eliminar el perfil ni los datos
 para volver a cargar: ejecutar otra vez conserva los registros ya creados.
@@ -116,6 +124,8 @@ disponer de ambas carpetas para incluirlas. No se ha validado ese despliegue aú
 El compose actual activa prod; el seed se bloquea deliberadamente en ese perfil.
 Usar un entorno demo dedicado y acordar su configuración con el SM.
 
-S5-09 sigue en su rama: no se inventa su aprobación en el esquema de main.
-Pendiente incorporar sus estados y completar dos clientes pendientes antes de
-considerar S5-04 terminado.
+S5-09 ya está incorporado. Los dos pendientes completan los diez clientes del
+conjunto inicial. Para ensayar aprobar y rechazar se usa la pantalla existente;
+repetir el seed conserva las decisiones y no vuelve a ponerlos pendientes.
+Si ya fueron revisados durante la demo, que no aparezcan como pendientes es el
+resultado esperado. No se borra ni reinicia la base automáticamente.

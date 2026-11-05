@@ -1,6 +1,7 @@
 package com.rentadeautos.modules.demo;
 
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,13 +61,18 @@ class ClienteDemoInitializerTest {
         return clientes.saveAndFlush(cliente);
     }
 
-    @Test void creaOchoClientesActivosConCredencialesHashYLicenciaVigente() {
+    @Test void creaDiezClientesConCredencialesYOchoAprobadosDosPendientes() {
         seed.run();
-        assertEquals(8, clientes.count());
+        assertEquals(10, clientes.count());
+        assertEquals(8, clientes.findByEstadoAprobacionOrderByIdAsc(EstadoAprobacionCliente.APROBADO).size());
+        assertEquals(2, clientes.findByEstadoAprobacionOrderByIdAsc(EstadoAprobacionCliente.PENDIENTE).size());
         for (Cliente cliente : clientes.findAll()) {
             assertTrue(cliente.getCorreo().endsWith("@s504.example"));
             assertTrue(cliente.getNumeroLicencia().startsWith("S504-DEMO-"));
-            assertTrue(cliente.getActivo());
+            boolean aprobado = cliente.getEstadoAprobacion() == EstadoAprobacionCliente.APROBADO;
+            assertEquals(aprobado, cliente.getActivo());
+            if (aprobado) assertNotNull(cliente.getFechaRevision());
+            else assertNull(cliente.getFechaRevision());
             assertTrue(cliente.getLicenciaVencimiento().isAfter(LocalDate.now()));
             assertNotEquals("Demo-S504-test-2026", cliente.getPasswordHash());
             assertTrue(encoder.matches("Demo-S504-test-2026", cliente.getPasswordHash()));
@@ -77,14 +83,14 @@ class ClienteDemoInitializerTest {
         seed.run();
         String hash = clientes.findByCorreoIgnoreCase("demo01@s504.example").orElseThrow().getPasswordHash();
         seed.run();
-        assertEquals(8, clientes.count());
+        assertEquals(10, clientes.count());
         assertEquals(hash, clientes.findByCorreoIgnoreCase("demo01@s504.example").orElseThrow().getPasswordHash());
     }
 
     @Test void conservaRegistrosAjenosAlSeed() {
         var previo = insertar("manual@example.test", "LIC-MANUAL");
         seed.run();
-        assertEquals(9, clientes.count());
+        assertEquals(11, clientes.count());
         var conservado = clientes.findById(previo.getId()).orElseThrow();
         assertEquals("Registro previo", conservado.getNombre());
         assertNull(conservado.getPasswordHash());
@@ -120,4 +126,56 @@ class ClienteDemoInitializerTest {
         assertThrows(IllegalStateException.class, () -> invalido.run());
         assertEquals(0, clientes.count());
     }
+    @Test void pendientesSonVisiblesEnLaConsultaAdministrativa() {
+        seed.run();
+        var pendientes = clientes.findByEstadoAprobacionOrderByIdAsc(EstadoAprobacionCliente.PENDIENTE);
+        assertEquals(java.util.List.of("demo09@s504.example", "demo10@s504.example"),
+                pendientes.stream().map(Cliente::getCorreo).toList());
+        assertTrue(pendientes.stream().noneMatch(Cliente::getActivo));
+    }
+
+    @Test void repetirNoRevierteAprobacionNiRechazoDePendientes() {
+        seed.run();
+        var aprobado = clientes.findByCorreoIgnoreCase("demo09@s504.example").orElseThrow();
+        aprobado.setEstadoAprobacion(EstadoAprobacionCliente.APROBADO);
+        aprobado.setActivo(true);
+        var fecha = java.time.LocalDateTime.of(2026, 11, 1, 10, 0);
+        aprobado.setFechaRevision(fecha);
+        var rechazado = clientes.findByCorreoIgnoreCase("demo10@s504.example").orElseThrow();
+        rechazado.setEstadoAprobacion(EstadoAprobacionCliente.RECHAZADO);
+        rechazado.setActivo(false);
+        rechazado.setFechaRevision(fecha);
+        clientes.saveAndFlush(aprobado);
+        clientes.saveAndFlush(rechazado);
+        seed.run();
+        assertEquals(10, clientes.count());
+        assertEquals(EstadoAprobacionCliente.APROBADO, clientes.findById(aprobado.getId()).orElseThrow().getEstadoAprobacion());
+        assertEquals(fecha, clientes.findById(aprobado.getId()).orElseThrow().getFechaRevision());
+        assertEquals(EstadoAprobacionCliente.RECHAZADO, clientes.findById(rechazado.getId()).orElseThrow().getEstadoAprobacion());
+        assertFalse(clientes.findById(rechazado.getId()).orElseThrow().getActivo());
+    }
+
+    @Test void adaptaCuentaDelSeedAnteriorSinCambiarPassword() {
+        var anterior = insertar("demo01@s504.example", "S504-DEMO-01");
+        String hash = encoder.encode("Password-previo-2026");
+        anterior.setPasswordHash(hash);
+        clientes.saveAndFlush(anterior);
+        seed.run();
+        var actualizado = clientes.findById(anterior.getId()).orElseThrow();
+        assertEquals(EstadoAprobacionCliente.APROBADO, actualizado.getEstadoAprobacion());
+        assertEquals(hash, actualizado.getPasswordHash());
+    }
+
+    @Test void loginDePendienteEsRechazadoYElDeAprobadoFunciona() {
+        seed.run();
+        var jwt = new com.rentadeautos.modules.auth.security.JwtService(
+                "clave-de-pruebas-demo-s504-no-utilizar-en-produccion-2026", 30);
+        var login = new com.rentadeautos.modules.auth.service.ClienteLoginService(clientes, encoder, jwt);
+        var aprobado = new com.rentadeautos.modules.auth.dto.LoginRequest("demo01@s504.example", "Demo-S504-test-2026");
+        var pendiente = new com.rentadeautos.modules.auth.dto.LoginRequest("demo09@s504.example", "Demo-S504-test-2026");
+        assertTrue(login.login(aprobado).isPresent());
+        assertThrows(com.rentadeautos.modules.auth.exception.CuentaClienteNoAprobadaException.class,
+                () -> login.login(pendiente));
+    }
+
 }
