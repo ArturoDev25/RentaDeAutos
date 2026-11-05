@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentadeautos.modules.auth.dto.ClienteRegistroRequest;
 import com.rentadeautos.modules.auth.exception.ClienteRegistroDuplicadoException;
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,13 +38,15 @@ class ClienteRegistroServiceTest {
                 password, "8441234567", " lic-s4-02 ", LocalDate.now().plusYears(1), null);
     }
 
-    @Test void altaActivaConNormalizacionYBCryptSinRecortarPassword() {
+    // S5-09: el alta del portal queda inactiva y pendiente de aprobación.
+    @Test void altaPendienteConNormalizacionYBCryptSinRecortarPassword() {
         when(clientes.saveAndFlush(any())).thenAnswer(inv -> {
             Cliente c = inv.getArgument(0);
             assertEquals("ana@example.test", c.getCorreo());
             assertEquals("LIC-S4-02", c.getNumeroLicencia());
             assertEquals("Ana", c.getNombre());
-            assertTrue(c.getActivo());
+            assertFalse(c.getActivo());
+            assertEquals(EstadoAprobacionCliente.PENDIENTE, c.getEstadoAprobacion());
             assertNotEquals(" Clave123! ", c.getPasswordHash());
             assertTrue(encoder.matches(" Clave123! ", c.getPasswordHash()));
             assertFalse(encoder.matches("Clave123!", c.getPasswordHash()));
@@ -52,7 +55,8 @@ class ClienteRegistroServiceTest {
         });
         var respuesta = servicio.registrar(datos(" Clave123! "));
         assertEquals(7L, respuesta.id());
-        assertTrue(respuesta.activo());
+        assertFalse(respuesta.activo());
+        assertEquals(EstadoAprobacionCliente.PENDIENTE, respuesta.estadoAprobacion());
         verify(clientes).existsByCorreoIgnoreCase("ana@example.test");
         verify(clientes).existsByNumeroLicenciaIgnoreCase("LIC-S4-02");
     }

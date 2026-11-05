@@ -107,6 +107,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/devoluciones", "/api/v1/devoluciones/**")
                     .denyAll()
 
+                // S5-09: revisión de cuentas del portal (consultar pendientes, aprobar y
+                // rechazar). Va antes de las reglas generales de clientes: el Auditor
+                // y el Cliente reciben 403.
+                .requestMatchers(HttpMethod.GET, "/api/v1/clientes/pendientes")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+                .requestMatchers(HttpMethod.PATCH,
+                    "/api/v1/clientes/*/aprobar", "/api/v1/clientes/*/rechazar")
+                    .hasAnyRole("ADMINISTRADOR", "AGENTE", "SUPERVISOR")
+
                 // Consultas de los catálogos del Sprint 2.
                 .requestMatchers(HttpMethod.GET,
                     "/api/v1/clientes", "/api/v1/clientes/**",

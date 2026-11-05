@@ -106,6 +106,12 @@ class ReservacionServiceTest {
         r.setTarifaDia(new BigDecimal("850.00"));
         when(reservaciones.findById(8L)).thenReturn(Optional.of(r));
         when(reservaciones.saveAndFlush(r)).thenReturn(r);
+        // Editar ahora registra al actor en la bitácora: se requiere sesión autenticada.
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin@ejemplo.test", null));
+        UsuarioApp usuario = new UsuarioApp();
+        ReflectionTestUtils.setField(usuario, "id", 7L);
+        when(usuarios.findByCorreo("admin@ejemplo.test")).thenReturn(Optional.of(usuario));
 
         var respuesta = servicio.editar(8L, datos(inicio.plusDays(3)));
 
@@ -117,6 +123,12 @@ class ReservacionServiceTest {
         Reservacion r = new Reservacion();
         when(reservaciones.findById(4L)).thenReturn(Optional.of(r));
         when(reservaciones.saveAndFlush(r)).thenReturn(r);
+        // Cancelar ahora registra al actor en la bitácora: se requiere sesión autenticada.
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("admin@ejemplo.test", null));
+        UsuarioApp usuario = new UsuarioApp();
+        ReflectionTestUtils.setField(usuario, "id", 7L);
+        when(usuarios.findByCorreo("admin@ejemplo.test")).thenReturn(Optional.of(usuario));
         assertEquals("CANCELADA", servicio.cancelar(4L).estado());
         assertEquals(409, assertThrows(ReservacionException.class,
                 () -> servicio.cancelar(4L)).getStatus().value());

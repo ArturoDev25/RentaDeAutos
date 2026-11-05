@@ -50,7 +50,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     function nombreCompleto(cliente) { return `${cliente.nombre} ${cliente.apellidos}`.trim(); }
     function fecha(valor) { return valor ? new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' }).format(new Date(`${valor}T00:00:00`)) : '-'; }
     function iniciales(cliente) { return `${cliente.nombre?.[0] || ''}${cliente.apellidos?.[0] || ''}`.toUpperCase(); }
-    function etiquetaEstado(cliente) { return crear('span', `veh-estado cliente-estado ${cliente.activo ? 'activo' : 'inactivo'}`, cliente.activo ? 'Activo' : 'Inactivo'); }
+    // S5-09: las cuentas del portal sin aprobar se distinguen de las inactivas.
+    const ESTADOS_REVISION = { PENDIENTE: ['pendiente', 'Pendiente'], RECHAZADO: ['rechazado', 'Rechazado'] };
+    function enRevision(cliente) { return Boolean(ESTADOS_REVISION[cliente.estadoAprobacion]); }
+    function etiquetaEstado(cliente) {
+        const [clase, texto] = ESTADOS_REVISION[cliente.estadoAprobacion] || (cliente.activo ? ['activo', 'Activo'] : ['inactivo', 'Inactivo']);
+        return crear('span', `veh-estado cliente-estado ${clase}`, texto);
+    }
     function botonAccion(clase, iconoClase, titulo, accion) {
         const boton = crear('button', `veh-accion ${clase}`); boton.type = 'button'; boton.title = titulo; boton.setAttribute('aria-label', titulo); boton.append(icono(iconoClase)); boton.addEventListener('click', accion); return boton;
     }
@@ -106,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const acciones = crear('div', 'veh-acciones'); acciones.append(botonAccion('ver', 'fa-solid fa-eye', 'Ver detalle', () => abrirDetalle(cliente)));
             if (puedeModificar) acciones.append(botonAccion('editar', 'fa-solid fa-pen', 'Editar', () => abrirFormulario(cliente)));
             if (puedeDesactivar && cliente.activo) acciones.append(botonAccion('eliminar', 'fa-solid fa-user-slash', 'Desactivar', () => desactivar(cliente)));
-            if (puedeDesactivar && !cliente.activo) acciones.append(botonAccion('activar', 'fa-solid fa-user-check', 'Activar', () => reactivar(cliente)));
+            if (puedeDesactivar && !cliente.activo && !enRevision(cliente)) acciones.append(botonAccion('activar', 'fa-solid fa-user-check', 'Activar', () => reactivar(cliente)));
             celda(acciones); return fila;
         });
         tabla.replaceChildren(...filas); dibujarPaginacion();

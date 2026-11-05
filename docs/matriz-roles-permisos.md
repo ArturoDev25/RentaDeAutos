@@ -24,6 +24,7 @@ elementos en el frontend.
 | Consultar perfil propio | Sí | Sí | Sí | Sí |
 | Consultar clientes | Sí | Sí | Sí | Sí |
 | Registrar y modificar clientes | Sí | Sí | Sí | No |
+| Aprobar o rechazar cuentas del portal (S5-09) | Sí | Sí | Sí | No |
 | Consultar vehículos | Sí | Sí | Sí | Sí |
 | Registrar y modificar vehículos | Sí | No | Sí | No |
 | Consultar reservaciones | Sí | Sí | Sí | Sí |

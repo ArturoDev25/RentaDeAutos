@@ -82,6 +82,12 @@ public class ClienteService {
     @Transactional
     public ClienteResponse reactivar(Long id) {
         Cliente cliente = buscar(id);
+        // S5-09: una cuenta del portal pendiente o rechazada se revisa en
+        // "Clientes pendientes"; reactivarla aquí saltaría la aprobación.
+        if (cliente.bloqueadoPorAprobacion()) {
+            throw new ClienteInvalidoException(
+                    "Esta cuenta del portal está pendiente o fue rechazada; revísala en Clientes pendientes");
+        }
         cliente.setActivo(true);
         return ClienteResponse.desde(clienteRepository.saveAndFlush(cliente));
     }

@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 btnEditar.addEventListener('click', () => abrirFormulario(tar));
                 divAcc.append(btnEditar);
 
-                // Botón Desactivar (solo si está activa)
+                // Desactivar si está activa; Reactivar si está inactiva.
                 if (tar.activo) {
                     const btnDesactivar = document.createElement('button');
                     btnDesactivar.type      = 'button';
@@ -224,6 +224,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     btnDesactivar.innerHTML = '<i class="fa-solid fa-ban" aria-hidden="true"></i> Desactivar';
                     btnDesactivar.addEventListener('click', () => desactivarTarifa(tar));
                     divAcc.append(btnDesactivar);
+                } else {
+                    const btnReactivar = document.createElement('button');
+                    btnReactivar.type      = 'button';
+                    btnReactivar.className = 'tar-btn';
+                    btnReactivar.setAttribute('aria-label', `Reactivar tarifa de ${tar.categoriaNombre}`);
+                    btnReactivar.innerHTML = '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reactivar';
+                    btnReactivar.addEventListener('click', () => reactivarTarifa(tar));
+                    divAcc.append(btnReactivar);
                 }
             } else {
                 // Solo lectura
@@ -458,6 +466,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await solicitar(`/v1/tarifas/${tar.id}/desactivar`, { method: 'PATCH' });
             await refrescarTrasCambio('Tarifa desactivada correctamente.');
+        } catch (error) {
+            mostrarMensaje(mensajeError(error), 'error');
+        } finally {
+            bloquear(false);
+        }
+    }
+
+    /* ── Reactivar tarifa ─────────────────────────────────────────── */
+    async function reactivarTarifa(tar) {
+        if (ocupado) return;
+
+        const confirmar = window.confirm(
+            `¿Deseas reactivar la tarifa de "${tar.categoriaNombre}"?\n` +
+            'Volverá a estar disponible para cotizar reservaciones de esa categoría.'
+        );
+        if (!confirmar) return;
+
+        ocultarMensaje();
+        bloquear(true);
+
+        try {
+            await solicitar(`/v1/tarifas/${tar.id}/reactivar`, { method: 'PATCH' });
+            await refrescarTrasCambio('Tarifa reactivada correctamente.');
         } catch (error) {
             mostrarMensaje(mensajeError(error), 'error');
         } finally {

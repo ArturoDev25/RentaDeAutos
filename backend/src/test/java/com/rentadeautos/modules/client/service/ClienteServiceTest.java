@@ -3,7 +3,9 @@ package com.rentadeautos.modules.client.service;
 import com.rentadeautos.modules.client.dto.ClienteRequest;
 import com.rentadeautos.modules.client.dto.FiltroClientes;
 import com.rentadeautos.modules.client.exception.ClienteDuplicadoException;
+import com.rentadeautos.modules.client.exception.ClienteInvalidoException;
 import com.rentadeautos.modules.client.model.Cliente;
+import com.rentadeautos.modules.client.model.EstadoAprobacionCliente;
 import com.rentadeautos.modules.client.repository.ClienteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -132,5 +135,20 @@ class ClienteServiceTest {
         verify(clienteRepository).saveAndFlush(captor.capture());
         assertNull(captor.getValue().getPasswordHash(),
                 "El alta de mostrador debe crear el cliente sin passwordHash (NULL), sin contraseñas ficticias");
+    }
+
+    // S5-09: una cuenta pendiente o rechazada no se puede "reactivar" saltándose la aprobación.
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.EnumSource(value = EstadoAprobacionCliente.class,
+            names = {"PENDIENTE", "RECHAZADO"})
+    void reactivarNoSeSaltaLaAprobacion(EstadoAprobacionCliente estado) {
+        Cliente cliente = new Cliente();
+        cliente.setActivo(false);
+        cliente.setEstadoAprobacion(estado);
+        when(clienteRepository.findById(7L)).thenReturn(Optional.of(cliente));
+
+        assertThrows(ClienteInvalidoException.class, () -> clienteService.reactivar(7L));
+        assertFalse(cliente.getActivo());
+        verify(clienteRepository, never()).saveAndFlush(any(Cliente.class));
     }
 }

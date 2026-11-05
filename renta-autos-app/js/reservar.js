@@ -3,8 +3,10 @@
 // Crea la reservación con POST /v1/cliente/reservaciones (S4-06).
 
 document.addEventListener('DOMContentLoaded', () => {
-    const HORA = 'T10:00:00';
     const SUCURSAL = 'Sucursal Saltillo';
+    const HORA_MIN = 8;              // la sucursal abre a las 8:00
+    const HORA_MAX = 20;             // y cierra a las 20:00
+    const HORA_DEFECTO = '10:00';    // hora sugerida por defecto
     const NOMBRES_PASOS = ['Selección', 'Datos', 'Confirmación', 'Resultado'];
     const NOMBRE_ESTADO = {
         PENDIENTE: 'Pendiente de confirmación',
@@ -18,16 +20,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const volver = document.getElementById('volverCatalogo');
     const params = new URLSearchParams(window.location.search);
 
+    const dos = n => String(n).padStart(2, '0');
+    const soloFecha = dt => (dt || '').slice(0, 10);
+    function hoyLocalISO() {
+        const d = new Date();
+        return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
+    }
+    // "YYYY-MM-DDTHH:MM" del momento actual, para el min de los campos datetime-local.
+    function ahoraLocalMin() {
+        const d = new Date();
+        return `${hoyLocalISO()}T${dos(d.getHours())}:${dos(d.getMinutes())}`;
+    }
+    // A partir de una fecha del catálogo (YYYY-MM-DD) sugiere fecha+hora válida:
+    // 10:00 por defecto, o la próxima hora hábil si la fecha es hoy y las 10:00 ya pasaron.
+    function sugerirDateTime(fechaISO) {
+        if (!fechaISO) return '';
+        if (fechaISO > hoyLocalISO()) return `${fechaISO}T${HORA_DEFECTO}`;
+        const d = new Date();
+        let h = d.getMinutes() > 0 ? d.getHours() + 1 : d.getHours();
+        if (h < HORA_MIN) h = HORA_MIN;
+        if (h > HORA_MAX) {                       // hoy ya cerró: sugerir mañana
+            const m = new Date(Date.now() + 86400000);
+            return `${m.getFullYear()}-${dos(m.getMonth() + 1)}-${dos(m.getDate())}T${HORA_DEFECTO}`;
+        }
+        return `${hoyLocalISO()}T${dos(h)}:00`;
+    }
+    // Días cobrados: mismo cálculo que el backend (1 + (segundos-1)/86400, mínimo 1).
+    function diasCobrados(inicioISO, finISO) {
+        const ini = new Date(inicioISO);
+        const fin = new Date(finISO);
+        if (Number.isNaN(ini.getTime()) || Number.isNaN(fin.getTime())) return 0;
+        const seg = Math.floor((fin - ini) / 1000);
+        if (seg <= 0) return 0;
+        return 1 + Math.floor((seg - 1) / 86400);
+    }
+
+    const inicioParam = Portal.esFechaISO(params.get('inicio')) ? params.get('inicio') : '';
+    const finParam = Portal.esFechaISO(params.get('fin')) ? params.get('fin') : '';
+
     const datos = {
         vehiculo: null,
-        inicio: Portal.esFechaISO(params.get('inicio')) ? params.get('inicio') : '',
-        fin: Portal.esFechaISO(params.get('fin')) ? params.get('fin') : '',
+        inicio: inicioParam ? sugerirDateTime(inicioParam) : '',
+        fin: finParam ? `${finParam}T${HORA_DEFECTO}` : '',
         observaciones: '',
         acepta: false
     };
 
-    if (datos.inicio && datos.fin) {
-        volver.href = `catalogo.html?${new URLSearchParams({ inicio: datos.inicio, fin: datos.fin }).toString()}`;
+    // El catálogo trabaja con fechas (sin hora): el enlace de volver conserva ese formato.
+    if (inicioParam && finParam) {
+        volver.href = `catalogo.html?${new URLSearchParams({ inicio: inicioParam, fin: finParam }).toString()}`;
     }
 
     // ---------- Utilidades ----------
@@ -46,16 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function urlReservar() {
         const p = new URLSearchParams();
-        if (datos.inicio) p.set('inicio', datos.inicio);
-        if (datos.fin) p.set('fin', datos.fin);
+        if (datos.inicio) p.set('inicio', soloFecha(datos.inicio));
+        if (datos.fin) p.set('fin', soloFecha(datos.fin));
         p.set('vehiculoId', datos.vehiculo.id);
         return `reservar.html?${p.toString()}`;
-    }
-
-    function fechaLarga(iso) {
-        return new Date(`${iso}T00:00:00`).toLocaleDateString('es-MX', {
-            day: 'numeric', month: 'long', year: 'numeric'
-        });
     }
 
     function fechaHora(texto) {
@@ -65,17 +100,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calcularResumen() {
-        const dias = Portal.diasEntre(datos.inicio, datos.fin);
+        const dias = diasCobrados(datos.inicio, datos.fin);
         const tarifa = Number(datos.vehiculo.tarifaDia);
         return { dias, tarifa, total: dias * tarifa };
     }
 
     // Devuelve un mensaje de error o cadena vacía si los datos son válidos
     function validarDatos() {
-        const problema = Portal.validarFechas(datos.inicio, datos.fin);
-        if (problema) return problema;
-        if (new Date(`${datos.inicio}${HORA}`) <= new Date()) {
-            return 'La recogida es a las 10:00 y para hoy ya pasó esa hora. Elige una fecha de inicio desde mañana.';
+        if (!datos.inicio || !datos.fin) return 'Selecciona la fecha y hora de recogida y de devolución.';
+        const ini = new Date(datos.inicio);
+        const fin = new Date(datos.fin);
+        if (Number.isNaN(ini.getTime()) || Number.isNaN(fin.getTime())) return 'Las fechas no son válidas.';
+        if (ini <= new Date()) return 'La recogida debe ser en un horario futuro.';
+        if (fin <= ini) return 'La devolución debe ser posterior a la recogida.';
+        if (ini.getHours() < HORA_MIN || ini.getHours() > HORA_MAX
+            || fin.getHours() < HORA_MIN || fin.getHours() > HORA_MAX) {
+            return `La sucursal atiende de ${HORA_MIN}:00 a ${HORA_MAX}:00. Elige horas dentro de ese rango.`;
         }
         return '';
     }
@@ -149,15 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedor.innerHTML = `
             <form class="card paso" id="formDatos" novalidate>
                 <h2 class="card-title">2. Datos de la reservación</h2>
-                <p class="nota"><i class="fa-solid fa-location-dot"></i> ${SUCURSAL} · Recogida y devolución a las 10:00</p>
+                <p class="nota"><i class="fa-solid fa-location-dot"></i> ${SUCURSAL} · Horario de atención: ${HORA_MIN}:00 a ${HORA_MAX}:00</p>
                 <div class="campos-fechas">
                     <div class="pt-field">
-                        <label for="fechaInicio">Fecha de inicio</label>
-                        <input type="date" id="fechaInicio" value="${e(datos.inicio)}">
+                        <label for="fechaInicio">Fecha y hora de recogida</label>
+                        <input type="datetime-local" id="fechaInicio" value="${e(datos.inicio)}">
                     </div>
                     <div class="pt-field">
-                        <label for="fechaFin">Fecha de fin</label>
-                        <input type="date" id="fechaFin" value="${e(datos.fin)}">
+                        <label for="fechaFin">Fecha y hora de devolución</label>
+                        <input type="datetime-local" id="fechaFin" value="${e(datos.fin)}">
                     </div>
                 </div>
                 <div class="pt-field">
@@ -178,8 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const estimado = document.getElementById('estimado');
         const error = document.getElementById('errorDatos');
 
-        inicio.min = Portal.hoyISO();
-        fin.min = inicio.value || Portal.hoyISO();
+        inicio.min = ahoraLocalMin();
+        fin.min = inicio.value || ahoraLocalMin();
 
         function leer() {
             datos.inicio = inicio.value;
@@ -190,11 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
         function actualizar() {
             leer();
             if (inicio.value) fin.min = inicio.value;
-            if (Portal.validarFechas(datos.inicio, datos.fin)) {
+            const { dias, total } = calcularResumen();
+            if (!dias) {
                 estimado.innerHTML = '';
                 return;
             }
-            const { dias, total } = calcularResumen();
             estimado.innerHTML = `<span>${dias} ${dias === 1 ? 'día' : 'días'} · Total estimado</span>
                 <strong>${e(Portal.moneda(total))}</strong>`;
         }
@@ -228,8 +268,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <dl class="resumen-lista">
                     <div><dt>Vehículo</dt><dd>${e(Portal.nombreVehiculo(v))} · ${e(v.categoria)}</dd></div>
                     <div><dt>Sucursal</dt><dd>${SUCURSAL}</dd></div>
-                    <div><dt>Recogida</dt><dd>${e(fechaLarga(datos.inicio))}, 10:00</dd></div>
-                    <div><dt>Devolución</dt><dd>${e(fechaLarga(datos.fin))}, 10:00</dd></div>
+                    <div><dt>Recogida</dt><dd>${e(fechaHora(datos.inicio))}</dd></div>
+                    <div><dt>Devolución</dt><dd>${e(fechaHora(datos.fin))}</dd></div>
                     <div><dt>Duración</dt><dd>${dias} ${dias === 1 ? 'día' : 'días'}</dd></div>
                     <div><dt>Tarifa por día</dt><dd>${e(Portal.moneda(tarifa))}</dd></div>
                     ${notas ? `<div><dt>Observaciones</dt><dd>${e(notas)}</dd></div>` : ''}
@@ -281,8 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enviarReservacion() {
         const cuerpo = {
             vehiculoId: Number(datos.vehiculo.id),
-            fechaInicio: `${datos.inicio}${HORA}`,
-            fechaFin: `${datos.fin}${HORA}`
+            fechaInicio: datos.inicio,
+            fechaFin: datos.fin
         };
         const notas = datos.observaciones.trim();
         if (notas) cuerpo.observaciones = notas;

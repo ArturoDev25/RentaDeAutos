@@ -3,10 +3,12 @@ package com.rentadeautos.modules.auth.controller;
 import com.rentadeautos.common.dto.ApiResponse;
 import com.rentadeautos.modules.auth.dto.LoginRequest;
 import com.rentadeautos.modules.auth.dto.LoginResponse;
+import com.rentadeautos.modules.auth.exception.CuentaClienteNoAprobadaException;
 import com.rentadeautos.modules.auth.service.ClienteLoginService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +40,14 @@ public class ClienteLoginController {
                     .body(ApiResponse.error(MENSAJE_CREDENCIALES));
         }
         return ResponseEntity.ok(ApiResponse.success(respuesta.get()));
+    }
+
+    /**
+     * S5-09: cuenta del portal pendiente de aprobación o rechazada → 403.
+     * El frontend no reintenta como personal ante un 403 y muestra este mensaje.
+     */
+    @ExceptionHandler(CuentaClienteNoAprobadaException.class)
+    public ResponseEntity<ApiResponse<Void>> cuentaNoAprobada(CuentaClienteNoAprobadaException error) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error(error.getMessage()));
     }
 }

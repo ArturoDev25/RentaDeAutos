@@ -91,10 +91,12 @@ class PortalClienteIntegrationTest {
     }
 
     @Test
-    void registroExitosoGuardaCuentaActivaBCryptSinExponerCredenciales() throws Exception {
+    void registroExitosoGuardaCuentaPendienteBCryptSinExponerCredenciales() throws Exception {
         long antes = contar("clientes");
         JsonNode respuesta = cuerpo(enviarRegistro(datosRegistro("alta")).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.activo").value(true))
+                // S5-09: la cuenta nace inactiva y pendiente de aprobación.
+                .andExpect(jsonPath("$.data.activo").value(false))
+                .andExpect(jsonPath("$.data.estadoAprobacion").value("PENDIENTE"))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.passwordHash").doesNotExist())
                 .andExpect(jsonPath("$.data.accessToken").doesNotExist()));
@@ -104,7 +106,9 @@ class PortalClienteIntegrationTest {
         assertTrue(encoder.matches(PASSWORD, hash));
         assertNotEquals(PASSWORD, hash);
         assertEquals(antes + 1, contar("clientes"));
-        assertEquals(Boolean.TRUE, jdbc.queryForObject("SELECT activo FROM clientes WHERE id = ?", Boolean.class, id));
+        assertEquals(Boolean.FALSE, jdbc.queryForObject("SELECT activo FROM clientes WHERE id = ?", Boolean.class, id));
+        assertEquals("PENDIENTE", jdbc.queryForObject(
+                "SELECT estado_aprobacion FROM clientes WHERE id = ?", String.class, id));
         assertFalse(respuesta.toString().contains(hash));
         assertFalse(respuesta.toString().contains(PASSWORD));
     }
@@ -401,6 +405,10 @@ class PortalClienteIntegrationTest {
     private Cuenta cuenta(String sufijo) throws Exception {
         var datos = datosRegistro(sufijo);
         long id = cuerpo(enviarRegistro(datos).andExpect(status().isCreated())).path("data").path("id").asLong();
+        // S5-09: el personal aprueba la cuenta antes de que el cliente pueda iniciar sesión.
+        // (El flujo HTTP completo de aprobación se prueba en ClienteAprobacionIntegrationTest.)
+        jdbc.update("UPDATE clientes SET activo = TRUE, estado_aprobacion = 'APROBADO' WHERE id = ?", id);
+        em.clear();
         String correo = datos.get("correo").toString();
         JsonNode login = cuerpo(mvc.perform(post(LOGIN).contentType("application/json")
                         .content(json.writeValueAsString(Map.of("correo", correo, "password", PASSWORD))))

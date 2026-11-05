@@ -3,12 +3,17 @@ package com.rentadeautos.modules.client.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "clientes")
@@ -51,6 +56,23 @@ public class Cliente {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    /**
+     * S5-09: estado de revisión de la cuenta del portal. Es nulo para clientes
+     * de mostrador o registrados antes de S5-09 (no participan en el flujo).
+     */
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "estado_aprobacion", length = 20)
+    private EstadoAprobacionCliente estadoAprobacion;
+
+    /** S5-09: momento en que el personal aprobó o rechazó la cuenta. */
+    @Column(name = "fecha_revision")
+    private LocalDateTime fechaRevision;
+
+    /** Fecha de alta; la columna created_at la llena la base de datos. */
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private LocalDateTime fechaRegistro;
+
     public Long getId() { return id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -70,6 +92,17 @@ public class Cliente {
     public void setDireccion(String direccion) { this.direccion = direccion; }
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
+    public EstadoAprobacionCliente getEstadoAprobacion() { return estadoAprobacion; }
+    public void setEstadoAprobacion(EstadoAprobacionCliente estadoAprobacion) { this.estadoAprobacion = estadoAprobacion; }
+    public LocalDateTime getFechaRevision() { return fechaRevision; }
+    public void setFechaRevision(LocalDateTime fechaRevision) { this.fechaRevision = fechaRevision; }
+    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
+
+    /** S5-09: la cuenta del portal espera revisión o fue rechazada por el personal. */
+    public boolean bloqueadoPorAprobacion() {
+        return estadoAprobacion == EstadoAprobacionCliente.PENDIENTE
+                || estadoAprobacion == EstadoAprobacionCliente.RECHAZADO;
+    }
 
     /**
      * Determina si el cliente cuenta con credenciales activas para acceder al portal.
@@ -91,6 +124,7 @@ public class Cliente {
                 ", licenciaVencimiento=" + licenciaVencimiento +
                 ", direccion='" + direccion + '\'' +
                 ", activo=" + activo +
+                ", estadoAprobacion=" + estadoAprobacion +
                 ", tieneCuentaPortal=" + tieneCuentaPortal() +
                 '}';
     }
