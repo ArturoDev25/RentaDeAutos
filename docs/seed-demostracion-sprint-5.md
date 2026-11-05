@@ -1,4 +1,4 @@
-# S5-04 — Seed de demostración (avances 1 y 2)
+# S5-04 — Seed de demostración (avances 1 a 3)
 
 ## Alcance actual
 
@@ -11,8 +11,8 @@ No actualiza registros existentes, no restablece contraseñas ni elimina datos.
 Las coincidencias parciales de correo/licencia provocan error antes de insertar.
 La carga es transaccional. No requiere migración nueva.
 
-Este avance NO completa S5-04: faltan los clientes pendientes de aprobación,
-y reservaciones/rentas del guion final.
+Este avance aún NO completa S5-04: faltan los clientes pendientes de aprobación
+y la validación del guion en el servidor de demostración.
 S5-09 aún no está integrado en el main d9c93a5 usado como base. No se simula una
 aprobación usando `activo`: aprobación y activación son conceptos diferentes.
 
@@ -30,6 +30,46 @@ Maven empaqueta las cinco fotos existentes del frontend como recursos del backen
 sin duplicarlas en el repositorio. Compilar desde el repositorio completo, con
 `renta-autos-app` junto a `backend`. El seed guarda las fotos en el formato
 que consume el catálogo actual.
+
+## Reservaciones y rentas demo
+
+El tercer initializer corre después de clientes y catálogo, con la misma activación
+opcional. Inserta cinco escenarios para `demo01@s504.example`:
+
+| Estado | Vehículo | Fechas relativas a la primera carga |
+|---|---|---|
+| PENDIENTE | Tsuru | Inicio en 5 días, por 3 días |
+| CONFIRMADA | Audi Q7 | Inicio en 2 días, por 3 días |
+| EN_CURSO | Tesla Model 3 | Inicio ayer, devolución dentro de 2 días |
+| FINALIZADA | BMW Serie 3 | Inicio hace 6 días, devolución hace 3 días |
+| CANCELADA | Ferrari F8 | Inicio en 9 días, por 3 días |
+
+Las fechas parten de las 09:00 del día local del servidor. Se guarda una entrega
+para la renta en curso y otra para la finalizada. Esta última tiene devolución
+registrada en plazo, sin daños ni atraso: total final igual a tres días de tarifa.
+El creador es el cliente demo; quien entrega/recibe es el administrador ficticio
+`admin@demo.local`, localizado por correo y rol, sin asumir su ID.
+
+Audi queda RESERVADO y Tesla RENTADO. Tsuru, BMW y Ferrari siguen disponibles,
+salvo que la presentación cambie posteriormente su estado. Las consultas actuales
+del catálogo, Mis reservaciones, Mis rentas y rentas activas consumen estos datos.
+Otros clientes no ven las reservaciones de demo01.
+
+Se selecciona una tarifa vigente en el inicio de cada escenario y se conserva como
+snapshot. Para fechas pasadas sin tarifa, se completa únicamente el hueco histórico
+de la categoría demo con el precio vigente actual, sin editar vigencias existentes.
+Es una tarifa ficticia de reconstrucción para la presentación.
+
+Los escenarios se identifican por observaciones `[S504-DEMO-ESTADO]`. No editar
+esas marcas. Repetir la carga conserva las fechas, importes y estados ya guardados;
+no desplaza fechas ni restaura la presentación. Si pasan varios días, la renta en
+curso puede aparecer retrasada, lo cual es coherente con que no se ha devuelto.
+No se elimina ni reinicia la base automáticamente.
+
+La carga construye un escenario sintético dentro de una transacción; no ejecuta
+los endpoints ni genera evidencias de acciones reales. Comprueba identidad demo,
+estado del vehículo y compromisos previos; usa bloqueos antes de insertar. No
+reemplaza reservaciones existentes ni fuerza unidades de mantenimiento a disponibles.
 
 ## Activación opcional
 
@@ -57,12 +97,25 @@ mantienen sin cambios en este avance y no se activan con demo por sí solo.
 Desde `backend`, Java 21:
 
 ```powershell
-.\mvnw.cmd "-Dtest=ClienteDemoInitializerTest,ClienteDemoActivacionTest,CatalogoDemoInitializerTest" test
+.\mvnw.cmd "-Dtest=ClienteDemoInitializerTest,ClienteDemoActivacionTest,CatalogoDemoInitializerTest,ReservacionesDemoInitializerTest" test
 .\mvnw.cmd test
 ```
 
-Hay 18 casos: nueve de carga de clientes con H2, cinco de activación del
-contexto y cuatro del catálogo demo.
+Hay 25 casos específicos: nueve de clientes con H2, cinco de activación del
+contexto, cuatro del catálogo y siete de reservaciones/rentas.
 No requieren conexión al servidor. Pendiente ejecutar contra MySQL de demostración
 cuando el SM confirme el acceso y la base destino. No eliminar el perfil ni los datos
 para volver a cargar: ejecutar otra vez conserva los registros ya creados.
+
+## Coordinación con Docker y S5-09
+
+El main 3b3f06a incorpora Docker. Antes de integrar y desplegar esta rama hay que
+coordinar el empaquetado de fotos: el Dockerfile actual compila solo backend,
+mientras el POM del seed toma las imágenes de renta-autos-app. El build debe
+disponer de ambas carpetas para incluirlas. No se ha validado ese despliegue aún.
+El compose actual activa prod; el seed se bloquea deliberadamente en ese perfil.
+Usar un entorno demo dedicado y acordar su configuración con el SM.
+
+S5-09 sigue en su rama: no se inventa su aprobación en el esquema de main.
+Pendiente incorporar sus estados y completar dos clientes pendientes antes de
+considerar S5-04 terminado.
