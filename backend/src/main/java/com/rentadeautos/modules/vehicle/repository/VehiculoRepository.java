@@ -15,6 +15,8 @@ import java.util.Optional;
  * Acceso a datos de los vehículos.
  */
 public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
+    Optional<Vehiculo> findByPlacaIgnoreCase(String placa);
+
 
     boolean existsByPlacaIgnoreCase(String placa);
 

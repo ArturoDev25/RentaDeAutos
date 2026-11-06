@@ -1,0 +1,11 @@
+# Perfil exclusivo de demostración. Usar una base separada, no la de producción.
+# No activa los initializers antiguos de los perfiles dev/default.
+spring:
+  datasource:
+    url: ${DEMO_DB_URL:jdbc:mysql://localhost:3306/rentadeautos_demo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+
+app:
+  demo:
+    seed:
+      enabled: ${DEMO_SEED_ENABLED:false}
+      password: ${DEMO_SEED_PASSWORD:}
