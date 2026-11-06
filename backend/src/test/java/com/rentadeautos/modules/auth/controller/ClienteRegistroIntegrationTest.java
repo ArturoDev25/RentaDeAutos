@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:registro_s402_db;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE",
+        "spring.datasource.url=${TEST_DB_URL_PREFIX:jdbc:h2:mem:}registro_s402_db${TEST_DB_URL_SUFFIX:;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}",
         "spring.flyway.enabled=true",
         "spring.flyway.locations=classpath:db/migration",
         "spring.jpa.hibernate.ddl-auto=validate",

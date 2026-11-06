@@ -33,3 +33,67 @@ jobs:
             backend/target/surefire-reports/*.txt
           if-no-files-found: warn
           retention-days: 7
+
+  # S5-07: mismas pruebas, pero contra un MySQL 8 real (el job "test" sigue usando H2).
+  test-mysql:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      # El sistema asume que la JVM corre en UTC (igual que serverTimezone=UTC de la conexion).
+      TZ: UTC
+      TEST_DB_URL_PREFIX: jdbc:mysql://127.0.0.1:3306/
+      TEST_DB_URL_SUFFIX: ?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+      TEST_DB_DRIVER: com.mysql.cj.jdbc.Driver
+      TEST_DB_USER: root
+      TEST_DB_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Pruebas de repositorio contra MySQL (@DataJpaTest)
+        working-directory: backend
+        env:
+          SPRING_TEST_DATABASE_REPLACE: none
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rentadeautos_jpa_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+        run: ./mvnw -B -ntp test -Dtest='ReporteClienteRepositoryTest,ReservacionClienteRepositoryTest,ReservacionPortalAltaTest,TarifaDataInitializerTest,VehiculoRepositoryTest,TarifaRepositoryTest,CatalogoRepositoryTest,RentaActivaRepositoryTest'
+
+      - name: Resto de las pruebas contra MySQL (migraciones Flyway V1..V7)
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/rentadeautos_app_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+        run: ./mvnw -B -ntp test -Dtest='!ReporteClienteRepositoryTest,!ReservacionClienteRepositoryTest,!ReservacionPortalAltaTest,!TarifaDataInitializerTest,!VehiculoRepositoryTest,!TarifaRepositoryTest,!CatalogoRepositoryTest,!RentaActivaRepositoryTest'
+
+      - name: Conservar reportes de pruebas (MySQL)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-pruebas-backend-mysql
+          path: |
+            backend/target/surefire-reports/*.xml
+            backend/target/surefire-reports/*.txt
+          if-no-files-found: warn
+          retention-days: 7

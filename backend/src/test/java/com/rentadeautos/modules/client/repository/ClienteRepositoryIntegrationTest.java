@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
@@ -24,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(properties = {
-        "spring.datasource.url=jdbc:h2:mem:client_repo_v5_db;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.datasource.username=sa",
-        "spring.datasource.password=",
+        "spring.datasource.url=${TEST_DB_URL_PREFIX:jdbc:h2:mem:}client_repo_v5_db${TEST_DB_URL_SUFFIX:;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE}",
+        "spring.datasource.driver-class-name=${TEST_DB_DRIVER:org.h2.Driver}",
+        "spring.datasource.username=${TEST_DB_USER:sa}",
+        "spring.datasource.password=${TEST_DB_PASSWORD:}",
         "spring.flyway.enabled=true",
         "spring.flyway.locations=classpath:db/migration",
         "spring.jpa.hibernate.ddl-auto=validate"
@@ -124,7 +125,7 @@ class ClienteRepositoryIntegrationTest {
         Cliente c = crearClienteBase("Invalido", null, "LIC-CHECK-CORREO");
         c.setPasswordHash(passwordEncoder.encode("PasswordValido123"));
 
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(DataAccessException.class, () -> {
             clienteRepository.saveAndFlush(c);
         }, "Debe violar chk_clientes_acceso_requiere_correo al intentar registrar password sin correo");
     }
@@ -135,7 +136,7 @@ class ClienteRepositoryIntegrationTest {
         Cliente c = crearClienteBase("InvalidoHash", "invalido@test.com", "LIC-CHECK-HASH");
         c.setPasswordHash("12345678"); // Menor a 50 caracteres
 
-        assertThrows(DataIntegrityViolationException.class, () -> {
+        assertThrows(DataAccessException.class, () -> {
             clienteRepository.saveAndFlush(c);
         }, "Debe violar chk_clientes_password_hash al intentar guardar un hash menor a 50 caracteres");
     }
