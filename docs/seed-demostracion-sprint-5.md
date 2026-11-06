@@ -1,4 +1,4 @@
-# S5-04 — Seed de demostración (avances 1 a 4)
+# S5-04 — Seed de demostración (avances 1 a 5)
 
 ## Alcance actual
 
@@ -129,3 +129,50 @@ conjunto inicial. Para ensayar aprobar y rechazar se usa la pantalla existente;
 repetir el seed conserva las decisiones y no vuelve a ponerlos pendientes.
 Si ya fueron revisados durante la demo, que no aparezcan como pendientes es el
 resultado esperado. No se borra ni reinicia la base automáticamente.
+
+## Avance 5 Ampliación de datos ficticios
+
+Se agregan 50 clientes, 150 vehículos sin fotos y 54 escenarios operativos al
+conjunto inicial, por solicitud del SM. Son datos sintéticos; se usan nombres
+verosímiles y correos bajo el dominio reservado s504-ampliado.example.
+Los teléfonos son ficticios y las licencias llevan el prefijo S504-CLI-.
+
+- ClientelaDemoInitializer, orden 52: 40 activos (portal aprobado o mostrador),
+  6 pendientes INACTIVOS y 4 rechazados INACTIVOS. No restablece contraseñas
+  ni decisiones del personal sobre clientes ya creados.
+- FlotaDemoInitializer, orden 55: 10 categorías, 150 vehículos con placas
+  S504-FLT-001 a S504-FLT-150 y VIN propios. 16 inician en mantenimiento,
+  8 en baja y 126 disponibles. Las categorías existentes se conservan; se
+  completan huecos de tarifa con vigencias sin traslape desde seis meses atrás.
+  No se modifica una tarifa existente ni se reactiva una categoría inactiva.
+- OperacionDemoInitializer, orden 70: 18 EN_CURSO, 14 FINALIZADAS,
+  12 CONFIRMADAS, 6 PENDIENTES y 4 CANCELADAS; 32 entregas y 14 devoluciones.
+  Solo selecciona identidades de esta ampliación, no registros manuales.
+  Valida compromisos previos y copia la tarifa vigente para la fecha de inicio.
+  Requiere operadores ficticios activos autorizados: no usa cualquier usuario
+  como reemplazo si faltan.
+
+Cada escenario usa un vehículo distinto y se identifica como [S504-OP:01] a
+[S504-OP:54] en observaciones. No editar estas marcas. Una carga posterior
+conserva estados y fechas y completa los escenarios faltantes si todavía pueden
+crearse válidamente; no fuerza vehículos comprometidos. Las devoluciones
+coinciden con el kilometraje actual del auto y sus importes pactados.
+Las cargas tienen transacciones separadas por initializer: si falla operación,
+clientela y flota ya cargadas pueden conservarse. No es una única transacción
+para todos los initializers. No se ha validado concurrencia entre dos arranques
+de la aplicación: ejecutar la carga en una sola instancia demo.
+
+En una base inicialmente vacía, los totales combinados son 60 clientes,
+155 vehículos, 13 categorías y 59 reservaciones; los datos preexistentes
+pueden cambiar esos totales. Los 150 vehículos nuevos no tienen foto: los
+cinco del seed original sí. Mantiene el perfil demo y la activación explícita.
+
+Las pruebas de la ampliación son 22: 7 de clientela, 6 de flota y 9 de operación.
+Combinadas con las 29 anteriores suman 51 casos específicos. Su ejecución en el
+equipo del desarrollador sigue pendiente hasta obtener el resumen de Maven.
+
+Desde backend, Java 21:
+
+```powershell
+.\mvnw.cmd "-Dtest=ClienteDemoInitializerTest,ClienteDemoActivacionTest,CatalogoDemoInitializerTest,ReservacionesDemoInitializerTest,ClientelaDemoInitializerTest,FlotaDemoInitializerTest,OperacionDemoInitializerTest" test
+```
