@@ -1,9 +1,15 @@
 # Manual de usuario del portal del cliente — RentaDeAutos
 
-**Tarea:** S4-12 — Documentar el portal y actualizar el manual de usuario  
-**Sprint:** 4  
-**Tipo de documento:** Manual de usuario  
-**Ubicación sugerida en el repositorio:** `docs/manual-usuario-portal-cliente.md`
+Acceso para la demostración: https://srv01.tailb2f071.ts.net/login.html
+
+**Origen:** S4-12. Actualización: S5-08.
+**Tipo:** Manual de usuario del portal y aprobación por el personal.
+**Base revisada:** commit `3b4380d062de6154ad1f71c6ceb9d3faadfcf883`.
+**Fecha de revisión documental:** 6 de noviembre de 2026.
+
+La revisión se realizó sobre el código y la documentación de esa versión.
+La correspondencia con el servidor se registra por separado en
+[la verificación S5-08](s5-08-verificacion-y-ensayo.md).
 
 ## 1. Introducción
 
@@ -13,29 +19,72 @@ Este manual describe el uso de las opciones visibles en el portal. La disponibil
 
 ## 2. Acceso al portal
 
-### 2.1 Inicio de sesión
+### 2.1 Inicio de sesión de clientes y personal
 
-1. Abrir la página de inicio de sesión.
-2. Escribir el correo electrónico en el campo **Correo Electrónico**.
-3. Introducir la contraseña en el campo **Contraseña**.
-4. Seleccionar **INGRESAR**.
-5. Si las credenciales son válidas, el sistema permitirá acceder al portal correspondiente a la cuenta.
+1. Abrir `login.html` desde la dirección de la aplicación que proporcione el equipo.
+2. Escribir el correo y la contraseña. El botón del ojo permite mostrar u ocultar la contraseña.
+3. Seleccionar **INGRESAR**.
+4. Una cuenta de cliente aprobada y activa entra al portal; una cuenta activa de
+   personal entra al panel administrativo.
+5. Si la sesión venció, iniciar sesión de nuevo antes de continuar.
 
-Si no se puede iniciar sesión, verificar que el correo y la contraseña estén escritos correctamente. Si el problema continúa, comprobar que el servicio de autenticación esté disponible o contactar al responsable del sistema.
+Con credenciales incorrectas se muestra un mensaje genérico. Una cuenta pendiente
+o rechazada no puede entrar. Si su contraseña es correcta, se informa el estado
+de la solicitud. Si una cuenta aprobada se desactiva posteriormente, también pierde
+el acceso. Contactar al personal si se requiere revisar el estado de la cuenta.
 
-![Pantalla de inicio de sesión](imagenes/InicioDeSesion.png)
+El personal no crea sus cuentas desde el registro público; utiliza la cuenta que
+le asigna la administración. No hay verificación por correo ni recuperación
+automática de contraseña mediante email en este alcance.
 
-### 2.2 Registro de una cuenta
+### 2.2 Registro de una cuenta de cliente
 
-1. En la pantalla de inicio de sesión, seleccionar **Regístrate aquí**.
-2. Completar los campos que solicite el formulario de registro.
-3. Revisar que la información sea correcta.
-4. Enviar el formulario y leer el mensaje que muestre el sistema.
-5. Si el registro se completa correctamente, regresar al inicio de sesión e ingresar con las credenciales registradas.
+1. Desde el login, abrir la opción de registro.
+2. Capturar nombre, apellidos, correo electrónico, teléfono, número de licencia,
+   fecha de vencimiento y contraseña. La dirección es opcional.
+3. Usar un correo con formato válido y una licencia cuyo vencimiento sea posterior
+   al día actual. La contraseña admite entre 6 y 72 caracteres y no más de
+   72 bytes UTF-8; algunos caracteres acentuados o emojis ocupan varios bytes.
+4. Revisar los avisos del formulario y seleccionar **REGISTRARSE**.
+5. Si el correo o la licencia ya están registrados, corregir los datos o consultar
+   al personal. No enviar repetidamente la solicitud.
+6. Al finalizar, el formulario muestra **“Tu cuenta quedó pendiente de aprobación”**.
+   El registro no inicia una sesión y todavía no permite entrar al portal.
+7. Esperar la revisión del personal. Después de ser aprobada, entrar desde el login
+   con las mismas credenciales.
 
-Los campos exactos del formulario y las validaciones pueden variar según la versión desplegada del portal.
+La autorización la puede realizar un administrador, agente o supervisor.
+Una cuenta rechazada permanece inhabilitada. Los datos de cuentas anteriores y
+altas de mostrador conservan el comportamiento previo.
 
-![Pantalla de Registro](imagenes/RegistroExitoso.png)
+### 2.2.1 Aprobar o rechazar cuentas desde el panel
+
+Procedimiento para **ADMINISTRADOR, AGENTE y SUPERVISOR**:
+
+1. Iniciar sesión como personal y abrir **Clientes pendientes**.
+2. Identificar al solicitante por nombre, correo y licencia. Revisar los datos de
+   contacto y el aviso de vigencia de licencia.
+3. Para autorizar, seleccionar **Aprobar** y confirmar la acción cuando la interfaz
+   lo solicite. La cuenta queda **APROBADO**, activa, y puede iniciar sesión.
+4. Para denegar, seleccionar **Rechazar**, capturar un motivo opcional de hasta
+   255 caracteres y confirmar la acción. Queda **RECHAZADO** e inactiva.
+5. Leer el resultado, actualizar la vista y comprobar que la cuenta ya no aparezca
+   como pendiente. El sistema registra la revisión en auditoría.
+
+Si otra persona ya revisó la cuenta, el sistema puede mostrar un conflicto; actualizar
+la lista antes de continuar. Una cuenta pendiente o rechazada no se habilita con
+el botón de activación normal de **Clientes**. Este flujo no permite revisar de nuevo
+una cuenta que ya dejó de estar pendiente.
+
+El auditor y el cliente no están autorizados para consultar ni ejecutar estas
+acciones. En caso de acceso denegado, no utilizar las credenciales de otra persona.
+
+| Estado de aprobación | Activa | Acceso al portal |
+|---|---|---|
+| PENDIENTE | No | No |
+| APROBADO | Sí | Sí |
+| RECHAZADO | No | No |
+| APROBADO y desactivada posteriormente | No | No |
 
 ### 2.3 Cierre de sesión
 
@@ -118,7 +167,7 @@ El portal presenta el proceso de reservación en cuatro etapas: **Selección**, 
 
 1. Revisar la sucursal indicada para la recogida y devolución.
 2. Seleccionar la **Fecha de inicio**.
-3. Seleccionar la **Fecha de fin**.
+3. Seleccionar la **Fecha de fin**, posterior al inicio. Para una reserva nueva, elegir un inicio futuro.
 4. Agregar observaciones si se considera necesario; el campo **Observaciones** aparece como opcional.
 5. Revisar la duración y el total estimado.
 6. Seleccionar **Continuar**.
@@ -179,20 +228,28 @@ La sección **Mis reservaciones** permite revisar las reservaciones de la cuenta
 
 El portal advierte que la cancelación libera la unidad apartada y que la acción no se puede deshacer. Por eso, se debe verificar la reservación antes de confirmar.
 
-La opción de cancelación puede depender del estado de la reservación y de las reglas del sistema.
+Solo se pueden cancelar reservaciones propias **PENDIENTE** o **CONFIRMADA**
+cuya fecha de inicio aún sea futura. No se puede cancelar una reservación
+EN_CURSO, FINALIZADA, CANCELADA o cuya fecha de inicio ya pasó.
 
 ![Cancelar una reservacion](imagenes/CancelarReservacion.png)
 
 ## 8. Consultar Mis rentas
 
-La sección **Mis rentas** está destinada a consultar la información de las rentas asociadas con la cuenta del cliente.
+Esta sección es de **solo lectura** y muestra únicamente rentas de la cuenta
+actual que tienen una entrega registrada y están **EN_CURSO** o **FINALIZADA**.
+Una reserva pendiente o confirmada todavía no aparece como renta.
 
-1. Seleccionar **Mis rentas** en el menú lateral.
-2. Revisar los registros que muestre el sistema.
-3. Abrir los detalles disponibles, si la interfaz ofrece esa opción.
-4. Comprobar la información y el estado que aparezcan en cada registro.
+1. Abrir **Mis rentas**.
+2. Elegir **Todas**, **Renta activa** o **Finalizadas**.
+3. Revisar vehículo, folio, fechas y estado.
+4. Seleccionar **Ver detalles** para consultar la entrega, devolución prevista,
+   devolución real cuando exista, tarifa y los importes disponibles.
+5. Cerrar el detalle con **Cerrar** o el icono de cierre.
 
-La información visible dependerá de las rentas registradas y de la versión de la aplicación. Una reservación pendiente no debe interpretarse automáticamente como una renta finalizada.
+Una renta activa muestra el importe estimado. Cuando existe devolución, se muestra
+el total final guardado. El cliente no registra entregas ni devoluciones desde
+esta sección; esas operaciones las realiza el personal.
 
 ## 9. Consultar reportes e historial de operaciones
 
@@ -253,7 +310,11 @@ Las condiciones sobre documentos, pagos, cobertura, modificaciones y asistencia 
 
 | Situación | Qué hacer |
 |---|---|
-| No se puede iniciar sesión. | Verificar el correo y la contraseña e intentar de nuevo. Si continúa, comprobar que el servicio de autenticación esté disponible. |
+| No se puede iniciar sesión. | Verificar credenciales, aprobación y que la cuenta siga activa. |
+| Cuenta pendiente de aprobación. | Esperar la revisión del personal; el registro exitoso no concede acceso inmediato. |
+| Cuenta rechazada. | Consultar al personal. La cuenta no puede entrar al portal. |
+| Correo o licencia duplicados. | Revisar los datos y consultar al personal si ya existe una cuenta. |
+| Vehículo ocupado en esas fechas. | Elegir otro vehículo o periodo; no se guarda una reserva traslapada. |
 | El catálogo no muestra los resultados esperados. | Revisar los filtros de categoría y precio y seleccionar **Buscar** nuevamente. |
 | No se encuentra un vehículo. | Probar otra categoría o rango de precio y revisar los criterios de búsqueda. |
 | Las fechas no se aceptan. | Revisar las fechas de inicio y fin y los mensajes que muestre el sistema. |
@@ -277,12 +338,19 @@ Las condiciones sobre documentos, pagos, cobertura, modificaciones y asistencia 
 
 ## 12. Alcance y mantenimiento del manual
 
-Este documento se basa en las opciones y los flujos identificados en las pantallas disponibles del portal del cliente. La documentación debe actualizarse cuando cambien los formularios, los estados, los mensajes, las reglas de negocio o la navegación.
+Este documento actualiza el manual de S4-12 para el flujo de S5-09. Conserva los
+procedimientos del catálogo, reservaciones, reportes y ayuda. Las capturas
+conservadas de S4-12 son referencias visuales; deben contrastarse con el despliegue
+antes de sustituirlas por capturas nuevas. Se retiraron las capturas antiguas de
+login y registro para no representar como vigente el acceso inmediato.
 
-Los procedimientos que dependan de servicios del backend deben comprobarse en un entorno funcional antes de considerarse verificados. Las capturas de pantalla pueden agregarse en una actualización posterior, cuando se pueda ejecutar la aplicación y confirmar cada flujo.
+El sistema opera con Sucursal Saltillo y no cobra en línea al crear la reserva.
+La aprobación de una **cuenta** y la confirmación de una **reservación** son pasos
+distintos. Tras la confirmación del personal se registra la entrega, y después la
+devolución con el costo final.
 
-## 13. Conclusión
+Documentos relacionados:
 
-El portal de RentaDeAutos reúne las funciones principales para que el cliente consulte vehículos, filtre el catálogo, revise los detalles, solicite reservaciones, consulte sus operaciones y acceda al centro de ayuda. Este manual describe los pasos generales para utilizar esas opciones y destaca aspectos importantes como la confirmación pendiente y el carácter estimado de los importes.
-
-Mantener esta documentación alineada con la aplicación facilita el uso del sistema y permite actualizar la guía conforme avance el desarrollo del proyecto.
+- [Guía de despliegue Ubuntu](s5-08-guia-despliegue-ubuntu.md).
+- [Guion de demostración](s5-08-guion-demo.md).
+- [Verificación de versión y acta de ensayo](s5-08-verificacion-y-ensayo.md).
